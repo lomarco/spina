@@ -3,7 +3,8 @@ use std::{
     io::{
         BufReader,
         Read
-    }
+    },
+    env // FIXME: Delet this line
 };
 
 const MAGIC: [u8; 4] = *b"SPIN";
@@ -18,7 +19,15 @@ struct Header {
 }
 
 fn main() -> std::io::Result<()> {
-    let file = File::open("bc.spc")?;
+    // FIXME: Delete this lines
+    let args: Vec<String> = env::args().collect();
+    if args.len() != 2 {
+        println!("usage: {}: <filename> ", args[0]);
+    }
+    let filename = &args[1];
+    // FIXME: Delete this lines
+
+    let file = File::open(filename)?;
     let mut reader = BufReader::new(file);
 
     let mut magic = [0u8; 4];
