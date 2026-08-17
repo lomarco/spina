@@ -33,12 +33,8 @@ fn main() -> std::io::Result<()> {
     let mut magic = [0u8; 4];
     reader.read_exact(&mut magic)?;
 
-    if magic == MAGIC {
-        println!("magic number:");
-        println!("{}", std::str::from_utf8(&magic).expect("Magic number fault"));
-        println!("{:#04x?}", magic);
-    } else {
-        println!("magic fault!!!");
+    if magic != MAGIC {
+        println!("magic fault: '{}'", std::str::from_utf8(&magic).expect("Magic number fault"));
     }
 
     Ok(())
