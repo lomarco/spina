@@ -4,7 +4,7 @@ use std::{
         BufReader,
         Read
     },
-    env // FIXME: Delet this line
+    env // FIXME: Replace this code to clap
 };
 
 const MAGIC: [u8; 4] = *b"SPIN";
@@ -19,13 +19,13 @@ struct Header {
 }
 
 fn main() -> std::io::Result<()> {
-    // FIXME: Delete this lines
+    // FIXME: Replace this code to clap
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
         println!("usage: {}: <filename> ", args[0]);
     }
     let filename = &args[1];
-    // FIXME: Delete this lines
+    // FIXME: Replace this code to clap
 
     let file = File::open(filename)?;
     let mut reader = BufReader::new(file);
