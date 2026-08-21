@@ -13,7 +13,7 @@ struct Flags(u16);
 
 impl Flags {
     const OPTIMIZE: Self = Self(1 << 0);
-    const SWAG: Self     = Self(1 << 1);
+    const DEBUG: Self     = Self(1 << 1);
 
     fn from(bits: u16) -> Self {
         Self(bits)
