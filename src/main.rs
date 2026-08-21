@@ -44,10 +44,6 @@ fn main() -> std::io::Result<()> {
     let mut magic = [0u8; 4];
     reader.read_exact(&mut magic)?;
 
-    if magic != MAGIC {
-        println!("magic fault: '{}'", std::str::from_utf8(&magic).expect("Magic number fault"));
-    }
-
     let mut flags = [0u8; 2];
     reader.read_exact(&mut flags)?;
 
