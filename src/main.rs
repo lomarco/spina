@@ -9,9 +9,20 @@ use std::{
 
 const MAGIC: [u8; 4] = *b"SPIN";
 
+struct Flags(u16);
+
+impl Flags {
+    const OPTIMIZE: Self = Self(1 << 0);
+    const SWAG: Self     = Self(1 << 1);
+
+    fn from(bits: u16) -> Self {
+        Self(bits)
+    }
+}
+
 struct Header {
     magic: u32,
-    flags: u16,
+    flags: Flags,
     constant_pool_count: u32,
     constant_pool_offset: u32,
     functions_count: u32,
