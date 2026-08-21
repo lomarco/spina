@@ -7,7 +7,7 @@ use std::{
     env // FIXME: Replace this code to clap
 };
 
-const MAGIC: [u8; 4] = *b"SPIN";
+const MAGIC: u32 = 0x5350494e;
 
 struct Flags(u16);
 
