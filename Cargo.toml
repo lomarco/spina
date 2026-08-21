@@ -3,4 +3,11 @@ name = "spina"
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
+[[bin]]
+path = "crates/core/main.rs"
+name = "spina"
+
+[workspace]
+members = [
+    "crates/bc"
+]

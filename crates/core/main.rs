@@ -29,6 +29,35 @@ struct Header {
     functions_offset: u32
 }
 
+enum Tags {
+    Int,
+    Float,
+    IntRef,
+    FloatRef,
+    FuncRef
+}
+
+enum Data {
+    Int(i32),
+    Float(f32),
+    IntRef(u32),
+    FloatRef(u32),
+    FuncRef(u32)
+}
+
+struct Constant {
+    tag: Tags,
+    data_len: u32,
+    data: Data
+}
+
+struct Function {
+    name_index: u32,
+    param_count: u16,
+    locals_count: u16,
+    code: Vec<u8>
+}
+
 fn main() -> std::io::Result<()> {
     // FIXME: Replace this code to clap
     let args: Vec<String> = env::args().collect();
