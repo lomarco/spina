@@ -1,11 +1,4 @@
-use std::{
-    fs::File,
-    io::{
-        BufReader,
-        Read
-    },
-    env // FIXME: Replace this code to clap
-};
+use std::env; // FIXME: Replace this code to clap
 
 use bc::{
     ;

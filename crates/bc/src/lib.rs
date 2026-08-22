@@ -1,3 +1,11 @@
+use std::{
+    fs::File,
+    io::{
+        BufReader,
+        Read
+    },
+};
+
 const MAGIC: u32 = 0x5350494e;
 
 struct Flags(u16);
