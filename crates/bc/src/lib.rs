@@ -44,7 +44,7 @@ impl Header {
             functions_offset: 0
         }
     }
-    fn decode(r: &mut impl Read) -> Result<Self, Error> { // TODO: Add error.rs for magic number
+    fn decode(&mut self, r: &mut impl Read) -> Result<(), Error> { // TODO: Add error.rs for magic number
                                                           // checking and the rest fields of Header.
         let mut magic = [0u8; 4];
         r.read_exact(&mut magic)?;
@@ -63,14 +63,14 @@ impl Header {
 
         let mut functions_offset = [0u8; 4];
         r.read_exact(&mut functions_offset)?;
-        Ok(Self {
-            magic: u32::from_le_bytes(magic),
-            flags: Flags::from(u16::from_le_bytes(flags)),
-            constant_pool_count: u32::from_le_bytes(constant_pool_count),
-            constant_pool_offset: u32::from_le_bytes(constant_pool_offset),
-            functions_count: u32::from_le_bytes(functions_count),
-            functions_offset: u32::from_le_bytes(functions_offset),
-        })
+
+        self.magic = u32::from_le_bytes(magic);
+        self.flags = Flags::from(u16::from_le_bytes(flags));
+        self.constant_pool_count = u32::from_le_bytes(constant_pool_count);
+        self.constant_pool_offset = u32::from_le_bytes(constant_pool_offset);
+        self.functions_count = u32::from_le_bytes(functions_count);
+        self.functions_offset = u32::from_le_bytes(functions_offset);
+        Ok(())
     }
 }
 
@@ -117,8 +117,8 @@ impl Spc {
             functions: Vec::new()
         }
     }
-    pub fn decode_from(&self, r: &impl Read) -> Result <()> {
-        self::Header.decode(r)?;
+    pub fn decode_from(&mut self, r: &mut impl Read) -> Result <(), Error> {
+        self.header.decode(r)?;
         Ok(())
     }
 }
