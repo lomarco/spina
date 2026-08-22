@@ -30,7 +30,8 @@ struct Header {
     constant_pool_count: u32,
     constant_pool_offset: u32,
     functions_count: u32,
-    functions_offset: u32
+    functions_offset: u32 // FIXME: Maybe add timestamp
+}
 
 impl Header {
     fn new() -> Self {
