@@ -117,7 +117,7 @@ impl Spc {
             constant: Vec::new(),
             functions: Vec::new()
         }
-    },
+    }
     pub fn decode_from(&self, r: &impl Read) -> Result <()> {
         self::Header.decode(r)?;
         Ok(())
