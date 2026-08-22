@@ -9,8 +9,10 @@ name = "spina"
 
 [workspace]
 members = [
-    "crates/bc"
+    "crates/bc",
+    "crates/lex"
 ]
 
 [dependencies]
 bc = {path = "crates/bc"}
+lex = {path = "crates/lex"}
