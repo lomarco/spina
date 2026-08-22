@@ -13,6 +13,11 @@ struct Flags(u16);
 impl Flags {
     const OPTIMIZE: Self = Self(1 << 0);
     const DEBUG: Self    = Self(1 << 1);
+    const NONE: Self     = Self(0);
+
+    fn new() -> Self {
+        Self::NONE
+    }
 
     fn from(bits: u16) -> Self {
         Self(bits)
