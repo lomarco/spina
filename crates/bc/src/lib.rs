@@ -45,7 +45,8 @@ impl Header {
             functions_offset: 0
         }
     }
-    fn decode(r: &mut impl Read) -> Result<Self, Error> { // TODO: Add error.rs
+    fn decode(r: &mut impl Read) -> Result<Self, Error> { // TODO: Add error.rs for magic number
+                                                          // checking and the rest fields of Header.
         let mut magic = [0u8; 4];
         r.read_exact(&mut magic)?;
 
