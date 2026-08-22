@@ -1,4 +1,5 @@
 use logos::Logos; // TODO: Rewrite it for myself
+use std::ops::Range;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
@@ -52,4 +53,20 @@ pub enum Token<'source> {
     I32,
 
     Eof,
+}
+
+#[derive(Debug)]
+pub struct SpannedToken<'src> {
+    token: Token<'src>,
+    span: Range<usize>
+}
+
+pub fn flex<'source>(content: &'source str) -> Result<Vec<SpannedToken<'source>>, ()> {
+    let mut tokens: Vec<SpannedToken<'source>> = Vec::with_capacity(512);
+
+    for (res, span) in Token::lexer(content).spanned() {
+        tokens.push(SpannedToken {token: res?, span: span});
+    }
+
+    Ok(tokens)
 }
