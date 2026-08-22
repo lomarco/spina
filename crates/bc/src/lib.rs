@@ -91,7 +91,7 @@ enum Data {
     FuncRef(u32)
 }
 
-struct Constant {
+struct Constant { // TODO: Add soa
     tag: Tags,
     data_len: u32,
     data: Data
