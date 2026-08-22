@@ -31,6 +31,18 @@ struct Header {
     constant_pool_offset: u32,
     functions_count: u32,
     functions_offset: u32
+
+impl Header {
+    fn new() -> Self {
+        Self {
+            magic: 0,
+            flags: Flags::new(),
+            constant_pool_count: 0,
+            constant_pool_offset: 0,
+            functions_count: 0,
+            functions_offset: 0
+        }
+    }
 }
 
 enum Tags {
