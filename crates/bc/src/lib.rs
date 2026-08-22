@@ -59,8 +59,18 @@ struct Function {
 
 struct Spc {
     header: Header,
-    constant: Constant,
-    functions: Function,
+    constant: Vec<Constant>,
+    functions: Vec<Function>,
+}
+
+impl Spc {
+    pub fn new() -> Self {
+        Self {
+            header: Header::new(),
+            constant: Vec::new(),
+            functions: Vec::new()
+        }
+    },
 }
 
 #[cfg(test)]
