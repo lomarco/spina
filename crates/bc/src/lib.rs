@@ -2,7 +2,8 @@ use std::{
     fs::File,
     io::{
         BufReader,
-        Read
+        Read,
+        Error // TODO: Add error.rs
     },
 };
 
@@ -43,6 +44,33 @@ impl Header {
             functions_count: 0,
             functions_offset: 0
         }
+    }
+    fn decode(r: &mut impl Read) -> Result<Self, Error> { // TODO: Add error.rs
+        let mut magic = [0u8; 4];
+        r.read_exact(&mut magic)?;
+
+        let mut flags = [0u8; 2];
+        r.read_exact(&mut flags)?;
+
+        let mut constant_pool_count = [0u8; 4];
+        r.read_exact(&mut constant_pool_count)?;
+
+        let mut constant_pool_offset = [0u8; 4];
+        r.read_exact(&mut constant_pool_offset)?;
+
+        let mut functions_count = [0u8; 4];
+        r.read_exact(&mut functions_count)?;
+
+        let mut functions_offset = [0u8; 4];
+        r.read_exact(&mut functions_offset)?;
+        Ok(Self {
+            magic: u32::from_le_bytes(magic),
+            flags: Flags::from(u16::from_le_bytes(flags)),
+            constant_pool_count: u32::from_le_bytes(constant_pool_count),
+            constant_pool_offset: u32::from_le_bytes(constant_pool_offset),
+            functions_count: u32::from_le_bytes(functions_count),
+            functions_offset: u32::from_le_bytes(functions_offset),
+        })
     }
 }
 
