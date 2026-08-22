@@ -11,3 +11,6 @@ name = "spina"
 members = [
     "crates/bc"
 ]
+
+[dependencies]
+bc = {path = "crates/bc"}
