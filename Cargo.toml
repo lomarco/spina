@@ -14,6 +14,7 @@ members = [
 ]
 
 [dependencies]
+anyhow = "^1.0.104"
 bc = {path = "crates/bc"}
 lex = {path = "crates/lex"}
 

@@ -1,8 +1,11 @@
-use std::env; // FIXME: Replace this code to clap
+use anyhow::{Context, Result}; // TODO: Delete it
 use lex::flex;
-use std::fs::File;
-use std::io::Read;
-use std::process::ExitCode;
+
+use std::{
+    env, // FIXME: Replace this code to clap
+    fs::read_to_string,
+    process::ExitCode,
+};
 
 fn run() -> Result<()> {
     // FIXME: Replace this code to clap
@@ -13,8 +16,8 @@ fn run() -> Result<()> {
     let filename = &args[1];
     // FIXME: Replace this code to clap
 
-    let mut cont = String::new();
-    File::open(filename)?.read_to_string(&mut cont)?;
+    let cont =
+        read_to_string(filename).with_context(|| format!("failed to read file '{}'", filename))?;
     match flex(&cont) {
         Ok(tokens) => println!("{tokens:?}"),
         Err(err) => return Err(err.into()),
