@@ -66,8 +66,8 @@ pub enum Token<'source> {
 
 #[derive(Debug)]
 pub struct SpannedToken<'src> {
-    token: Token<'src>,
-    span: Range<usize>
+    pub token: Token<'src>,
+    pub span: Range<usize>,
 }
 
 pub fn flex<'source>(content: &'source str) -> Result<Vec<SpannedToken<'source>>> {
