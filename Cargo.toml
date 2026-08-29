@@ -16,3 +16,6 @@ members = [
 [dependencies]
 bc = {path = "crates/bc"}
 lex = {path = "crates/lex"}
+
+[workspace.dependencies]
+thiserror = "^2"
