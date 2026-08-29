@@ -1,5 +1,14 @@
 use logos::Logos; // TODO: Rewrite it for myself
 use std::ops::Range;
+use thiserror::Error;
+
+#[derive(Error, Debug, Clone, PartialEq)]
+pub enum LexError {
+    #[error("unexpected char '{char}' on position {position}")]
+    UnexpectedChar { char: char, position: usize },
+}
+
+pub type Result<T> = std::result::Result<T, LexError>;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
@@ -51,21 +60,32 @@ pub enum Token<'source> {
 
     #[token("i32")]
     I32,
-
-    Eof,
 }
 
 #[derive(Debug)]
 pub struct SpannedToken<'src> {
-    token: Token<'src>,
-    span: Range<usize>
+    pub token: Token<'src>,
+    pub span: Range<usize>,
 }
 
-pub fn flex<'source>(content: &'source str) -> Result<Vec<SpannedToken<'source>>, ()> {
+pub fn flex<'source>(content: &'source str) -> Result<Vec<SpannedToken<'source>>> {
     let mut tokens: Vec<SpannedToken<'source>> = Vec::with_capacity(512);
 
     for (res, span) in Token::lexer(content).spanned() {
-        tokens.push(SpannedToken {token: res?, span: span});
+        match res {
+            Ok(token) => tokens.push(SpannedToken {
+                token: token,
+                span: span,
+            }),
+            Err(_) => {
+                return Err(LexError::UnexpectedChar {
+                    position: span.start,
+                    char: content[span.clone()].chars().next().unwrap(), // TODO: Rewrite it, and
+                                                                         // add lines around a error
+                                                                         // line number and etc.
+                });
+            }
+        }
     }
 
     Ok(tokens)
