@@ -60,8 +60,6 @@ pub enum Token<'source> {
 
     #[token("i32")]
     I32,
-
-    Eof,
 }
 
 #[derive(Debug)]
