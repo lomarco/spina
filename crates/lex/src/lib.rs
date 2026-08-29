@@ -82,6 +82,7 @@ pub fn flex<'source>(content: &'source str) -> Result<Vec<SpannedToken<'source>>
                     position: span.start,
                     char: content[span.clone()].chars().next().unwrap(), // TODO: Rewrite it, and
                                                                          // add lines around a error
+                                                                         // line number and etc.
                 });
             }
         }
