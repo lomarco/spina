@@ -10,13 +10,15 @@ name = "spina"
 [workspace]
 members = [
     "crates/bc",
-    "crates/lex"
+    "crates/lex",
+    "crates/parser"
 ]
 
 [dependencies]
 anyhow = "^1.0.104"
 bc = {path = "crates/bc"}
 lex = {path = "crates/lex"}
+parser = {path = "crates/parser"}
 
 [workspace.dependencies]
 thiserror = "^2"
