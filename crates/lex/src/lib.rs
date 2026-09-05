@@ -1,6 +1,6 @@
 use logos::Logos; // TODO: Rewrite it for myself
-use std::ops::Range;
 use thiserror::Error;
+use common::Span;
 
 #[derive(Error, Debug, Clone, PartialEq)]
 pub enum LexError {
@@ -65,7 +65,7 @@ pub enum Token<'source> {
 #[derive(Debug)]
 pub struct SpannedToken<'src> {
     pub token: Token<'src>,
-    pub span: Range<usize>,
+    pub span: Span,
 }
 
 pub fn flex<'source>(content: &'source str) -> Result<Vec<SpannedToken<'source>>> {
@@ -75,7 +75,7 @@ pub fn flex<'source>(content: &'source str) -> Result<Vec<SpannedToken<'source>>
         match res {
             Ok(token) => tokens.push(SpannedToken {
                 token: token,
-                span: span,
+                span: Span::from(span),
             }),
             Err(_) => {
                 return Err(LexError::UnexpectedChar {

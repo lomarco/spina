@@ -11,7 +11,8 @@ name = "spina"
 members = [
     "crates/bc",
     "crates/lex",
-    "crates/parser"
+    "crates/parser",
+    "crates/common"
 ]
 
 [dependencies]
@@ -21,4 +22,5 @@ lex = {path = "crates/lex"}
 parser = {path = "crates/parser"}
 
 [workspace.dependencies]
+common = {path = "crates/common"}
 thiserror = "^2"
