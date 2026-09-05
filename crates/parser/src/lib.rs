@@ -1,3 +1,5 @@
+use common::Span;
+
 pub enum BinOpKind {
     /// The `+` operator (addition)
     Add,
