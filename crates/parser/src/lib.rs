@@ -1,4 +1,5 @@
 use common::Span;
+use lex::SpannedToken;
 
 pub enum BinOpKind {
     /// The `+` operator (addition)

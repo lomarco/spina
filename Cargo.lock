@@ -83,6 +83,7 @@ name = "parser"
 version = "0.1.0"
 dependencies = [
  "common",
+ "lex",
 ]
 
 [[package]]
@@ -126,7 +127,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bc",
- "lex",
  "parser",
 ]
 
