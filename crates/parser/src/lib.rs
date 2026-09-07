@@ -84,4 +84,7 @@ pub struct Parser<'a> {
     tokens: Vec<Spanned<Token<'a>>>,
 }
 
+pub struct Item {
+    pub kind: ItemKind,
+    pub span: Span,
 }
