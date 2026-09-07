@@ -14,3 +14,8 @@ impl From<Range<usize>> for Span {
         }
     }
 }
+
+pub struct Spanned<T> {
+    pub t: T,
+    pub span: Span,
+}

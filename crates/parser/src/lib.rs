@@ -1,4 +1,4 @@
-use common::Span;
+use common::{Span, Spanned};
 use lex::SpannedToken;
 
 pub struct Unit {
@@ -42,11 +42,6 @@ pub enum BinOpKind {
     Ge,
     /// The `>` operator (greater than)
     Gt,
-}
-
-pub struct Spanned<T> {
-    pub node: T,
-    pub span: Span,
 }
 
 pub type BinOp = Spanned<BinOpKind>;
