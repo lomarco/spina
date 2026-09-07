@@ -14,10 +14,3 @@ impl From<Range<usize>> for Span {
         }
     }
 }
-
-#[derive(Debug)]
-pub struct SpannedToken<'src> {
-    pub token: Token<'src>,
-    pub span: Span,
-}
-

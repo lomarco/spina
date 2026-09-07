@@ -1,6 +1,6 @@
 use logos::Logos; // TODO: Rewrite it for myself
 use thiserror::Error;
-use common::{Span, SpannedToken};
+use common::Span;
 
 #[derive(Error, Debug, Clone, PartialEq)]
 pub enum LexError {
@@ -60,6 +60,12 @@ pub enum Token<'source> {
 
     #[token("i32")]
     I32,
+}
+
+#[derive(Debug)]
+pub struct SpannedToken<'src> {
+    pub token: Token<'src>,
+    pub span: Span,
 }
 
 pub fn flex<'source>(content: &'source str) -> Result<Vec<SpannedToken<'source>>> {

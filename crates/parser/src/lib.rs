@@ -1,4 +1,4 @@
-use common::{Span, SpannedToken};
+use common::Span;
 
 pub enum BinOpKind {
     /// The `+` operator (addition)
