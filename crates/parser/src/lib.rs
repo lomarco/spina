@@ -1,5 +1,5 @@
 use common::{Span, Spanned};
-use lex::SpannedToken;
+use lex::Token;
 
 pub struct Unit {
     pub items: Vec<Item>,
@@ -80,6 +80,8 @@ pub enum ExprKind {
     Ret(Option<Box<Expr>>),
 }
 
-pub struct Parse {
-    tokens: Vec<SpannedToken<'source>>,
+pub struct Parser<'a> {
+    tokens: Vec<Spanned<Token<'a>>>,
+}
+
 }
