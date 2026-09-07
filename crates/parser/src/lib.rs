@@ -1,6 +1,10 @@
 use common::Span;
 use lex::SpannedToken;
 
+pub struct Unit {
+    pub items: Vec<Item>,
+}
+
 pub enum BinOpKind {
     /// The `+` operator (addition)
     Add,
