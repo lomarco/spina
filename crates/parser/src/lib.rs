@@ -5,6 +5,12 @@ pub struct Unit {
     pub items: Vec<Item>,
 }
 
+pub struct ForLoop {
+    pub pat: Box<Pat>,
+    pub iter: Box<Expr>,
+    pub body: Box<Block>,
+}
+
 pub struct Block {
     pub stmts: Vec<Stmt>,
     pub span: Span,
