@@ -89,14 +89,14 @@ pub enum ExprKind {
     Lit(token::Lit),
     Let(Box<Pat>, Box<Expr>, Span),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
-    While(Box<Expr>, Box<Block>, Option<Label>),
+    While(Box<Expr>, Box<Block>),
     ForLoop(Box<ForLoop>),
-    Loop(Box<Block>, Option<Label>, Span),
-    Block(Box<Block>, Option<Label>),
+    Loop(Box<Block>, Span),
+    Block(Box<Block>),
     Field(Box<Expr>, Ident),
     Index(Box<Expr>, Box<Expr>, Span),
-    Break(Option<Label>, Option<Box<Expr>>),
-    Continue(Option<Label>),
+    Break(Option<Box<Expr>>),
+    Continue(), // FIXME: Add Label
     Ret(Option<Box<Expr>>),
 }
 
