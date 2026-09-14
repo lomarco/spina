@@ -5,6 +5,42 @@ pub struct Unit {
     pub items: Vec<Item>,
 }
 
+pub enum LocalKind {
+    /// Local declaration.
+    /// Example: `let x;`
+    Decl,
+    /// Local declaration with an initializer.
+    /// Example: `let x = y;`
+    Init(Box<Expr>),
+}
+
+pub struct Local {
+    pub super_: Option<Span>,
+    pub pat: Box<Pat>,
+    pub ty: Option<Box<Ty>>,
+    pub kind: LocalKind,
+    pub span: Span,
+    pub colon_sp: Option<Span>,
+}
+
+pub enum StmtKind {
+    /// A local (let) binding.
+    Let(Box<Local>),
+    /// An item definition.
+    Item(Box<Item>),
+    /// Expr without trailing semi-colon.
+    Expr(Box<Expr>),
+    /// Expr with a trailing semi-colon.
+    Semi(Box<Expr>),
+    /// Just a trailing semi-colon.
+    Empty,
+}
+
+pub struct Stmt {
+    pub kind: StmtKind,
+    pub span: Span,
+}
+
 pub struct Ident {
     pub name: Symbol,
     pub span: Span,
