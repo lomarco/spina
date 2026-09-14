@@ -10,6 +10,29 @@ pub struct Ident {
     pub span: Span,
 }
 
+pub struct Symbol(SymbolIndex);
+
+pub enum LitKind {
+    Bool, // AST only, must never appear in a `Token`
+    Byte,
+    Char,
+    Integer, // e.g. `1`, `1u8`, `1f32`
+    Float,   // e.g. `1.`, `1.0`, `1e3f32`
+    Str,
+    StrRaw(u8), // raw string delimited by `n` hash symbols
+    ByteStr,
+    ByteStrRaw(u8), // raw byte string delimited by `n` hash symbols
+    CStr,
+    CStrRaw(u8),
+    Err(ErrorGuaranteed),
+}
+
+pub struct Lit {
+    pub kind: LitKind,
+    pub symbol: Symbol,
+    pub suffix: Option<Symbol>,
+}
+
 pub struct ForLoop {
     pub pat: Box<Pat>,
     pub iter: Box<Expr>,
