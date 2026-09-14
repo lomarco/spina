@@ -24,7 +24,6 @@ pub enum LitKind {
     ByteStrRaw(u8), // raw byte string delimited by `n` hash symbols
     CStr,
     CStrRaw(u8),
-    Err(ErrorGuaranteed),
 }
 
 pub struct Lit {
