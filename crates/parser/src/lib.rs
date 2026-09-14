@@ -5,6 +5,11 @@ pub struct Unit {
     pub items: Vec<Item>,
 }
 
+pub struct Block {
+    pub stmts: Vec<Stmt>,
+    pub span: Span,
+}
+
 pub enum PatKind {
     Expr(Box<Expr>),
 }
