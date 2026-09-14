@@ -113,7 +113,7 @@ pub enum ExprKind {
     Tup(Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
-    Lit(token::Lit),
+    Lit(Lit),
     Let(Box<Pat>, Box<Expr>, Span),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
