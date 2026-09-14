@@ -165,6 +165,35 @@ pub enum ExprKind {
 
 pub struct Parser<'a> {
     tokens: Vec<Spanned<Token<'a>>>,
+pub enum TyKind { // FIXME: Add primitives types
+    /// A fixed length array (`[T; n]`).
+    Array(Box<Ty>, AnonConst),
+    /// A raw pointer (`*const T` or `*mut T`).
+    Ptr(MutTy),
+    /// Placeholder for a kind that has failed to be defined.
+    Err(ErrorGuaranteed),
+}
+
+pub struct Ty {
+    pub kind: TyKind,
+    pub span: Span,
+}
+
+pub struct ConstItem {
+    pub ident: Ident,
+    pub ty: Box<Ty>,
+    pub body: Option<Box<Expr>>,
+}
+
+pub struct Fn {
+    pub ident: Ident,
+    pub ty: Box<Ty>,
+    pub body: Option<Box<Block>>,
+}
+
+pub enum ItemKind {
+    Const(Box<ConstItem>),
+    Fn(Box<Fn>),
 }
 
 pub struct Item {
