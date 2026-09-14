@@ -5,6 +5,15 @@ pub struct Unit {
     pub items: Vec<Item>,
 }
 
+pub enum PatKind {
+    Expr(Box<Expr>),
+}
+
+pub struct Pat {
+    pub kind: PatKind,
+    pub span: Span,
+}
+
 pub enum BinOpKind {
     /// The `+` operator (addition)
     Add,
