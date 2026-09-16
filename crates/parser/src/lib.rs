@@ -165,6 +165,8 @@ pub enum ExprKind {
 
 pub struct Parser<'a> {
     tokens: Vec<Spanned<Token<'a>>>,
+}
+
 pub enum TyKind { // FIXME: Add primitives types
     /// A fixed length array (`[T; n]`).
     Array(Box<Ty>, AnonConst),
