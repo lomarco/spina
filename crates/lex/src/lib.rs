@@ -12,7 +12,7 @@ pub type Result<T> = std::result::Result<T, LexError>;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
-pub enum Token<'source> {
+pub enum TokenKind<'source> {
     #[token("=")]
     Eq,
 
@@ -64,10 +64,10 @@ pub enum Token<'source> {
 
 // TODO: Add TokenStream struct
 
-pub fn flex<'source>(content: &'source str) -> Result<Vec<Spanned<Token<'source>>>> {
-    let mut tokens: Vec<Spanned<Token<'source>>> = Vec::with_capacity(512);
+pub fn flex<'source>(content: &'source str) -> Result<Vec<Spanned<TokenKind<'source>>>> {
+    let mut tokens: Vec<Spanned<TokenKind<'source>>> = Vec::with_capacity(512);
 
-    for (res, span) in Token::lexer(content).spanned() {
+    for (res, span) in TokenKind::lexer(content).spanned() {
         match res {
             Ok(token) => tokens.push(Spanned {
                 t: token,
