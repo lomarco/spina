@@ -60,6 +60,25 @@ pub enum TokenKind<'source> {
 
     #[token("i32")]
     I32,
+
+    Dummy
+}
+
+pub const DUMMY_SP: Span = Span { start: 0, end: 0 };
+
+pub struct Token<'a> {
+    pub kind: TokenKind<'a>,
+    pub span: Span,
+}
+
+impl<'a> Token<'a> {
+    pub const fn new(kind: TokenKind<'a>, span: Span) -> Self {
+        Token { kind, span }
+    }
+
+    pub fn dummy() -> Self {
+        Token::new(TokenKind::Dummy, DUMMY_SP)
+    }
 }
 
 // TODO: Add TokenStream struct
