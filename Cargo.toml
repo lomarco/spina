@@ -23,4 +23,5 @@ parser = {path = "crates/parser"}
 [workspace.dependencies]
 common = {path = "crates/common"}
 lex = {path = "crates/lex"}
+session = {path = "crates/session"}
 thiserror = "^2"

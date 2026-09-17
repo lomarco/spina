@@ -1,5 +1,6 @@
 use common::{Span, Spanned};
 use lex::Token;
+use session::Session;
 
 pub struct Unit {
     pub items: Vec<Item>,
