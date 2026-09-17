@@ -12,8 +12,8 @@ members = [
     "crates/bc",
     "crates/lex",
     "crates/parser",
-    "crates/common"
-]
+    "crates/common",
+    "crates/session"]
 
 [dependencies]
 anyhow = "^1.0.104"
