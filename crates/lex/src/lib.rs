@@ -62,6 +62,8 @@ pub enum Token<'source> {
     I32,
 }
 
+// TODO: Add TokenStream struct
+
 pub fn flex<'source>(content: &'source str) -> Result<Vec<Spanned<Token<'source>>>> {
     let mut tokens: Vec<Spanned<Token<'source>>> = Vec::with_capacity(512);
 
