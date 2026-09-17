@@ -164,6 +164,27 @@ pub enum ExprKind {
     Ret(Option<Box<Expr>>),
 }
 
+pub fn new_parser_from_file<'a>(file: &String, sp: Option<Span>) -> Result<Parser<'a>, Vec<Diag<'a>>> {
+    let cont = read_to_string(file).unwrap_or_else(|e| {
+        use std::io::ErrorKind;
+
+        match e.kind() {
+            ErrorKind::NotFound => format!("couldn't find file `{}`", file),
+            ErrorKind::PermissionDenied => {
+                format!("permission denied when opening file `{}`", file)
+            }
+            ErrorKind::IsADirectory => format!("`{}` is a directory", file),
+            _ => format!("couldn't read `{}`: {}", file, e),
+        }
+    });
+
+    let mut parser = Parser::new();
+    Ok(parser)
+}
+
+pub fn parse<'a>(file: &String) -> Unit { // TODO: Add new_parser_from_source_str
+    new_parser_from_file(file, None).parse_unit()
+}
 pub struct Parser<'a> {
     tokens: Vec<Spanned<Token<'a>>>,
 }

@@ -15,13 +15,7 @@ fn run() -> Result<()> {
     }
     let filename = &args[1];
     // FIXME: Replace this code to clap
-
-    let cont =
-        read_to_string(filename).with_context(|| format!("failed to read file '{}'", filename))?;
-    match flex(&cont) {
-        Ok(tokens) => println!("{tokens:?}"),
-        Err(err) => return Err(err.into()),
-    }
+    let mut unit = parse(filename); // TODO: Move all file opening logic to parse_from_file
 
     Ok(())
 }
