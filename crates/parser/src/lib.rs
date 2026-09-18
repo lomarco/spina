@@ -1,7 +1,8 @@
 use common::{Span, Spanned};
+use lex::flex;
+use std::fs::read_to_string;
 use lex::Token;
-use session::Session;
-use lex::TokenKind;
+use std::slice::Iter;
 
 pub struct Unit {
     pub items: Vec<Item>,
@@ -186,10 +187,28 @@ pub fn new_parser_from_file<'a>(file: &str, sp: Option<Span>) -> Result<Parser<'
 pub fn parse<'a>(file: &String) -> Unit { // TODO: Add new_parser_from_source_str
     new_parser_from_file(file, None).parse_unit()
 }
+
 pub struct Parser<'a> {
-    tokens: Vec<Spanned<Token<'a>>>,
+    pub token: Token<'a>,
+    token_cursor: Iter<'a, Spanned<Token<'a>>>,
+    break_last_token: u32,
+    num_bump_calls: u32,
 }
 
+impl<'a> Parser<'a> {
+    pub fn new(stream: Iter<'a, Spanned<Token<'a>>>) -> Self {
+        let mut parser = Parser {
+            token: Token::dummy(),
+            token_cursor: stream, // TODO: Add TokenCursor
+            break_last_token: 0,
+            num_bump_calls: 0
+        };
+
+        parser.bump();
+
+        parser
+    }
+}
 pub enum TyKind { // FIXME: Add primitives types
     /// A fixed length array (`[T; n]`).
     Array(Box<Ty>, AnonConst),
