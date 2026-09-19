@@ -1,6 +1,6 @@
 use logos::Logos; // TODO: Rewrite it for myself
 use thiserror::Error;
-use common::{Span, Spanned};
+use common::Span;
 
 #[derive(Error, Debug, Clone, PartialEq)]
 pub enum LexError {
@@ -79,17 +79,22 @@ impl<'a> Token<'a> {
     }
 }
 
+pub struct TokenStream<'a> (Vec<Token<'a>>);
+
+impl<'a> TokenStream<'a> {
+    pub fn new(tss: Vec<Token<'a>>) -> Self {
+        Self(tss)
+    }
+}
+
 // TODO: Add TokenStream struct
 
-pub fn flex<'source>(content: &'source str) -> Result<Vec<Spanned<TokenKind<'source>>>> {
-    let mut tokens: Vec<Spanned<TokenKind<'source>>> = Vec::with_capacity(512);
+pub fn flex<'source>(content: &'source str) -> Result<TokenStream<'source>, LexError> {
+    let mut tokens: Vec<Token> = Vec::with_capacity(512);
 
     for (res, span) in TokenKind::lexer(content).spanned() {
         match res {
-            Ok(token) => tokens.push(Spanned {
-                t: token,
-                span: Span::from(span),
-            }),
+            Ok(token) => tokens.push(Token::new(token, Span::from(span))),
             Err(_) => {
                 return Err(LexError::UnexpectedChar {
                     position: span.start,
@@ -101,5 +106,5 @@ pub fn flex<'source>(content: &'source str) -> Result<Vec<Spanned<TokenKind<'sou
         }
     }
 
-    Ok(tokens)
+    Ok(TokenStream::new(tokens))
 }
