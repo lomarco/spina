@@ -78,6 +78,17 @@ impl<'a> Token<'a> {
     }
 }
 
+pub struct TokenCursor<'a> {
+    stream: TokenStream<'a>,
+    next_idx: usize
+}
+
+impl<'a> TokenCursor<'a> {
+    pub fn new(stream: TokenStream<'a>) -> Self {
+        TokenCursor { stream: stream, next_idx: 0}
+    }
+}
+
 pub struct TokenStream<'a> (Vec<Token<'a>>);
 
 impl<'a> TokenStream<'a> {

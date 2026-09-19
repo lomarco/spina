@@ -1,7 +1,7 @@
 use common::{Span, Spanned};
 use lex::flex;
 use std::fs::read_to_string;
-use lex::Token;
+use lex::{Token, TokenStream, TokenCursor};
 use std::slice::Iter;
 
 // TODO: Add dcx
@@ -192,19 +192,21 @@ pub fn parse<'a>(file: &String) -> Unit { // TODO: Add new_parser_from_source_st
 
 pub struct Parser<'a> {
     pub token: Token<'a>,
-    token_cursor: Iter<'a, Spanned<Token<'a>>>,
+    token_cursor: TokenCursor<'a>,
     break_last_token: u32,
     num_bump_calls: u32,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(stream: Iter<'a, Spanned<Token<'a>>>) -> Self {
-        let mut parser = Parser {
+    pub fn new(stream: TokenStream<'a>) -> Self {
+        Parser {
             token: Token::dummy(),
-            token_cursor: stream, // TODO: Add TokenCursor
+            token_cursor: TokenCursor::new(stream),
             break_last_token: 0,
             num_bump_calls: 0
-        };
+        }
+    }
+}
 
         parser.bump();
 
