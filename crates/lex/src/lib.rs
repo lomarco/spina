@@ -88,19 +88,19 @@ impl<'a> TokenStream<'a> {
 
 // TODO: Add TokenStream struct
 
-pub fn flex<'source>(content: &'source str) -> Result<TokenStream<'source>, LexError> {
+pub fn flex<'source>(content: &'source str) -> Result<TokenStream<'source>, String> {
     let mut tokens: Vec<Token> = Vec::with_capacity(512);
 
     for (res, span) in TokenKind::lexer(content).spanned() {
         match res {
             Ok(token) => tokens.push(Token::new(token, Span::from(span))),
             Err(_) => {
-                return Err(LexError::UnexpectedChar {
-                    position: span.start,
-                    char: content[span.clone()].chars().next().unwrap(), // TODO: Rewrite it, and
-                                                                         // add lines around a error
-                                                                         // line number and etc.
-                });
+                let position = span.start;
+                let ch = content[span.clone()]
+                    .chars()
+                    .next()
+                    .unwrap();
+                return Err(format!("unexpected char '{ch}' on position {position}"));
             }
         }
     }
