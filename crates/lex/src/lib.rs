@@ -8,8 +8,6 @@ pub enum LexError {
     UnexpectedChar { char: char, position: usize },
 }
 
-pub type Result<T> = std::result::Result<T, LexError>;
-
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
 pub enum TokenKind<'source> {
