@@ -2,11 +2,10 @@ use logos::Logos; // TODO: Rewrite it for myself
 use thiserror::Error;
 use common::Span;
 
-#[derive(Error, Debug, Clone, PartialEq)]
-pub enum LexError {
-    #[error("unexpected char '{char}' on position {position}")]
-    UnexpectedChar { char: char, position: usize },
-}
+// pub enum LexError {
+//    #[error("unexpected char '{char}' on position {position}")]
+//    UnexpectedChar { char: char, position: usize },
+//}
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
