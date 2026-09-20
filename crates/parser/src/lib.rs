@@ -208,11 +208,6 @@ impl<'a> Parser<'a> {
     }
 }
 
-        parser.bump();
-
-        parser
-    }
-}
 pub enum TyKind { // FIXME: Add primitives types
     /// A fixed length array (`[T; n]`).
     Array(Box<Ty>, AnonConst),
