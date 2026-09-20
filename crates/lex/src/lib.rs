@@ -1,18 +1,15 @@
 use logos::Logos; // TODO: Rewrite it for myself
-use std::ops::Range;
 use thiserror::Error;
+use common::Span;
 
-#[derive(Error, Debug, Clone, PartialEq)]
-pub enum LexError {
-    #[error("unexpected char '{char}' on position {position}")]
-    UnexpectedChar { char: char, position: usize },
-}
-
-pub type Result<T> = std::result::Result<T, LexError>;
+// pub enum LexError {
+//    #[error("unexpected char '{char}' on position {position}")]
+//    UnexpectedChar { char: char, position: usize },
+//}
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
-pub enum Token<'source> {
+pub enum TokenKind<'source> {
     #[token("=")]
     Eq,
 
@@ -60,33 +57,64 @@ pub enum Token<'source> {
 
     #[token("i32")]
     I32,
+
+    Dummy
 }
 
-#[derive(Debug)]
-pub struct SpannedToken<'src> {
-    pub token: Token<'src>,
-    pub span: Range<usize>,
+pub const DUMMY_SP: Span = Span { start: 0, end: 0 };
+
+pub struct Token<'a> {
+    pub kind: TokenKind<'a>,
+    pub span: Span,
 }
 
-pub fn flex<'source>(content: &'source str) -> Result<Vec<SpannedToken<'source>>> {
-    let mut tokens: Vec<SpannedToken<'source>> = Vec::with_capacity(512);
+impl<'a> Token<'a> {
+    pub const fn new(kind: TokenKind<'a>, span: Span) -> Self {
+        Token { kind, span }
+    }
 
-    for (res, span) in Token::lexer(content).spanned() {
+    pub fn dummy() -> Self {
+        Token::new(TokenKind::Dummy, DUMMY_SP)
+    }
+}
+
+pub struct TokenCursor<'a> {
+    stream: TokenStream<'a>,
+    next_idx: usize
+}
+
+impl<'a> TokenCursor<'a> {
+    pub fn new(stream: TokenStream<'a>) -> Self {
+        TokenCursor { stream: stream, next_idx: 0}
+    }
+}
+
+pub struct TokenStream<'a> (Vec<Token<'a>>);
+
+impl<'a> TokenStream<'a> {
+    pub fn new(tss: Vec<Token<'a>>) -> Self {
+        Self(tss)
+    }
+}
+
+// TODO: Add TokenStream struct
+
+pub fn flex<'source>(content: &'source str) -> Result<TokenStream<'source>, String> {
+    let mut tokens: Vec<Token> = Vec::with_capacity(512);
+
+    for (res, span) in TokenKind::lexer(content).spanned() {
         match res {
-            Ok(token) => tokens.push(SpannedToken {
-                token: token,
-                span: span,
-            }),
+            Ok(token) => tokens.push(Token::new(token, Span::from(span))),
             Err(_) => {
-                return Err(LexError::UnexpectedChar {
-                    position: span.start,
-                    char: content[span.clone()].chars().next().unwrap(), // TODO: Rewrite it, and
-                                                                         // add lines around a error
-                                                                         // line number and etc.
-                });
+                let position = span.start;
+                let ch = content[span.clone()]
+                    .chars()
+                    .next()
+                    .unwrap();
+                return Err(format!("unexpected char '{ch}' on position {position}"));
             }
         }
     }
 
-    Ok(tokens)
+    Ok(TokenStream::new(tokens))
 }

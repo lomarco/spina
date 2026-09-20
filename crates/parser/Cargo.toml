@@ -1,10 +1,9 @@
 [package]
-name = "lex"
+name = "parser"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-thiserror = { workspace = true }
 common = { workspace = true }
-
-logos = "^0.16"
+lex = { workspace = true }
+session = { workspace = true }
