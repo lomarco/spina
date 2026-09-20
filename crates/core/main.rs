@@ -1,5 +1,4 @@
 use anyhow::{Context, Result}; // TODO: Delete it
-use lex::flex;
 
 use std::{
     env, // FIXME: Replace this code to clap
