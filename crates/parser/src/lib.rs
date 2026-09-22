@@ -2,7 +2,6 @@ use common::{Span, Spanned};
 use lex::flex;
 use std::fs::read_to_string;
 use lex::{Token, TokenStream, TokenCursor};
-use std::slice::Iter;
 
 // TODO: Add dcx
 
