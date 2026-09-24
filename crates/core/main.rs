@@ -1,4 +1,6 @@
 use anyhow::{Context, Result}; // TODO: Delete it
+use session::{Session, ParseSess, build_session};
+use parser::parse;
 
 use std::{
     env, // FIXME: Replace this code to clap
@@ -14,6 +16,8 @@ fn run() -> Result<()> {
     }
     let filename = &args[1];
     // FIXME: Replace this code to clap
+
+    let sess = build_session();
     let mut unit = parse(filename); // TODO: Move all file opening logic to parse_from_file
 
     Ok(())
