@@ -169,10 +169,6 @@ pub enum ExprKind {
     Ret(Option<Box<Expr>>),
 }
 
-pub fn source_to_stream(psess: &ParseSess, source: String) -> Result<TokenStream, String> { // TODO: Add Diag text error handling
-    flex(source.as_str())
-}
-
 pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, String> {
     let cont = read_to_string(path).map_err(|e| {
         use std::io::ErrorKind;
@@ -187,7 +183,7 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) ->
         }
     })?;
 
-    let stream = source_to_stream(psess, cont)?;
+    let stream = flex(cont.as_str())?;
 
     let parser = Parser::new(stream);
     Ok(parser)
