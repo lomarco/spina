@@ -169,11 +169,11 @@ pub enum ExprKind {
     Ret(Option<Box<Expr>>),
 }
 
-pub fn source_file_to_stream<'a>(psess: &ParseSess, source: String) -> Result<TokenStream<'a>, String> { // TODO: Add Diag text error handling
+pub fn source_file_to_stream(psess: &ParseSess, source: String) -> Result<TokenStream, String> { // TODO: Add Diag text error handling
     flex(source.as_str())
 }
 
-pub fn new_parser_from_file<'a>(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser<'a>, String> {
+pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, String> {
     let cont = read_to_string(path).map_err(|e| {
         use std::io::ErrorKind;
 
@@ -193,22 +193,25 @@ pub fn new_parser_from_file<'a>(psess: &ParseSess, path: &Path, sp: Option<Span>
     Ok(parser)
 }
 
-pub fn parse<'a>(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
+//fn new_parser_from_str() -> Result<Parser, String> {
+//}
+
+pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
     match &sess.input {
         Input::File(file) => new_parser_from_file(&sess.psess, file, None),
         Input::Str(str) => new_parser_from_str(),
     }.parse_unit()
 }
 
-pub struct Parser<'a> {
-    pub token: Token<'a>,
-    token_cursor: TokenCursor<'a>,
+pub struct Parser {
+    pub token: Token,
+    token_cursor: TokenCursor,
     break_last_token: u32,
     num_bump_calls: u32,
 }
 
-impl<'a> Parser<'a> {
-    pub fn new(stream: TokenStream<'a>) -> Self {
+impl Parser {
+    pub fn new(stream: TokenStream) -> Self {
         Parser {
             token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),
