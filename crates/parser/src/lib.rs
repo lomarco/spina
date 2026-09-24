@@ -2,6 +2,8 @@ use common::{Span, Spanned};
 use lex::flex;
 use std::fs::read_to_string;
 use lex::{Token, TokenStream, TokenCursor};
+use session::{Session, ParseSess, Input};
+use std::path::Path;
 
 // TODO: Add dcx
 
