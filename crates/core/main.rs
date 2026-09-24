@@ -17,8 +17,8 @@ fn run() -> Result<(), String> {
     let filename = &args[1];
     // FIXME: Replace this code to clap
 
-    let sess = build_session();
-    let mut unit = parse(filename); // TODO: Move all file opening logic to parse_from_file
+    let sess = build_session(filename);
+    let mut unit = parse(sess); // TODO: Move all file opening logic to parse_from_file
 
     Ok(())
 }
