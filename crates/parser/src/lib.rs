@@ -167,21 +167,27 @@ pub enum ExprKind {
     Ret(Option<Box<Expr>>),
 }
 
-pub fn new_parser_from_file<'a>(file: &str, sp: Option<Span>) -> Result<Parser<'a>, String> {
-    let cont = read_to_string(file).map_err(|e| {
+pub fn source_file_to_stream<'a>(psess: &ParseSess, source: String) -> Result<TokenStream<'a>, String> { // TODO: Add Diag text error handling
+    flex(source.as_str())
+}
+
+pub fn new_parser_from_file<'a>(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser<'a>, String> {
+    let cont = read_to_string(path).map_err(|e| {
         use std::io::ErrorKind;
 
         match e.kind() {
-            ErrorKind::NotFound => format!("couldn't find file `{}`", file),
+            ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
             ErrorKind::PermissionDenied => {
-                format!("permission denied when opening file `{}`", file)
+                format!("permission denied when opening file `{}`", path.display())
             }
-            ErrorKind::IsADirectory => format!("`{}` is a directory", file),
-            _ => format!("couldn't read `{}`: {}", file, e),
+            ErrorKind::IsADirectory => format!("`{}` is a directory", path.display()),
+            _ => format!("couldn't read `{}`: {}", path.display(), e),
         }
     })?;
 
-    let mut parser = Parser::new();
+    let stream = source_file_to_stream(psess, cont)?;
+
+    let parser = Parser::new(stream);
     Ok(parser)
 }
 
