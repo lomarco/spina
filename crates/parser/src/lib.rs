@@ -189,13 +189,14 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) ->
     Ok(parser)
 }
 
-//fn new_parser_from_str() -> Result<Parser, String> {
-//}
+fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, String> {
+    Ok(Parser::new(flex(str)?))
+}
 
 pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
     match &sess.input {
         Input::File(file) => new_parser_from_file(&sess.psess, file, None),
-        Input::Str(str) => new_parser_from_str(),
+        Input::Str(str) => new_parser_from_str(&sess.psess, str),
     }.parse_unit()
 }
 
