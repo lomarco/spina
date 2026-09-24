@@ -2,7 +2,8 @@ use common::{Span, Spanned};
 use lex::flex;
 use std::fs::read_to_string;
 use lex::{Token, TokenStream, TokenCursor};
-use std::slice::Iter;
+use session::{Session, ParseSess, Input};
+use std::path::Path;
 
 // TODO: Add dcx
 
@@ -168,37 +169,56 @@ pub enum ExprKind {
     Ret(Option<Box<Expr>>),
 }
 
-pub fn new_parser_from_file<'a>(file: &str, sp: Option<Span>) -> Result<Parser<'a>, String> {
-    let cont = read_to_string(file).map_err(|e| {
+pub fn unwrap_or_emit_fatal<T>(expr: Result<T, String>) -> T {
+    match expr {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("fatal error: {error}");
+            std::process::exit(1);
+        }
+    }
+}
+
+pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, String> {
+    let cont = read_to_string(path).map_err(|e| {
         use std::io::ErrorKind;
 
         match e.kind() {
-            ErrorKind::NotFound => format!("couldn't find file `{}`", file),
+            ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
             ErrorKind::PermissionDenied => {
-                format!("permission denied when opening file `{}`", file)
+                format!("permission denied when opening file `{}`", path.display())
             }
-            ErrorKind::IsADirectory => format!("`{}` is a directory", file),
-            _ => format!("couldn't read `{}`: {}", file, e),
+            ErrorKind::IsADirectory => format!("`{}` is a directory", path.display()),
+            _ => format!("couldn't read `{}`: {}", path.display(), e),
         }
     })?;
 
-    let mut parser = Parser::new();
+    let stream = flex(cont.as_str())?;
+
+    let parser = Parser::new(stream);
     Ok(parser)
 }
 
-pub fn parse<'a>(file: &String) -> Unit { // TODO: Add new_parser_from_source_str
-    new_parser_from_file(file, None).parse_unit()
+fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, String> {
+    Ok(Parser::new(flex(str)?))
 }
 
-pub struct Parser<'a> {
-    pub token: Token<'a>,
-    token_cursor: TokenCursor<'a>,
+pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
+    unwrap_or_emit_fatal(match &sess.input {
+        Input::File(file) => new_parser_from_file(&sess.psess, file, None),
+        Input::Str(str) => new_parser_from_str(&sess.psess, str),
+    }).parse_unit()
+}
+
+pub struct Parser {
+    pub token: Token,
+    token_cursor: TokenCursor,
     break_last_token: u32,
     num_bump_calls: u32,
 }
 
-impl<'a> Parser<'a> {
-    pub fn new(stream: TokenStream<'a>) -> Self {
+impl Parser {
+    pub fn new(stream: TokenStream) -> Self {
         Parser {
             token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),

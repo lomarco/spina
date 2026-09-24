@@ -1,4 +1,6 @@
 use anyhow::{Context, Result}; // TODO: Delete it
+use session::{Session, ParseSess, build_session};
+use parser::parse;
 
 use std::{
     env, // FIXME: Replace this code to clap
@@ -6,7 +8,7 @@ use std::{
     process::ExitCode,
 };
 
-fn run() -> Result<()> {
+fn run() -> Result<(), String> {
     // FIXME: Replace this code to clap
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
@@ -14,7 +16,9 @@ fn run() -> Result<()> {
     }
     let filename = &args[1];
     // FIXME: Replace this code to clap
-    let mut unit = parse(filename); // TODO: Move all file opening logic to parse_from_file
+
+    let sess = build_session(filename);
+    let mut unit = parse(sess); // TODO: Move all file opening logic to parse_from_file
 
     Ok(())
 }

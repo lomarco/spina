@@ -9,7 +9,7 @@ use common::Span;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
-pub enum TokenKind<'source> {
+pub enum TokenKind {
     #[token("=")]
     Eq,
 
@@ -49,8 +49,8 @@ pub enum TokenKind<'source> {
     #[token(":")]
     Col,
 
-    #[regex("[A-Za-z_][A-Za-z0-9_]*", |lex| lex.slice())]
-    Identifier(&'source str),
+    #[regex("[A-Za-z_][A-Za-z0-9_]*", |lex| lex.slice().to_owned())]
+    Identifier(String),
 
     #[regex("[0-9]+")]
     DecimalInteger,
@@ -63,13 +63,13 @@ pub enum TokenKind<'source> {
 
 pub const DUMMY_SP: Span = Span { start: 0, end: 0 };
 
-pub struct Token<'a> {
-    pub kind: TokenKind<'a>,
+pub struct Token {
+    pub kind: TokenKind,
     pub span: Span,
 }
 
-impl<'a> Token<'a> {
-    pub const fn new(kind: TokenKind<'a>, span: Span) -> Self {
+impl Token {
+    pub const fn new(kind: TokenKind, span: Span) -> Self {
         Token { kind, span }
     }
 
@@ -78,28 +78,28 @@ impl<'a> Token<'a> {
     }
 }
 
-pub struct TokenCursor<'a> {
-    stream: TokenStream<'a>,
+pub struct TokenCursor {
+    stream: TokenStream,
     next_idx: usize
 }
 
-impl<'a> TokenCursor<'a> {
-    pub fn new(stream: TokenStream<'a>) -> Self {
+impl TokenCursor {
+    pub fn new(stream: TokenStream) -> Self {
         TokenCursor { stream: stream, next_idx: 0}
     }
 }
 
-pub struct TokenStream<'a> (Vec<Token<'a>>);
+pub struct TokenStream(Vec<Token>);
 
-impl<'a> TokenStream<'a> {
-    pub fn new(tss: Vec<Token<'a>>) -> Self {
+impl TokenStream {
+    pub fn new(tss: Vec<Token>) -> Self {
         Self(tss)
     }
 }
 
 // TODO: Add TokenStream struct
 
-pub fn flex<'source>(content: &'source str) -> Result<TokenStream<'source>, String> {
+pub fn flex(content: &str) -> Result<TokenStream, String> {
     let mut tokens: Vec<Token> = Vec::with_capacity(512);
 
     for (res, span) in TokenKind::lexer(content).spanned() {
