@@ -169,6 +169,16 @@ pub enum ExprKind {
     Ret(Option<Box<Expr>>),
 }
 
+pub fn unwrap_or_emit_fatal<T>(expr: Result<T, String>) -> T {
+    match expr {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("fatal error: {error}");
+            std::process::exit(1);
+        }
+    }
+}
+
 pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, String> {
     let cont = read_to_string(path).map_err(|e| {
         use std::io::ErrorKind;
@@ -194,10 +204,10 @@ fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, String
 }
 
 pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
-    match &sess.input {
+    unwrap_or_emit_fatal(match &sess.input {
         Input::File(file) => new_parser_from_file(&sess.psess, file, None),
         Input::Str(str) => new_parser_from_str(&sess.psess, str),
-    }.parse_unit()
+    }).parse_unit()
 }
 
 pub struct Parser {
