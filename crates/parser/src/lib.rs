@@ -185,8 +185,11 @@ pub fn new_parser_from_file<'a>(file: &str, sp: Option<Span>) -> Result<Parser<'
     Ok(parser)
 }
 
-pub fn parse<'a>(file: &String) -> Unit { // TODO: Add new_parser_from_source_str
-    new_parser_from_file(file, None).parse_unit()
+pub fn parse<'a>(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
+    match &sess.input {
+        Input::File(file) => new_parser_from_file(&sess.psess, file, None),
+        Input::Str(str) => new_parser_from_str(),
+    }.parse_unit()
 }
 
 pub struct Parser<'a> {
