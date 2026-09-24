@@ -8,7 +8,7 @@ use std::{
     process::ExitCode,
 };
 
-fn run() -> Result<()> {
+fn run() -> Result<(), String> {
     // FIXME: Replace this code to clap
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
