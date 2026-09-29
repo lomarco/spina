@@ -247,6 +247,13 @@ impl Parser {
         self.bump();
         Ok(ident)
     }
+
+    fn parse_fn_decl(&self) -> Result<FnDecl, String> {
+        Ok(FnDecl {
+            params: self.parse_fn_params()?,
+            ty: self.parse_ty()?,
+        })
+    }
 }
 
 pub enum TyKind { // FIXME: Add primitives types
