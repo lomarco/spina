@@ -26,3 +26,9 @@ pub struct Ident {
     pub name: Symbol,
     pub span: Span,
 }
+
+impl Ident {
+    pub fn new(name: Symbol, span: Span) -> Self {
+        Ident { name, span }
+    }
+}
