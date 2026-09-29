@@ -1,6 +1,6 @@
 use logos::Logos; // TODO: Rewrite it for myself
 use thiserror::Error;
-use common::Span;
+use common::{Span, Ident};
 
 // pub enum LexError {
 //    #[error("unexpected char '{char}' on position {position}")]
@@ -75,6 +75,13 @@ impl Token {
 
     pub fn dummy() -> Self {
         Token::new(TokenKind::Dummy, DUMMY_SP)
+    }
+
+    pub fn ident(&self) -> Option<Ident> {
+        match self.kind {
+            Ident(name, kind) => Some(Ident::new(name, self.span)),
+            _ => None,
+        }
     }
 }
 
