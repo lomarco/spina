@@ -241,6 +241,12 @@ impl Parser {
         let body = self.parse_fn_body()?;
         Ok((ident, decl, body))
     }
+
+    fn parse_ident(&self) -> Result<Ident, String> {
+        let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
+        self.bump();
+        Ok(ident)
+    }
 }
 
 pub enum TyKind { // FIXME: Add primitives types
