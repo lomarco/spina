@@ -68,6 +68,16 @@ pub enum LitKind {
     CStrRaw(u8),
 }
 
+pub struct Param {
+    pub ty: Ty,
+    pub ident: Ident,
+}
+
+pub struct FnDecl {
+    pub params: Vec<Param>,
+    pub ty: Ty,
+}
+
 pub struct Lit {
     pub kind: LitKind,
     pub symbol: Symbol,
@@ -225,6 +235,18 @@ impl Parser {
             break_last_token: 0,
             num_bump_calls: 0
         }
+    }
+    fn parse_fn(&self, sp: Span) -> Result<Ident, FnDecl, Box<Block>, String> {
+        let fn_span = self.token.span;
+        let ident = self.parse_ident()?;
+        let decl = match self.parse_fn_decl() {
+            Ok(decl) => decl,
+            Err(e) => {
+                ;
+            }
+        };
+        let body = self.parse_fn_body()?;
+        Ok((ident, decl, body))
     }
 }
 
