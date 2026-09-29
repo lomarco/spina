@@ -13,52 +13,181 @@ pub enum TokenKind {
     #[token("=")]
     Eq,
 
+    #[token("<")]
+    Lt,
+
+    #[token("<=")]
+    Le,
+
+    #[token("==")]
+    EqEq,
+
+    #[token("!=")]
+    Ne,
+
+    #[token(">=")]
+    Ge,
+
+    #[token(">")]
+    Gt,
+
+    #[token("&&")]
+    AndAnd,
+
+    #[token("||")]
+    OrOr,
+
+    #[token("!")]
+    Bang,
+
+    #[token("~")]
+    Tilde,
+
     #[token("+")]
-    Add,
+    Plus,
 
     #[token("-")]
-    Min,
+    Minus,
 
     #[token("*")]
-    Mul,
+    Star,
 
     #[token("/")]
-    Div,
+    Slash,
 
-    #[token("fn")]
-    Fn,
+    #[token("%")]
+    Percent,
 
-    #[token("let")]
-    Let,
+    #[token("^")]
+    Caret,
 
-    #[token("mut")]
-    Mut,
+    #[token("&")]
+    And,
 
-    #[token("(")]
-    LeftParen,
+    #[token("|")]
+    Or,
 
-    #[token(")")]
-    RightParen,
+    #[token("<<")]
+    Shl,
 
-    #[token("{")]
-    LeftBrace,
+    #[token(">>")]
+    Shr,
 
-    #[token("}")]
-    RightBrace,
+    #[token("+=")]
+    PlusEq,
+
+    #[token("-=")]
+    MinusEq,
+
+    #[token("*=")]
+    StarEq,
+
+    #[token("/=")]
+    SlashEq,
+
+    #[token("%=")]
+    PercentEq,
+
+    #[token("^=")]
+    CaretEq,
+
+    #[token("&=")]
+    AndEq,
+
+    #[token("|=")]
+    OrEq,
+
+    #[token("<<=")]
+    ShlEq,
+
+    #[token(">>=")]
+    ShrEq,
+
+
+    #[token("@")]
+    At,
+
+    #[token(".")]
+    Dot,
+
+    #[token("..")]
+    DotDot,
+
+    #[token("...")]
+    DotDotDot,
+
+    #[token("..=")]
+    DotDotEq,
+
+    #[token(",")]
+    Comma,
+
+    #[token(";")]
+    Semi,
 
     #[token(":")]
-    Col,
+    Colon,
 
-    #[regex("[A-Za-z_][A-Za-z0-9_]*", |lex| lex.slice().to_owned())]
-    Identifier(String),
+    #[token("::")]
+    PathSep,
 
-    #[regex("[0-9]+")]
-    DecimalInteger,
+    #[token("->")]
+    RArrow,
 
-    #[token("i32")]
-    I32,
+    #[token("<-")]
+    LArrow,
 
-    Dummy
+    #[token("=>")]
+    FatArrow,
+
+    #[token("#")]
+    Pound,
+
+    #[token("$")]
+    Dollar,
+
+    #[token("?")]
+    Question,
+
+    #[token("'")]
+    SingleQuote,
+
+    #[token("(")]
+    OpenParen,
+
+    #[token(")")]
+    CloseParen,
+
+    #[token("{")]
+    OpenBrace,
+
+    #[token("}")]
+    CloseBrace,
+
+    #[token("[")]
+    OpenBracket,
+
+    #[token("]")]
+    CloseBracket,
+
+
+    #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*")]
+    Ident,
+
+    #[regex(r"[0-9]+")]
+    IntLiteral,
+
+    #[regex(r"[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?")]
+    FloatLiteral,
+
+    #[regex(r#""([^"\\]|\\.)*""#)]
+    StringLiteral,
+
+    #[regex(r#"'([^'\\]|\\.)'"#)]
+    CharLiteral,
+
+    #[end]
+    Eof,
 }
 
 pub const DUMMY_SP: Span = Span { start: 0, end: 0 };
