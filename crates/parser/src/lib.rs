@@ -47,13 +47,6 @@ pub struct Stmt {
     pub span: Span,
 }
 
-pub struct Ident {
-    pub name: Symbol,
-    pub span: Span,
-}
-
-pub struct Symbol(SymbolIndex);
-
 pub enum LitKind {
     Bool, // AST only, must never appear in a `Token`
     Byte,

@@ -19,3 +19,10 @@ pub struct Spanned<T> {
     pub t: T,
     pub span: Span,
 }
+
+pub struct Symbol(SymbolIndex);
+
+pub struct Ident {
+    pub name: Symbol,
+    pub span: Span,
+}
