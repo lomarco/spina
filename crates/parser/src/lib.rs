@@ -1,4 +1,4 @@
-use common::{Span, Spanned};
+use common::{Span, Spanned, Ident};
 use lex::flex;
 use std::fs::read_to_string;
 use lex::{Token, TokenStream, TokenCursor, TokenKind};
