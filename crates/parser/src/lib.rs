@@ -243,6 +243,13 @@ impl Parser {
         Ok(ident)
     }
 
+    fn parse_param(&self) -> Result<Param, String> {
+        let ident = self.parse_fn_param_ident_colon()?;
+        let ty = self.parse_ty_for_param()?;
+
+        Ok(Param { ty, ident })
+    }
+
     fn parse_fn_param_ident_colon(&self) -> Result<Ident, String> {
         let ident = self.parse_ident()?;
         if !self.eat(TokenKind::Colon) {
