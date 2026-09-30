@@ -3,6 +3,7 @@ use std::fs::read_to_string;
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
 use session::{Session, ParseSess, Input};
 use std::path::Path;
+use std::mem::replace;
 
 // TODO: Add dcx
 
