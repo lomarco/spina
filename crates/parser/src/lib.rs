@@ -243,6 +243,14 @@ impl Parser {
         Ok(ident)
     }
 
+    fn parse_fn_param_ident_colon(&self) -> Result<Ident, String> {
+        let ident = self.parse_ident()?;
+        if !self.eat(TokenKind::Colon) {
+            return Err("Expected colon".to_string());
+        }
+        Ok(ident)
+    }
+
     fn parse_fn_params(&self) -> Result<Vec<Param>, String> {
         if self.token != TokenKind::OpenParen {
             return Err("Missing fn params".as_string());
