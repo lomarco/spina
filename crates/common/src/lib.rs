@@ -47,3 +47,8 @@ pub struct Ty {
     pub span: Span,
 }
 
+impl Ty {
+    pub fn new(kind: TyKind, span: Span) -> Self {
+        Ty { kind, span }
+    }
+}
