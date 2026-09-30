@@ -243,6 +243,22 @@ impl Parser {
         Ok(ident)
     }
 
+    fn parse_fn_params(&self) -> Result<Vec<Param>, String> {
+        if self.token != TokenKind::OpenParen {
+            return Err("Missing fn params".as_string());
+        }
+        let params: Vec<Param> = Vec::new();
+        while (token.kind != TokenKind::Eof || token.kind != TokenKind::CloseParen) {
+            params.push(parse_param()?);
+
+            if !self.eat(TokenKind::Comma) {
+                break;
+            }
+        }
+
+        Ok(params)
+    }
+
     fn eat(&self, tok: TokenKind) -> bool {
         let is_present = check(tok);
         if is_present {
