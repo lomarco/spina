@@ -32,8 +32,6 @@ pub struct Local {
 pub enum StmtKind {
     /// A local (let) binding.
     Let(Box<Local>),
-    /// An item definition.
-    Item(Box<Item>),
     /// Expr without trailing semi-colon.
     Expr(Box<Expr>),
     /// Expr with a trailing semi-colon.
