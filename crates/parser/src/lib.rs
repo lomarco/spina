@@ -247,6 +247,17 @@ impl Parser {
         Ok(ident)
     }
 
+    fn eat(&self, tok: TokenKind) -> bool {
+        let is_present = check(tok);
+        if is_present {
+            self.bump()
+        };
+        is_present
+    }
+
+    fn check(&self, tok: TokenKind) -> bool {
+        self.token == tok
+    }
     fn parse_fn_decl(&self) -> Result<FnDecl, String> {
         Ok(FnDecl {
             params: self.parse_fn_params()?,
