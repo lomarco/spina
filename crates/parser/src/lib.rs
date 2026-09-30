@@ -215,8 +215,6 @@ pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
 pub struct Parser {
     pub token: Token,
     token_cursor: TokenCursor,
-    break_last_token: u32,
-    num_bump_calls: u32,
 }
 
 impl Parser {
@@ -224,8 +222,6 @@ impl Parser {
         Parser {
             token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),
-            break_last_token: 0,
-            num_bump_calls: 0
         }
     }
     fn parse_fn(&self, sp: Span) -> Result<Ident, FnDecl, Box<Block>, String> {
