@@ -212,6 +212,13 @@ impl Token {
             _ => None,
         }
     }
+
+    pub fn ty(&self) -> Option<Ty> {
+        match self.kind {
+            Ty(kind, span) => Some(Ty::new(kind, span)),
+            _ => None,
+        }
+    }
 }
 
 pub struct TokenCursor {
