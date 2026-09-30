@@ -223,6 +223,18 @@ impl TokenCursor {
     pub fn new(stream: TokenStream) -> Self {
         TokenCursor { stream: stream, next_idx: 0}
     }
+
+    fn bump(&self) {
+        self.next_idx += 1;
+    }
+
+    pub fn next_and_bump(&self) -> Token {
+        self.bump();
+        match self.stream.get(self.next_idx) {
+            Some(next_tok) => return next_tok,
+            None() => return Token::new(TokenKind::Eof, DUMMY_SP),
+        }
+    }
 }
 
 pub struct TokenStream(Vec<Token>);
@@ -230,6 +242,10 @@ pub struct TokenStream(Vec<Token>);
 impl TokenStream {
     pub fn new(tss: Vec<Token>) -> Self {
         Self(tss)
+    }
+
+    pub fn get(&self, idx: usize) -> Option<Token> {
+        self.get(idx)
     }
 }
 
