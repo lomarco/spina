@@ -228,12 +228,7 @@ impl Parser {
     fn parse_fn(&self, sp: Span) -> Result<Ident, FnDecl, Box<Block>, String> {
         let fn_span = self.token.span;
         let ident = self.parse_ident()?;
-        let decl = match self.parse_fn_decl() {
-            Ok(decl) => decl,
-            Err(e) => {
-                ;
-            }
-        };
+        let decl = self.parse_fn_decl()?;
         let body = self.parse_fn_body()?;
         Ok((ident, decl, body))
     }
