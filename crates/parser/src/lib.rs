@@ -1,7 +1,6 @@
 use common::{Span, Spanned, Ident};
-use lex::flex;
 use std::fs::read_to_string;
-use lex::{Token, TokenStream, TokenCursor, TokenKind};
+use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
 use session::{Session, ParseSess, Input};
 use std::path::Path;
 
