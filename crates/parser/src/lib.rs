@@ -246,7 +246,7 @@ impl Parser {
 
     fn parse_param(&self) -> Result<Param, String> {
         let ident = self.parse_fn_param_ident_colon()?;
-        let ty = self.parse_ty_for_param()?;
+        let ty = self.parse_ty()?;
 
         Ok(Param { ty, ident })
     }
@@ -257,6 +257,12 @@ impl Parser {
             return Err("Expected colon".to_string());
         }
         Ok(ident)
+    }
+
+    fn parse_ty(&self) -> Result<Ty, String> {
+        let ty = self.token.ty().ok_or_else(|| "Expected ty".to_string())?;
+        self.bump();
+        Ok(ty)
     }
 
     fn parse_fn_params(&self) -> Result<Vec<Param>, String> {
