@@ -254,6 +254,15 @@ impl Parser {
     fn check(&self, tok: TokenKind) -> bool {
         self.token == tok
     }
+
+    fn bump(&self) {
+        self.bump_with(self.token_cursor.next_and_bump())
+    }
+
+    fn bump_with(&self, next_token: Token) {
+        self.prev_token = replace(&mut self.token, next_token)
+    }
+
     fn parse_fn_decl(&self) -> Result<FnDecl, String> {
         Ok(FnDecl {
             params: self.parse_fn_params()?,
