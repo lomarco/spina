@@ -32,3 +32,18 @@ impl Ident {
         Ident { name, span }
     }
 }
+
+pub enum TyKind { // FIXME: Add primitives types
+    /// A fixed length array (`[T; n]`).
+    Array(Box<Ty>, AnonConst),
+    /// A raw pointer (`*const T` or `*mut T`).
+    Ptr(MutTy),
+    /// Placeholder for a kind that has failed to be defined.
+    Err(ErrorGuaranteed),
+}
+
+pub struct Ty {
+    pub kind: TyKind,
+    pub span: Span,
+}
+

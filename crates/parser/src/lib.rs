@@ -1,4 +1,4 @@
-use common::{Span, Spanned, Ident};
+use common::{Span, Spanned, Ident, Ty};
 use std::fs::read_to_string;
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
 use session::{Session, ParseSess, Input};
@@ -301,20 +301,6 @@ impl Parser {
             ty: self.parse_ty()?,
         })
     }
-}
-
-pub enum TyKind { // FIXME: Add primitives types
-    /// A fixed length array (`[T; n]`).
-    Array(Box<Ty>, AnonConst),
-    /// A raw pointer (`*const T` or `*mut T`).
-    Ptr(MutTy),
-    /// Placeholder for a kind that has failed to be defined.
-    Err(ErrorGuaranteed),
-}
-
-pub struct Ty {
-    pub kind: TyKind,
-    pub span: Span,
 }
 
 pub struct ConstItem {
