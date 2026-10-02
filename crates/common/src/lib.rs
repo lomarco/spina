@@ -20,7 +20,7 @@ pub struct Spanned<T> {
     pub span: Span,
 }
 
-pub struct Symbol(SymbolIndex);
+pub struct Symbol(String); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
 
 pub struct Ident {
     pub name: Symbol,
