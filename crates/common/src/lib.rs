@@ -33,13 +33,42 @@ impl Ident {
     }
 }
 
-pub enum TyKind { // FIXME: Add primitives types
-    /// A fixed length array (`[T; n]`).
-    Array(Box<Ty>, AnonConst),
-    /// A raw pointer (`*const T` or `*mut T`).
-    Ptr(MutTy),
-    /// Placeholder for a kind that has failed to be defined.
-    Err(ErrorGuaranteed),
+pub enum FloatTy {
+    F16,
+    F32,
+    F64,
+    F128,
+}
+
+pub enum UintTy {
+    Usize,
+    U8,
+    U16,
+    U32,
+    U64,
+    U128,
+}
+
+pub enum IntTy {
+    Isize,
+    I8,
+    I16,
+    I32,
+    I64,
+    I128,
+}
+
+pub enum TyKind {
+    Array(Box<Ty>, u32),
+    Ptr(Box<Ty>),
+    Int(IntTy),
+    Uint(UintTy),
+    Float(FloatTy),
+    Str,
+    Bool,
+    Char,
+
+    Dummy,
 }
 
 pub struct Ty {
