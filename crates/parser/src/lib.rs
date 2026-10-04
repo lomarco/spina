@@ -177,7 +177,11 @@ impl Parser {
             token_cursor: TokenCursor::new(stream),
         }
     }
-    fn parse_fn(&self, sp: Span) -> Result<Ident, FnDecl, Box<Block>, String> {
+
+    pub fn parse_unit(&self) -> Result<Unit, String> {
+        let items = parse_items()?;
+        Ok(Unit { items })
+    }
     fn parse_fn(&self, sp: Span) -> Result<(Ident, FnDecl, Box<Block>), String> {
         let fn_span = self.token.span;
         let ident = self.parse_ident()?;
