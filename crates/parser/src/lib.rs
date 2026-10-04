@@ -182,6 +182,18 @@ impl Parser {
         let items = parse_items()?;
         Ok(Unit { items })
     }
+
+    fn parse_items(&self) -> Result<Vec<Item>, String> {
+        let items = Vec::with_capacity(128);
+
+        loop {
+            let Some(item) = self.parse_item()? else {
+                break Ok(items);
+            };
+            items.push(item);
+        }
+    }
+
     fn parse_fn(&self, sp: Span) -> Result<(Ident, FnDecl, Box<Block>), String> {
         let fn_span = self.token.span;
         let ident = self.parse_ident()?;
