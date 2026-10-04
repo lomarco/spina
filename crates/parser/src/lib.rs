@@ -42,22 +42,13 @@ pub struct Lit {
 }
 
 pub struct ForLoop {
-    pub pat: Box<Pat>,
+    pub ident: Box<Ident>,
     pub iter: Box<Expr>,
     pub body: Box<Block>,
 }
 
 pub struct Block {
     pub exprs: Vec<Expr>,
-    pub span: Span,
-}
-
-pub enum PatKind {
-    Expr(Box<Expr>),
-}
-
-pub struct Pat {
-    pub kind: PatKind,
     pub span: Span,
 }
 
@@ -122,7 +113,7 @@ pub enum ExprKind {
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
     Lit(Lit),
-    Let(Box<Pat>, Box<Expr>, Span),
+    Let(Box<Ident>, Box<Expr>, Span),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
     ForLoop(Box<ForLoop>),
