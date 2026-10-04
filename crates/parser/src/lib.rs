@@ -153,7 +153,6 @@ pub struct Expr {
 pub enum ExprKind {
     Array(Vec<Box<Expr>>),
     Call(Box<Expr>, Vec<Box<Expr>>),
-    Tup(Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
     Lit(Lit),
@@ -162,8 +161,6 @@ pub enum ExprKind {
     While(Box<Expr>, Box<Block>),
     ForLoop(Box<ForLoop>),
     Loop(Box<Block>, Span),
-    Block(Box<Block>),
-    Field(Box<Expr>, Ident),
     Index(Box<Expr>, Box<Expr>, Span),
     Break(Option<Box<Expr>>),
     Continue(), // FIXME: Add Label
