@@ -265,7 +265,7 @@ impl TokenStream {
     }
 
     pub fn get(&self, idx: usize) -> Option<Token> {
-        self.get(idx)
+        self.get(idx) // TODO: Fix it
     }
 }
 
