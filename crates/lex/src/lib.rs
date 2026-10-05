@@ -248,11 +248,11 @@ impl TokenCursor {
         self.next_idx += 1;
     }
 
-    pub fn next_and_bump(&self) -> Token {
+    pub fn next_and_bump(&mut self) -> Token {
         self.bump();
         match self.stream.get(self.next_idx) {
             Some(next_tok) => return next_tok,
-            None() => return Token::new(TokenKind::Eof, DUMMY_SP),
+            None => return Token::new(TokenKind::Eof, DUMMY_SP),
         }
     }
 }
