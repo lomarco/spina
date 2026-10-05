@@ -20,7 +20,7 @@ pub struct Spanned<T> {
     pub span: Span,
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Symbol(pub String); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
 
 impl From<&str> for Symbol {

@@ -213,8 +213,8 @@ impl Token {
     }
 
     pub fn ident(&self) -> Option<Ident> {
-        match self.kind {
-            Ident(name, kind) => Some(Ident::new(name, self.span)),
+        match &self.kind {
+            TokenKind::Ident(name) => Some(Ident::new(name.clone(), self.span)),
             _ => None,
         }
     }
