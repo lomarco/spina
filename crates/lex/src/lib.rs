@@ -244,7 +244,7 @@ impl TokenCursor {
         TokenCursor { stream: stream, next_idx: 0}
     }
 
-    fn bump(&self) {
+    fn bump(&mut self) {
         self.next_idx += 1;
     }
 
