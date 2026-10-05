@@ -174,6 +174,7 @@ pub enum TokenKind {
     #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*")]
     Ident,
 
+    // TODO: Replace it to Literal(LiteralKind)
     #[regex(r"[0-9]+")]
     IntLiteral,
 
@@ -185,6 +186,9 @@ pub enum TokenKind {
 
     #[regex(r#"'([^'\\]|\\.)'"#)]
     CharLiteral,
+    // TODO ^
+    //      |
+    //      |
 
     #[end]
     Eof,
