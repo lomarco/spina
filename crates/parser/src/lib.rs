@@ -271,6 +271,27 @@ impl Parser {
             ty: self.parse_ty()?,
         })
     }
+    fn parse_let(&self) -> Result<Expr, String> {
+        if !eat(TokenKind::Ident) {
+            return Err("Expected ident".to_string());
+        }
+        let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
+
+        if !eat(TokenKind::Eq) {
+            return Err("Expected Eq".to_string());
+        }
+
+        self.bump();
+
+        let init = parse_init();
+        Ok(Expr {
+            kind: ExprKind::Let(Box::new(ident),
+                Box::new(init),
+                ident.span),
+            span: ident.span // FIXME: Replace it to real span
+        })
+    }
+
 }
 
 pub struct ConstItem {
