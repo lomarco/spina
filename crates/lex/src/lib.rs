@@ -171,7 +171,7 @@ pub enum TokenKind {
     CloseBracket,
 
 
-    #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| lex.slice().to_string())]
+    #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| Symbol(lex.slice().to_string()))]
     Ident(Symbol),
 
     // TODO: Replace it to Literal(LiteralKind)
