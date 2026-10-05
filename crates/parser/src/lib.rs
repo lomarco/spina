@@ -277,6 +277,13 @@ impl Parser {
         }
         let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
 
+        if !eat(TokenKind::Colon) {
+            return Err("Expected Colon".to_string());
+        }
+        self.bump();
+
+        let ty = self.parse_ty()?;
+
         if !eat(TokenKind::Eq) {
             return Err("Expected Eq".to_string());
         }
