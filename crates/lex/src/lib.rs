@@ -1,6 +1,6 @@
 use logos::Logos; // TODO: Rewrite it for myself
 use thiserror::Error;
-use common::{Span, Ident};
+use common::{Span, Ident, Ty, Symbol};
 
 // pub enum LexError {
 //    #[error("unexpected char '{char}' on position {position}")]
@@ -171,8 +171,8 @@ pub enum TokenKind {
     CloseBracket,
 
 
-    #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*")]
-    Ident,
+    #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| lex.slice().to_string())]
+    Ident(Symbol),
 
     // TODO: Replace it to Literal(LiteralKind)
     #[regex(r"[0-9]+")]

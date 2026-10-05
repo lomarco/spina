@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-#[derive(Debug)]
+#[derive(Copy, Clone)]
 pub struct Span {
     pub start: u32,
     pub end: u32,
@@ -20,7 +20,14 @@ pub struct Spanned<T> {
     pub span: Span,
 }
 
-pub struct Symbol(String); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub struct Symbol(pub String); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
+
+impl From<&str> for Symbol {
+    fn from(s: &str) -> Self {
+        Symbol(s.to_string())
+    }
+}
 
 pub struct Ident {
     pub name: Symbol,
