@@ -190,6 +190,8 @@ pub enum TokenKind {
     //      |
     //      |
 
+    Dummy,
+
     #[end]
     Eof,
 }
