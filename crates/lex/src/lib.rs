@@ -225,6 +225,13 @@ impl Token {
             _ => None,
         }
     }
+
+    fn is_keyword(&self, ident: Ident) -> bool {
+        matches!(
+            ident.name.0.as_str(),
+            "fn" | "let" | "for" | "while" // ...
+        )
+    }
 }
 
 pub struct TokenCursor {
