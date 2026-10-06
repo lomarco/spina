@@ -22,5 +22,12 @@ pub struct Source (String);
 
 pub struct ParseSess {
     pub source: Source,
+    pub diag: Diag
     // TODO: Add the rest fields
+}
+
+impl ParseSess {
+    pub fn struct_fatal(self, msg: String) -> ! {
+        Diag::new(self, Fatal, msg)
+    }
 }
