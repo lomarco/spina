@@ -1,5 +1,6 @@
 use std::panic::{panic_any, resume_unwind};
 use common::Span;
+use std::process::ExitCode;
 
 pub type PResult<T> = Result<T, Diag>;
 
@@ -17,12 +18,12 @@ pub enum Level {
 pub struct Diag {
     level: Level,
     message: String,
-    code: u32,
+    code: ExitCode,
     span: Span,
 }
 
 impl Diag {
-    pub fn new(level: Level, message: String, code: u32, span: Span) -> Self {
+    pub fn new(level: Level, message: String, code: ExitCode, span: Span) -> Self {
         Self { level, message, code, span }
     }
 
