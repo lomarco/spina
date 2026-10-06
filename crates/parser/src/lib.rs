@@ -1,4 +1,4 @@
-use common::{Span, Spanned, Ident, Ty};
+use common::{Span, Ident, Ty};
 use std::fs::read_to_string;
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
 use session::{Session, ParseSess, Input};
@@ -91,7 +91,10 @@ pub enum BinOpKind {
     Gt,
 }
 
-pub type BinOp = Spanned<BinOpKind>;
+pub struct BinOp {
+    kind: BinOpKind,
+    span: Span
+}
 
 pub enum UnOp {
     /// The `*` operator for dereferencing

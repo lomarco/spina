@@ -15,11 +15,6 @@ impl From<Range<usize>> for Span {
     }
 }
 
-pub struct Spanned<T> {
-    pub t: T,
-    pub span: Span,
-}
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct Symbol(pub String); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
 
