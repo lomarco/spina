@@ -17,13 +17,13 @@ pub enum Level {
 pub struct Diag {
     level: Level,
     message: String,
-    code: ErrCode,
+    code: u32,
     span: Span,
 }
 
 impl Diag {
-    pub fn new(level: Level, message: String) -> Self {
-        Self { level, message, code: None, span: Span::new(0, 0) }
+    pub fn new(level: Level, message: String, code: u32, span: Span) -> Self {
+        Self { level, message, code, span }
     }
 
     fn raise(self) -> ! {
