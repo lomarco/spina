@@ -20,7 +20,7 @@ fn run() {
     // FIXME: Replace this code to clap
 
     let sess = build_session(filename);
-    let mut unit = parse(sess); // TODO: Move all file opening logic to parse_from_file
+    let unit = parse(sess); // TODO: Move all file opening logic to parse_from_file
 }
 
 fn main() -> ExitCode {
