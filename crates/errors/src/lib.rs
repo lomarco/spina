@@ -26,7 +26,7 @@ impl Diag {
         Self { level, message, code: None, span: Span::new(0, 0) }
     }
 
-    pub fn raise(self) -> ! {
+    fn raise(self) -> ! {
         resume_unwind(Box::new(FatalErrorMarker));
     }
 
