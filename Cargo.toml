@@ -13,7 +13,9 @@ members = [
     "crates/lex",
     "crates/parser",
     "crates/common",
-    "crates/session"]
+    "crates/session",
+    "crates/errors"
+]
 
 [dependencies]
 anyhow = "^1.0.104"
@@ -23,4 +25,5 @@ parser = {path = "crates/parser"}
 common = {path = "crates/common"}
 lex = {path = "crates/lex"}
 session = {path = "crates/session"}
+errors = {path = "crates/errors"}
 thiserror = "^2"
