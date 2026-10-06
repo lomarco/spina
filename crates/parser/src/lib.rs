@@ -115,16 +115,17 @@ pub enum ExprKind {
     Call(Box<Expr>, Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
-    Lit(Lit),
     Let(Box<Ident>, Box<Expr>, Span),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
-    ForLoop(Box<ForLoop>),
-    Loop(Box<Block>, Span),
     Index(Box<Expr>, Box<Expr>, Span),
     Break(Option<Box<Expr>>),
-    Continue(), // FIXME: Add Label
     Ret(Option<Box<Expr>>),
+    Continue(), // FIXME: Add Label
+
+    Lit(Lit),
+    ForLoop(Box<ForLoop>),
+    Loop(Box<Block>, Span),
 }
 
 pub fn unwrap_or_emit_fatal<T>(expr: Result<T, String>) -> T {
