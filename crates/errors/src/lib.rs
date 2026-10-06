@@ -31,13 +31,13 @@ impl Diag {
     }
 
     pub fn emit(self) {
-        let level = self.level;
-        self.emit_diagnostic(self.take_diag());
+        let level = &self.level;
+        self.emit_diagnostic();
 
         match level {
             Level::Bug => panic_any(ExplicitBug),
             Level::Fatal => self.raise(),
-            _ => {}
+            _ => {},
         }
     }
 
