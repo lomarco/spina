@@ -5,7 +5,7 @@ use std::process::ExitCode;
 pub type PResult<T> = Result<T, Diag>;
 
 pub struct ExplicitBug;
-pub struct FatalErrorMarker;
+pub struct FatalErrorMarker(pub ExitCode);
 
 #[derive(Debug, PartialEq)]
 pub enum Level {
@@ -28,7 +28,7 @@ impl Diag {
     }
 
     fn raise(self) -> ! {
-        resume_unwind(Box::new(FatalErrorMarker));
+        resume_unwind(Box::new(FatalErrorMarker(self.code)));
     }
 
     pub fn emit(self) {
