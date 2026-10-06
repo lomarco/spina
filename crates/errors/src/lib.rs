@@ -1,4 +1,5 @@
 use std::panic::{panic_any, resume_unwind};
+use common::Span;
 
 pub type PResult<T> = Result<T, Diag>;
 
@@ -17,10 +18,14 @@ pub struct Diag {
     level: Level,
     message: String,
     code: ErrCode,
-    span: MultiSpan,
+    span: Span,
 }
 
 impl Diag {
+    pub fn new(level: Level, message: String) -> Self {
+        Self { level, message, code: None, span: Span::new() }
+    }
+
     pub fn raise(self) -> ! {
         resume_unwind(Box::new(FatalErrorMarker));
     }
