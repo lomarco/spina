@@ -18,13 +18,24 @@ pub struct Diag<'a> {
     message: Vec<String>,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Diag {
+    pub fn raise(self) -> ! {
+        resume_unwind(Box::new(FatalErrorMarker));
+    }
+    pub fn emit(self) {
+        let level = self.level;
+        self.dcx.emit_diagnostic(self.take_diag());
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+        match level {
+            Level::Bug => panic_any(ExplicitBug),
+            Level::Fatal => self.raise(),
+            _ => {}
+        }
+    }
+
+    pub fn emit_fatal(self) -> ! {
+        assert_eq!(self.level, Level::Fatal);
+        self.emit();
+        unreachable!();
     }
 }
