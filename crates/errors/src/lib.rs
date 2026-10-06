@@ -23,7 +23,7 @@ pub struct Diag {
 
 impl Diag {
     pub fn new(level: Level, message: String) -> Self {
-        Self { level, message, code: None, span: Span::new() }
+        Self { level, message, code: None, span: Span::new(0, 0) }
     }
 
     pub fn raise(self) -> ! {

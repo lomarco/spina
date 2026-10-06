@@ -15,6 +15,12 @@ impl From<Range<usize>> for Span {
     }
 }
 
+impl Span {
+    pub fn new(start: u32, end: u32) -> Self {
+        Self { start, end }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Symbol(pub String); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
 
