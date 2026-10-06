@@ -143,7 +143,9 @@ name = "spina"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "errors",
  "parser",
+ "session",
 ]
 
 [[package]]
