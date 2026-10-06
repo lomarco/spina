@@ -46,4 +46,9 @@ impl Diag {
         self.emit();
         unreachable!();
     }
+
+    fn emit_diagnostic(&self) {
+        println!("Error: {}:, {:#?}", self.message, self.span) // TODO: Add gen diagnostic text with level, ermess, exit-code, span and extract
+                   // of code
+    }
 }
