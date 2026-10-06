@@ -21,6 +21,8 @@ fn run() {
 
     let sess = build_session(filename);
     let unit = parse(sess); // TODO: Move all file opening logic to parse_from_file
+
+    println!("{unit}"); // FIXME
 }
 
 fn main() -> ExitCode {
