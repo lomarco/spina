@@ -12,6 +12,10 @@ pub enum Level {
     Error,
     Note,
 }
+
+pub struct Diag<'a> {
+    level: Level,
+    message: Vec<String>,
 }
 
 #[cfg(test)]
