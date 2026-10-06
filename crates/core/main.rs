@@ -1,6 +1,8 @@
 use anyhow::{Context, Result}; // TODO: Delete it
 use session::{Session, ParseSess, build_session};
 use parser::parse;
+use std::panic::catch_unwind;
+use errors::FatalErrorMarker;
 
 use std::{
     env, // FIXME: Replace this code to clap
@@ -8,7 +10,7 @@ use std::{
     process::ExitCode,
 };
 
-fn run() -> Result<(), String> {
+fn run() {
     // FIXME: Replace this code to clap
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
@@ -19,16 +21,11 @@ fn run() -> Result<(), String> {
 
     let sess = build_session(filename);
     let mut unit = parse(sess); // TODO: Move all file opening logic to parse_from_file
-
-    Ok(())
 }
 
 fn main() -> ExitCode {
-    match run() {
-        Ok(()) => ExitCode::SUCCESS,
-        Err(e) => {
-            eprintln!("Error: {e:?}");
-            ExitCode::FAILURE
-        }
+    match catch_unwind(run) {
+        Ok(_) => ExitCode::SUCCESS,
+        Err(_) => ExitCode::FAILURE,
     }
 }
