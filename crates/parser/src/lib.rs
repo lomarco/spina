@@ -128,12 +128,14 @@ pub enum ExprKind {
     Loop(Box<Block>, Span),
 }
 
-pub fn unwrap_or_emit_fatal<T>(expr: Result<T, String>) -> T {
+pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag<'_>>>) -> T {
     match expr {
-        Ok(value) => value,
-        Err(error) => {
-            eprintln!("fatal error: {error}");
-            std::process::exit(1);
+        Ok(expr) => expr,
+        Err(errs) => {
+            for err in errs {
+                err.emit();
+            }
+            FatalError.raise()
         }
     }
 }
