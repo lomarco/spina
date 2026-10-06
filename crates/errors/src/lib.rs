@@ -1,5 +1,17 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+use std::panic::{panic_any, resume_unwind};
+
+pub type PResult<'a, T> = Result<T, Diag<'a>>;
+
+pub struct ExplicitBug;
+pub struct FatalErrorMarker;
+
+#[derive(Debug, PartialEq)]
+pub enum Level {
+    Bug,
+    Fatal,
+    Error,
+    Note,
+}
 }
 
 #[cfg(test)]
