@@ -1,6 +1,6 @@
 use std::panic::{panic_any, resume_unwind};
 
-pub type PResult<'a, T> = Result<T, Diag<'a>>;
+pub type PResult<T> = Result<T, Diag>;
 
 pub struct ExplicitBug;
 pub struct FatalErrorMarker;
@@ -13,18 +13,21 @@ pub enum Level {
     Note,
 }
 
-pub struct Diag<'a> {
+pub struct Diag {
     level: Level,
-    message: Vec<String>,
+    message: String,
+    code: ErrCode,
+    span: MultiSpan,
 }
 
 impl Diag {
     pub fn raise(self) -> ! {
         resume_unwind(Box::new(FatalErrorMarker));
     }
+
     pub fn emit(self) {
         let level = self.level;
-        self.dcx.emit_diagnostic(self.take_diag());
+        self.emit_diagnostic(self.take_diag());
 
         match level {
             Level::Bug => panic_any(ExplicitBug),
