@@ -1,58 +1,15 @@
-use common::{Span, Spanned};
-use lex::flex;
+use common::{Span, Ident, Ty};
 use std::fs::read_to_string;
-use lex::{Token, TokenStream, TokenCursor};
+use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
 use session::{Session, ParseSess, Input};
 use std::path::Path;
+use std::mem::replace;
 
 // TODO: Add dcx
 
 pub struct Unit {
     pub items: Vec<Item>,
 }
-
-pub enum LocalKind {
-    /// Local declaration.
-    /// Example: `let x;`
-    Decl,
-    /// Local declaration with an initializer.
-    /// Example: `let x = y;`
-    Init(Box<Expr>),
-}
-
-pub struct Local {
-    pub super_: Option<Span>,
-    pub pat: Box<Pat>,
-    pub ty: Option<Box<Ty>>,
-    pub kind: LocalKind,
-    pub span: Span,
-    pub colon_sp: Option<Span>,
-}
-
-pub enum StmtKind {
-    /// A local (let) binding.
-    Let(Box<Local>),
-    /// An item definition.
-    Item(Box<Item>),
-    /// Expr without trailing semi-colon.
-    Expr(Box<Expr>),
-    /// Expr with a trailing semi-colon.
-    Semi(Box<Expr>),
-    /// Just a trailing semi-colon.
-    Empty,
-}
-
-pub struct Stmt {
-    pub kind: StmtKind,
-    pub span: Span,
-}
-
-pub struct Ident {
-    pub name: Symbol,
-    pub span: Span,
-}
-
-pub struct Symbol(SymbolIndex);
 
 pub enum LitKind {
     Bool, // AST only, must never appear in a `Token`
@@ -68,6 +25,16 @@ pub enum LitKind {
     CStrRaw(u8),
 }
 
+pub struct Param {
+    pub ty: Ty,
+    pub ident: Ident,
+}
+
+pub struct FnDecl {
+    pub params: Vec<Param>,
+    pub ty: Ty,
+}
+
 pub struct Lit {
     pub kind: LitKind,
     pub symbol: Symbol,
@@ -75,22 +42,13 @@ pub struct Lit {
 }
 
 pub struct ForLoop {
-    pub pat: Box<Pat>,
+    pub ident: Box<Ident>,
     pub iter: Box<Expr>,
     pub body: Box<Block>,
 }
 
 pub struct Block {
-    pub stmts: Vec<Stmt>,
-    pub span: Span,
-}
-
-pub enum PatKind {
-    Expr(Box<Expr>),
-}
-
-pub struct Pat {
-    pub kind: PatKind,
+    pub exprs: Vec<Expr>,
     pub span: Span,
 }
 
@@ -133,7 +91,10 @@ pub enum BinOpKind {
     Gt,
 }
 
-pub type BinOp = Spanned<BinOpKind>;
+pub struct BinOp {
+    kind: BinOpKind,
+    span: Span
+}
 
 pub enum UnOp {
     /// The `*` operator for dereferencing
@@ -152,21 +113,19 @@ pub struct Expr {
 pub enum ExprKind {
     Array(Vec<Box<Expr>>),
     Call(Box<Expr>, Vec<Box<Expr>>),
-    Tup(Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
-    Lit(Lit),
-    Let(Box<Pat>, Box<Expr>, Span),
+    Let(Box<Ident>, Box<Expr>, Span),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
-    ForLoop(Box<ForLoop>),
-    Loop(Box<Block>, Span),
-    Block(Box<Block>),
-    Field(Box<Expr>, Ident),
     Index(Box<Expr>, Box<Expr>, Span),
     Break(Option<Box<Expr>>),
-    Continue(), // FIXME: Add Label
     Ret(Option<Box<Expr>>),
+    Continue(), // FIXME: Add Label
+
+    Lit(Lit),
+    ForLoop(Box<ForLoop>),
+    Loop(Box<Block>, Span),
 }
 
 pub fn unwrap_or_emit_fatal<T>(expr: Result<T, String>) -> T {
@@ -213,8 +172,6 @@ pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
 pub struct Parser {
     pub token: Token,
     token_cursor: TokenCursor,
-    break_last_token: u32,
-    num_bump_calls: u32,
 }
 
 impl Parser {
@@ -222,24 +179,130 @@ impl Parser {
         Parser {
             token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),
-            break_last_token: 0,
-            num_bump_calls: 0
         }
     }
-}
 
-pub enum TyKind { // FIXME: Add primitives types
-    /// A fixed length array (`[T; n]`).
-    Array(Box<Ty>, AnonConst),
-    /// A raw pointer (`*const T` or `*mut T`).
-    Ptr(MutTy),
-    /// Placeholder for a kind that has failed to be defined.
-    Err(ErrorGuaranteed),
-}
+    pub fn parse_unit(&self) -> Result<Unit, String> {
+        let items = parse_items()?;
+        Ok(Unit { items })
+    }
 
-pub struct Ty {
-    pub kind: TyKind,
-    pub span: Span,
+    fn parse_items(&self) -> Result<Vec<Item>, String> {
+        let items = Vec::with_capacity(128);
+
+        loop {
+            let Some(item) = self.parse_item()? else {
+                break Ok(items);
+            };
+            items.push(item);
+        }
+    }
+
+    fn parse_fn(&self, sp: Span) -> Result<(Ident, FnDecl, Box<Block>), String> {
+        let fn_span = self.token.span;
+        let ident = self.parse_ident()?;
+        let decl = self.parse_fn_decl()?;
+        let body = self.parse_fn_body()?;
+        Ok((ident, decl, body))
+    }
+
+    fn parse_ident(&self) -> Result<Ident, String> {
+        let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
+        self.bump();
+        Ok(ident)
+    }
+
+    fn parse_param(&self) -> Result<Param, String> {
+        let ident = self.parse_fn_param_ident_colon()?;
+        let ty = self.parse_ty()?;
+
+        Ok(Param { ty, ident })
+    }
+
+    fn parse_fn_param_ident_colon(&self) -> Result<Ident, String> {
+        let ident = self.parse_ident()?;
+        if !self.eat(TokenKind::Colon) {
+            return Err("Expected colon".to_string());
+        }
+        Ok(ident)
+    }
+
+    fn parse_ty(&self) -> Result<Ty, String> {
+        let ty = self.token.ty().ok_or_else(|| "Expected ty".to_string())?;
+        self.bump();
+        Ok(ty)
+    }
+
+    fn parse_fn_params(&self) -> Result<Vec<Param>, String> {
+        if self.token != TokenKind::OpenParen {
+            return Err("Missing fn params".as_string());
+        }
+        let params: Vec<Param> = Vec::new();
+        while (token.kind != TokenKind::Eof || token.kind != TokenKind::CloseParen) {
+            params.push(parse_param()?);
+
+            if !self.eat(TokenKind::Comma) {
+                break;
+            }
+        }
+
+        Ok(params)
+    }
+
+    fn eat(&self, tok: TokenKind) -> bool {
+        let is_present = check(tok);
+        if is_present {
+            self.bump()
+        };
+        is_present
+    }
+
+    fn check(&self, tok: TokenKind) -> bool {
+        self.token == tok
+    }
+
+    fn bump(&self) {
+        self.bump_with(self.token_cursor.next_and_bump())
+    }
+
+    fn bump_with(&self, next_token: Token) {
+        self.prev_token = replace(&mut self.token, next_token)
+    }
+
+    fn parse_fn_decl(&self) -> Result<FnDecl, String> {
+        Ok(FnDecl {
+            params: self.parse_fn_params()?,
+            ty: self.parse_ty()?,
+        })
+    }
+    fn parse_let(&self) -> Result<Expr, String> {
+        if !eat(TokenKind::Ident) {
+            return Err("Expected ident".to_string());
+        }
+        let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
+
+        if !eat(TokenKind::Colon) {
+            return Err("Expected Colon".to_string());
+        }
+        self.bump();
+
+        let ty = self.parse_ty()?;
+
+        if !eat(TokenKind::Eq) {
+            return Err("Expected Eq".to_string());
+        }
+
+        self.bump();
+
+        let init = parse_init();
+        Ok(Expr {
+            kind: ExprKind::Let(Box::new(ident),
+                Box::new(init),
+                ident.span),
+            span: ident.span // FIXME: Replace it to real span
+        })
+    }
+
 }
 
 pub struct ConstItem {
