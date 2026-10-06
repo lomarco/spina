@@ -29,11 +29,11 @@ pub struct ParseSess {
 }
 
 impl ParseSess {
-    pub fn struct_fatal(self, msg: String, code: u32, span: Span) -> Diag {
-        Diag::new(Level::Fatal, msg, code, span)
+    pub fn struct_fatal(self, msg: String, span: Span) -> Diag {
+        Diag::new(Level::Fatal, msg, span)
     }
 
-    pub fn fatal(self, msg: String, code: u32, span: Span) -> ! {
-        self.struct_fatal(msg, code, span).emit_fatal()
+    pub fn fatal(self, msg: String, span: Span) -> ! {
+        self.struct_fatal(msg, span).emit_fatal()
     }
 }
