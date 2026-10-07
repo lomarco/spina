@@ -4,6 +4,7 @@ use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
 use session::{Session, ParseSess, Input};
 use std::path::Path;
 use std::mem::replace;
+use errors::{Diag, PResult};
 
 // TODO: Add dcx
 
@@ -140,7 +141,7 @@ pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag<'_>>>) -> T {
     }
 }
 
-pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, String> {
+pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, Vec<Diag<'a>>> {
     let cont = read_to_string(path).map_err(|e| {
         use std::io::ErrorKind;
 
@@ -160,7 +161,7 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) ->
     Ok(parser)
 }
 
-fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, String> {
+fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, Vec<Diag<'a>>> {
     Ok(Parser::new(flex(str)?))
 }
 
@@ -184,12 +185,12 @@ impl Parser {
         }
     }
 
-    pub fn parse_unit(&self) -> Result<Unit, String> {
+    pub fn parse_unit(&self) -> PResult<Unit> {
         let items = parse_items()?;
         Ok(Unit { items })
     }
 
-    fn parse_items(&self) -> Result<Vec<Item>, String> {
+    fn parse_items(&self) -> PResult<Vec<Item>> {
         let items = Vec::with_capacity(128);
 
         loop {
@@ -200,7 +201,7 @@ impl Parser {
         }
     }
 
-    fn parse_fn(&self, sp: Span) -> Result<(Ident, FnDecl, Box<Block>), String> {
+    fn parse_fn(&self, sp: Span) -> PResult<(Ident, FnDecl, Box<Block>)> {
         let fn_span = self.token.span;
         let ident = self.parse_ident()?;
         let decl = self.parse_fn_decl()?;
@@ -208,20 +209,20 @@ impl Parser {
         Ok((ident, decl, body))
     }
 
-    fn parse_ident(&self) -> Result<Ident, String> {
+    fn parse_ident(&self) -> PResult<Ident> {
         let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
         self.bump();
         Ok(ident)
     }
 
-    fn parse_param(&self) -> Result<Param, String> {
+    fn parse_param(&self) -> PResult<Param> {
         let ident = self.parse_fn_param_ident_colon()?;
         let ty = self.parse_ty()?;
 
         Ok(Param { ty, ident })
     }
 
-    fn parse_fn_param_ident_colon(&self) -> Result<Ident, String> {
+    fn parse_fn_param_ident_colon(&self) -> PResult<Ident> {
         let ident = self.parse_ident()?;
         if !self.eat(TokenKind::Colon) {
             return Err("Expected colon".to_string());
@@ -229,13 +230,13 @@ impl Parser {
         Ok(ident)
     }
 
-    fn parse_ty(&self) -> Result<Ty, String> {
+    fn parse_ty(&self) -> PResult<Ty> {
         let ty = self.token.ty().ok_or_else(|| "Expected ty".to_string())?;
         self.bump();
         Ok(ty)
     }
 
-    fn parse_fn_params(&self) -> Result<Vec<Param>, String> {
+    fn parse_fn_params(&self) -> PResult<Vec<Param>> {
         if self.token != TokenKind::OpenParen {
             return Err("Missing fn params".as_string());
         }
@@ -271,13 +272,13 @@ impl Parser {
         self.prev_token = replace(&mut self.token, next_token)
     }
 
-    fn parse_fn_decl(&self) -> Result<FnDecl, String> {
+    fn parse_fn_decl(&self) -> PResult<FnDecl> {
         Ok(FnDecl {
             params: self.parse_fn_params()?,
             ty: self.parse_ty()?,
         })
     }
-    fn parse_let(&self) -> Result<Expr, String> {
+    fn parse_let(&self) -> PResult<Expr> {
         if !eat(TokenKind::Ident) {
             return Err("Expected ident".to_string());
         }
