@@ -157,12 +157,12 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) ->
 
     let stream = flex(cont.as_str())?;
 
-    let parser = Parser::new(stream);
+    let parser = Parser::new(psess, stream);
     Ok(parser)
 }
 
 fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, Vec<Diag<'a>>> {
-    Ok(Parser::new(flex(str)?))
+    Ok(Parser::new(psess, flex(str)?))
 }
 
 pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
