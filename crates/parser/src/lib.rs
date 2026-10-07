@@ -173,13 +173,15 @@ pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
 }
 
 pub struct Parser {
+    psess: &ParseSess,
     pub token: Token,
     token_cursor: TokenCursor,
 }
 
 impl Parser {
-    pub fn new(stream: TokenStream) -> Self {
+    pub fn new(psess: &ParseSess, stream: TokenStream) -> Self {
         Parser {
+            psess,
             token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),
         }
