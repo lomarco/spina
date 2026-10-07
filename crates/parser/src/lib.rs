@@ -5,6 +5,7 @@ use session::{Session, ParseSess, Input};
 use std::path::Path;
 use std::mem::replace;
 use errors::{Diag, PResult};
+use std::io::ErrorKind;
 
 // TODO: Add dcx
 
@@ -143,9 +144,7 @@ pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag<'_>>>) -> T {
 
 pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, Vec<Diag<'a>>> {
     let cont = read_to_string(path).map_err(|e| {
-        use std::io::ErrorKind;
-
-        match e.kind() {
+        let msg = match e.kind() {
             ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
             ErrorKind::PermissionDenied => {
                 format!("permission denied when opening file `{}`", path.display())
