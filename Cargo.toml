@@ -27,4 +27,3 @@ common = {path = "crates/common"}
 lex = {path = "crates/lex"}
 session = {path = "crates/session"}
 errors = {path = "crates/errors"}
-thiserror = "^2"
