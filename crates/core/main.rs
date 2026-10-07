@@ -1,4 +1,3 @@
-use anyhow::{Context, Result}; // TODO: Delete it
 use session::{Session, ParseSess, build_session};
 use parser::parse;
 use std::panic::catch_unwind;

@@ -18,7 +18,6 @@ members = [
 ]
 
 [dependencies]
-anyhow = "^1.0.104"
 parser = {path = "crates/parser"}
 session = {path = "crates/session"}
 errors = {path = "crates/errors"}
