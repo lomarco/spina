@@ -1,7 +1,6 @@
 use session::{Session, ParseSess, build_session};
 use parser::parse;
-use std::panic::catch_unwind;
-use errors::FatalErrorMarker;
+use errors::catch_fatal_error_marker;
 
 use std::{
     env, // FIXME: Replace this code to clap
@@ -25,8 +24,5 @@ fn run() {
 }
 
 fn main() -> ExitCode {
-    match catch_unwind(run) {
-        Ok(_) => ExitCode::SUCCESS,
-        Err(_) => ExitCode::FAILURE,
-    }
+    catch_fatal_error_marker(run)
 }
