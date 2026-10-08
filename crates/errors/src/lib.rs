@@ -36,7 +36,7 @@ pub enum Level {
 pub struct Diag {
     level: Level,
     message: String,
-    span: Span,
+    span: Option<Span>,
 }
 
 impl Diag {
