@@ -142,7 +142,7 @@ pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag<'_>>>) -> T {
     }
 }
 
-pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, Vec<Diag<'a>>> {
+pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, Vec<Diag>> {
     let cont = read_to_string(path).map_err(|e| {
         let msg = match e.kind() {
             ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
@@ -160,7 +160,7 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) ->
     Ok(parser)
 }
 
-fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, Vec<Diag<'a>>> {
+fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, Vec<Diag>> {
     Ok(Parser::new(psess, flex(str)?))
 }
 
