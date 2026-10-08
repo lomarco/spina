@@ -9,6 +9,10 @@ pub type PResult<T> = Result<T, Diag>;
 pub struct ExplicitBug;
 pub struct FatalErrorMarker;
 
+pub fn raise() -> ! {
+    resume_unwind(Box::new(FatalErrorMarker));
+}
+
 pub fn catch_fatal_error_marker<T>(f: impl FnOnce() -> T) -> ExitCode {
     match catch_unwind(AssertUnwindSafe(f)) {
         Ok(_) => ExitCode::SUCCESS,
@@ -36,21 +40,13 @@ pub struct Diag {
 }
 
 impl Diag {
-    pub fn new(level: Level, message: String, span: Span) -> Self {
-        Self { level, message, span }
-    }
-
-    fn raise(self) -> ! {
-        resume_unwind(Box::new(FatalErrorMarker));
-    }
-
     pub fn emit(self) {
         let level = &self.level;
         self.emit_diagnostic();
 
         match level {
             Level::Bug => panic_any(ExplicitBug),
-            Level::Fatal => self.raise(),
+            Level::Fatal => raise(),
             _ => {},
         }
     }

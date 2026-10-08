@@ -137,7 +137,7 @@ pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
             for err in errs {
                 err.emit();
             }
-            FatalError.raise()
+            raise()
         }
     }
 }
