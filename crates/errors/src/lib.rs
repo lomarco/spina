@@ -57,6 +57,14 @@ impl Diag {
         unreachable!();
     }
 
+    pub fn struct_fatal(self, message: String) -> Diag {
+        Diag { level: Level::Fatal, message, span: None }
+    }
+
+    pub fn fatal(self, msg: String) -> ! {
+        self.struct_fatal(msg).emit_fatal()
+    }
+
     fn emit_diagnostic(&self) {
         eprintln!("Error: {}:, {:#?}", self.message, self.span) // TODO: Add gen diagnostic text with level, ermess, exit-code, span and extract
                    // of code
