@@ -69,6 +69,19 @@ impl Diag {
         self.struct_fatal(msg).emit_fatal()
     }
 
+    fn struct_err(self, message: String, span: Span) -> Diag {
+        Diag::new(Level::Error, message, Some(span))
+    }
+
+    fn emit_err(self) {
+        assert_eq!(self.level, Level::Error);
+        self.emit();
+    }
+
+    pub fn err(self, msg: String, span: Span) {
+        self.struct_err(msg, span).emit_err();
+    }
+
     fn emit_diagnostic(&self) {
         eprintln!("Error: {}:, {:#?}", self.message, self.span) // TODO: Add gen diagnostic text with level, ermess, exit-code, span and extract
                    // of code
