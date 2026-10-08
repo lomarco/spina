@@ -130,7 +130,7 @@ pub enum ExprKind {
     Loop(Box<Block>, Span),
 }
 
-pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag<'_>>>) -> T {
+pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
     match expr {
         Ok(expr) => expr,
         Err(errs) => {
