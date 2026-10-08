@@ -131,15 +131,12 @@ pub enum ExprKind {
 }
 
 pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
-    match expr {
-        Ok(expr) => expr,
-        Err(errs) => {
-            for err in errs {
-                err.emit();
-            }
-            raise()
+    expr.unwrap_or_else(|errs| {
+        for err in errs {
+            err.emit();
         }
-    }
+        raise()
+    })
 }
 
 pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, Vec<Diag>> {
