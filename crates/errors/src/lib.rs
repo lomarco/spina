@@ -40,6 +40,10 @@ pub struct Diag {
 }
 
 impl Diag {
+    fn new(level: Level, message: String, span: Option<Span>) -> Self {
+        Diag { level, message, span }
+    }
+
     pub fn emit(self) {
         let level = &self.level;
         self.emit_diagnostic();
@@ -57,8 +61,8 @@ impl Diag {
         unreachable!();
     }
 
-    pub fn struct_fatal(self, message: String) -> Diag {
-        Diag { level: Level::Fatal, message, span: None }
+    fn struct_fatal(self, message: String) -> Diag {
+        Diag::new(Level::Fatal, message, None)
     }
 
     pub fn fatal(self, msg: String) -> ! {
