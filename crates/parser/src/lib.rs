@@ -146,13 +146,13 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) ->
     let cont = read_to_string(path).map_err(|e| {
         let msg = match e.kind() {
             ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
-            ErrorKind::PermissionDenied => {
-                format!("permission denied when opening file `{}`", path.display())
-            }
+            ErrorKind::PermissionDenied => format!("permission denied when opening file `{}`", path.display()),
             ErrorKind::IsADirectory => format!("`{}` is a directory", path.display()),
             _ => format!("couldn't read `{}`: {}", path.display(), e),
-        }
-    })?;
+        };
+
+        Diag::fatal(msg);
+    });
 
     let stream = flex(cont.as_str())?;
 
