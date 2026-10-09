@@ -305,7 +305,6 @@ impl Parser {
             span: ident.span // FIXME: Replace it to real span
         })
     }
-
 }
 
 pub struct ConstItem {
