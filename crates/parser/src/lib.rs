@@ -11,9 +11,7 @@ use errors::{Diag, PResult};
 
 // TODO: Add dcx
 
-pub struct Unit {
-    pub items: Vec<Item>,
-}
+pub struct Unit(Vec<Item>);
 
 pub enum LitKind {
     Bool, // AST only, must never appear in a `Token`
@@ -187,7 +185,7 @@ impl Parser {
 
     pub fn parse_unit(&self) -> PResult<Unit> {
         let items = parse_items()?;
-        Ok(Unit { items })
+        Ok(Unit(items))
     }
 
     fn parse_items(&self) -> PResult<Vec<Item>> {
