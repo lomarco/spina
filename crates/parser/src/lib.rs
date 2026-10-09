@@ -198,6 +198,10 @@ impl Parser {
         }
     }
 
+    fn parse_item(&self) -> PResult<Option<Item>> {
+        Ok(self.parse_item_kind(self.token.span)?.map(|kind| Item { kind, span }))
+    }
+
     fn parse_fn(&self, sp: Span) -> PResult<(Ident, FnDecl, Box<Block>)> {
         let fn_span = self.token.span;
         let ident = self.parse_ident()?;
