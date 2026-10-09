@@ -1,6 +1,4 @@
 use std::path::PathBuf;
-use errors::{Diag, Level};
-use common::Span;
 
 pub enum Input {
     File(PathBuf),
@@ -22,18 +20,7 @@ impl Session {
 
 pub struct Source (String);
 
-pub struct ParseSess {
+pub struct ParseSess { // TODO: Delete this excess struct
     pub source: Source,
-    pub diag: Diag
     // TODO: Add the rest fields
-}
-
-impl ParseSess {
-    pub fn struct_fatal(self, msg: String, span: Span) -> Diag {
-        Diag::new(Level::Fatal, msg, span)
-    }
-
-    pub fn fatal(self, msg: String, span: Span) -> ! {
-        self.struct_fatal(msg, span).emit_fatal()
-    }
 }
