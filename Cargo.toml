@@ -1,5 +1,30 @@
+[package]
+name = "spina"
+version = "0.1.0"
+edition = "2024"
+
 [workspace]
 resolver = "3"
 members = [
-  "spinac"
+  "spinac/entry",
+  "spinac/parser",
+  "spinac/lex",
+  "spinac/common",
+  "spinac/err",
+  "spinac/sess",
 ]
+
+[workspace.dependencies]
+common = {path = "spinac/common"}
+lex = {path = "spinac/lex"}
+sess = {path = "spinac/sess"}
+err = {path = "spinac/err"}
+
+[[bin]]
+path = "spinac/entry/main.rs"
+name = "spinac"
+
+[dependencies]
+parser = {path = "spinac/parser"}
+sess = {path = "spinac/sess"}
+err = {path = "spinac/err"}
