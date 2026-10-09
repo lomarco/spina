@@ -9,7 +9,6 @@ name = "spina"
 
 [workspace]
 members = [
-    "crates/bc",
     "crates/lex",
     "crates/parser",
     "crates/common",
