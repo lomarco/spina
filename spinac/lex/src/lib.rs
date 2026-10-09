@@ -1,6 +1,6 @@
 use logos::Logos; // TODO: Rewrite it for myself
 use common::{Span, Ident, Ty, Symbol};
-use errors::Diag;
+use err::Diag;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
