@@ -225,20 +225,20 @@ impl Parser {
     fn parse_fn_param_ident_colon(&self) -> PResult<Ident> {
         let ident = self.parse_ident()?;
         if !self.eat(TokenKind::Colon) {
-            return Err("Expected colon".to_string());
+            return Err(Diag::err("Expected colon".as_string(), self.token.span));
         }
         Ok(ident)
     }
 
     fn parse_ty(&self) -> PResult<Ty> {
-        let ty = self.token.ty().ok_or_else(|| "Expected ty".to_string())?;
+        let ty = self.token.ty().ok_or_else(|| Diag::err("Expected ty".to_string(), self.token.span))?;
         self.bump();
         Ok(ty)
     }
 
     fn parse_fn_params(&self) -> PResult<Vec<Param>> {
         if self.token != TokenKind::OpenParen {
-            return Err("Missing fn params".as_string());
+            return Err(Diag::err("Missing fn params".as_string(), self.token.span));
         }
         let params: Vec<Param> = Vec::new();
         while (token.kind != TokenKind::Eof || token.kind != TokenKind::CloseParen) {
@@ -280,19 +280,19 @@ impl Parser {
     }
     fn parse_let(&self) -> PResult<Expr> {
         if !eat(TokenKind::Ident) {
-            return Err("Expected ident".to_string());
+            return Err(Diag::err("Expected ident".to_string(), self.token.span));
         }
-        let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
+        let ident = self.token.ident().ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
 
         if !eat(TokenKind::Colon) {
-            return Err("Expected Colon".to_string());
+            return Err(Diag::err("Expected Colon".to_string(), self.token.span));
         }
         self.bump();
 
         let ty = self.parse_ty()?;
 
         if !eat(TokenKind::Eq) {
-            return Err("Expected Eq".to_string());
+            return Err(Diag::err("Expected Eq".to_string(), self.token.span));
         }
 
         self.bump();
