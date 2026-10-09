@@ -40,8 +40,8 @@ pub struct Diag {
 }
 
 impl Diag {
-    fn new(level: Level, message: String, span: Option<Span>) -> Self {
-        Diag { level, message, span }
+    pub fn new(level: Level, message: String, span: Option<Span>) -> Self {
+        Self { level, message, span }
     }
 
     pub fn emit(self) {
