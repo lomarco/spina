@@ -60,7 +60,7 @@ impl Diag {
     pub fn emit(&self) {
         eprintln!("Error: {}:, {:#?}", self.message, self.span); // TODO: Add gen diagnostic text with level, ermess, exit-code, span and extract
                    // of code
-        if self.level == Level::Fatal {
+        if let Level::Fatal = self.level {
             raise()
         }
     }
