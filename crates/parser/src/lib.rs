@@ -184,8 +184,7 @@ impl Parser {
     }
 
     pub fn parse_unit(&self) -> PResult<Unit> {
-        let items = parse_items()?;
-        Ok(Unit(items))
+        Ok(Unit(parse_items()))
     }
 
     fn parse_items(&self) -> PResult<Vec<Item>> {
