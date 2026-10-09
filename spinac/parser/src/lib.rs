@@ -6,8 +6,8 @@ use std::{
 };
 use common::{Span, Ident, Ty, Symbol};
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
-use session::{Session, ParseSess, Input};
-use errors::{Diag, PResult};
+use sess::{Session, ParseSess, Input};
+use err::{Diag, PResult};
 
 // TODO: Add dcx
 
