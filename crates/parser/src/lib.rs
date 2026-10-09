@@ -148,7 +148,7 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) ->
             _ => format!("couldn't read `{}`: {}", path.display(), e),
         };
 
-        Diag::fatal(msg);
+        Diag::fatal(msg)
     });
 
     let stream = flex(cont.as_str())?;
