@@ -1,4 +1,4 @@
-use std::panic::{panic_any, resume_unwind};
+use std::panic::resume_unwind;
 use common::Span;
 use std::process::ExitCode;
 use std::panic::catch_unwind;
