@@ -223,6 +223,24 @@ impl Parser {
         Ok((ident, decl, body))
     }
 
+    fn parse_fn_body(&self) -> PResult<Box<Block>> {
+        if !eat(TokenKind::OpenBrace) {
+            return Err("Missing fn OpenBrace".as_string());
+        }
+
+        let exprs: Vec<Expr> = Vec::with_capacity(1024);
+
+        self.bump();
+
+        while self.token != TokenKind::Eof
+            && self.token != TokenKind::CloseBrace
+            && self.token != TokenKind::Semi {
+                exprs.pust(parse_expr()?);
+        }
+
+        Ok(Box::new(Block { exprs, span: sp }))
+    }
+
     fn parse_ident(&self) -> PResult<Ident> {
         let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
         self.bump();
