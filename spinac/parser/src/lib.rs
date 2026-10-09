@@ -352,6 +352,10 @@ impl Parser {
             span: ident.span // FIXME: Replace it to real span
         })
     }
+
+    fn parse_init(&self) -> PResult<Expr> {
+        ;
+    }
 }
 
 pub struct ConstItem {
