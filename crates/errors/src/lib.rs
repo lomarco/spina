@@ -40,50 +40,24 @@ pub struct Diag {
 }
 
 impl Diag {
-    pub fn new(level: Level, message: String, span: Option<Span>) -> Self {
+    fn new(level: Level, message: String, span: Option<Span>) -> Self {
         Self { level, message, span }
     }
 
-    pub fn emit(self) {
-        let level = &self.level;
-        self.emit_diagnostic();
-
-        match level {
-            Level::Bug => panic_any(ExplicitBug),
-            Level::Fatal => raise(),
-            _ => {},
-        }
+    pub fn err(message: String, span: Span) -> Self {
+        Self::new(Level::Error, message, Some(span))
     }
 
-    pub fn emit_fatal(self) -> ! {
-        assert_eq!(self.level, Level::Fatal);
-        self.emit();
+    pub fn fatal(message: String) -> ! {
+        Self::new(Level::Fatal, message, None).emit();
         unreachable!();
     }
 
-    fn struct_fatal(self, message: String) -> Diag {
-        Diag::new(Level::Fatal, message, None)
-    }
-
-    pub fn fatal(self, msg: String) -> ! {
-        self.struct_fatal(msg).emit_fatal()
-    }
-
-    fn struct_err(self, message: String, span: Span) -> Diag {
-        Diag::new(Level::Error, message, Some(span))
-    }
-
-    fn emit_err(self) {
-        assert_eq!(self.level, Level::Error);
-        self.emit();
-    }
-
-    pub fn err(self, msg: String, span: Span) {
-        self.struct_err(msg, span).emit_err();
-    }
-
-    fn emit_diagnostic(&self) {
-        eprintln!("Error: {}:, {:#?}", self.message, self.span) // TODO: Add gen diagnostic text with level, ermess, exit-code, span and extract
+    pub fn emit(&self) {
+        eprintln!("Error: {}:, {:#?}", self.message, self.span); // TODO: Add gen diagnostic text with level, ermess, exit-code, span and extract
                    // of code
+        if self.level == Level::Fatal {
+            raise()
+        }
     }
 }
