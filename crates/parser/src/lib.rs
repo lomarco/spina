@@ -4,7 +4,7 @@ use std::{
     mem::replace,
     io::ErrorKind,
 };
-use common::{Span, Ident, Ty};
+use common::{Span, Ident, Ty, Symbol};
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
 use session::{Session, ParseSess, Input};
 use errors::{Diag, PResult};
