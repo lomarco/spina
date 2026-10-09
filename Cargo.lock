@@ -12,18 +12,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "anyhow"
-version = "1.0.104"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
-
-[[package]]
 name = "bc"
 version = "0.1.0"
 
 [[package]]
 name = "common"
 version = "0.1.0"
+
+[[package]]
+name = "errors"
+version = "0.1.0"
+dependencies = [
+ "common",
+]
 
 [[package]]
 name = "fnv"
@@ -36,8 +37,8 @@ name = "lex"
 version = "0.1.0"
 dependencies = [
  "common",
+ "errors",
  "logos",
- "thiserror",
 ]
 
 [[package]]
@@ -60,7 +61,7 @@ dependencies = [
  "quote",
  "regex-automata",
  "regex-syntax",
- "syn 2.0.119",
+ "syn",
 ]
 
 [[package]]
@@ -83,6 +84,7 @@ name = "parser"
 version = "0.1.0"
 dependencies = [
  "common",
+ "errors",
  "lex",
  "session",
 ]
@@ -130,8 +132,9 @@ version = "0.1.0"
 name = "spina"
 version = "0.1.0"
 dependencies = [
- "anyhow",
+ "errors",
  "parser",
+ "session",
 ]
 
 [[package]]
@@ -143,37 +146,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
-]
-
-[[package]]
-name = "syn"
-version = "3.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8593e8e72159ed2257d083c7a454a85cbf854f37a0966d8d483aff8c8a3ebcee"
-dependencies = [
- "proc-macro2",
- "quote",
- "unicode-ident",
-]
-
-[[package]]
-name = "thiserror"
-version = "2.0.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec86235f5fcc2a73650310756d2ac5b138a5780bbbdfae3eeccec992c435ba4f"
-dependencies = [
- "thiserror-impl",
-]
-
-[[package]]
-name = "thiserror-impl"
-version = "2.0.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc04cd3e1236dd4a98afca4569f2deb3f120e5422a4023be2cb683f8486292af"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 3.0.6",
 ]
 
 [[package]]

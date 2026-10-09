@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Span {
     pub start: u32,
     pub end: u32,
@@ -12,6 +12,12 @@ impl From<Range<usize>> for Span {
             start: r.start as u32,
             end: r.end as u32
         }
+    }
+}
+
+impl Span {
+    pub fn new(start: u32, end: u32) -> Self {
+        Self { start, end }
     }
 }
 

@@ -20,7 +20,7 @@ impl Session {
 
 pub struct Source (String);
 
-pub struct ParseSess {
+pub struct ParseSess { // TODO: Delete this excess struct
     pub source: Source,
     // TODO: Add the rest fields
 }

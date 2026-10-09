@@ -1,11 +1,6 @@
 use logos::Logos; // TODO: Rewrite it for myself
-use thiserror::Error;
 use common::{Span, Ident, Ty, Symbol};
-
-// pub enum LexError {
-//    #[error("unexpected char '{char}' on position {position}")]
-//    UnexpectedChar { char: char, position: usize },
-//}
+use errors::Diag;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
@@ -271,9 +266,10 @@ impl TokenStream {
 
 // TODO: Add TokenStream struct
 
-pub fn flex(content: &str) -> Result<TokenStream, String> {
+pub fn flex(content: &str) -> Result<TokenStream, Vec<Diag>> {
     let mut tokens: Vec<Token> = Vec::with_capacity(512);
 
+    let mut errs: Vec<Diag> = Vec::new();
     for (res, span) in TokenKind::lexer(content).spanned() {
         match res {
             Ok(token) => tokens.push(Token::new(token, Span::from(span))),
@@ -283,7 +279,7 @@ pub fn flex(content: &str) -> Result<TokenStream, String> {
                     .chars()
                     .next()
                     .unwrap();
-                return Err(format!("unexpected char '{ch}' on position {position}"));
+                errs.push(Diag::err(format!("unexpected char '{ch}' on position '{position}'"), Span::from(span)));
             }
         }
     }

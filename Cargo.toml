@@ -13,14 +13,17 @@ members = [
     "crates/lex",
     "crates/parser",
     "crates/common",
-    "crates/session"]
+    "crates/session",
+    "crates/errors"
+]
 
 [dependencies]
-anyhow = "^1.0.104"
 parser = {path = "crates/parser"}
+session = {path = "crates/session"}
+errors = {path = "crates/errors"}
 
 [workspace.dependencies]
 common = {path = "crates/common"}
 lex = {path = "crates/lex"}
 session = {path = "crates/session"}
-thiserror = "^2"
+errors = {path = "crates/errors"}
