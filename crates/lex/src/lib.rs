@@ -216,12 +216,12 @@ impl Token {
 
     pub fn ty(&self) -> Option<Ty> {
         match self.kind {
-            Ty(kind, span) => Some(Ty::new(kind, span)),
+            TokenKind::Ident(name) => Some(Ty::new()),
             _ => None,
         }
     }
 
-    fn is_keyword(&self, ident: Ident) -> bool {
+    fn is_keyword(&self, kw: Symbol) -> bool {
         matches!(
             ident.name.0.as_str(),
             "fn" | "let" | "for" | "while" // ...
