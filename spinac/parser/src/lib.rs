@@ -241,6 +241,21 @@ impl Parser {
         Ok(Box::new(Block { exprs, span: sp }))
     }
 
+    fn parse_expr(&self) -> PResult<Expr> { // TODO: Add Interner
+        ;
+
+        let expr = if self.token.is_keyword() {
+            ;
+        } else if self.token.is_keyword() {
+            ;
+        }
+
+        Ok(match self.token.kind {
+            TokenKind::Ident.is_keyword() => parse_let()?,
+            // TODO: Add the rest ExprKind::*
+        })
+    }
+
     fn parse_ident(&self) -> PResult<Ident> {
         let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
         self.bump();

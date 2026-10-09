@@ -221,7 +221,7 @@ impl Token {
         }
     }
 
-    fn is_keyword(&self, kw: Symbol) -> bool {
+    fn is_keyword(&self, kw: Symbol) -> bool { // TODO: Add Interner
         matches!(
             ident.name.0.as_str(),
             "fn" | "let" | "for" | "while" // ...
