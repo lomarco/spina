@@ -1,8 +1,12 @@
-use std::panic::resume_unwind;
+use std::{
+    panic::{
+        resume_unwind,
+        catch_unwind,
+        AssertUnwindSafe
+    },
+    process::ExitCode,
+};
 use common::Span;
-use std::process::ExitCode;
-use std::panic::catch_unwind;
-use std::panic::AssertUnwindSafe;
 
 pub type PResult<T> = Result<T, Diag>;
 

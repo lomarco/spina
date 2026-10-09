@@ -1,11 +1,13 @@
+use std::{
+    fs::read_to_string,
+    path::Path,
+    mem::replace,
+    io::ErrorKind,
+};
 use common::{Span, Ident, Ty};
-use std::fs::read_to_string;
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
 use session::{Session, ParseSess, Input};
-use std::path::Path;
-use std::mem::replace;
 use errors::{Diag, PResult};
-use std::io::ErrorKind;
 
 // TODO: Add dcx
 
