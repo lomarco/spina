@@ -6,5 +6,5 @@ edition = "2024"
 [dependencies]
 common = { workspace = true }
 lex = { workspace = true }
-session = { workspace = true }
-errors = { workspace = true }
+sess = { workspace = true }
+err = { workspace = true }

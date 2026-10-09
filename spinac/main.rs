@@ -1,6 +1,6 @@
-use session::{Session, ParseSess, build_session};
+use sess::{Session, ParseSess, build_session};
 use parser::parse;
-use errors::catch_fatal_error_marker;
+use err::catch_fatal_error_marker;
 
 use std::{
     env, // FIXME: Replace this code to clap
