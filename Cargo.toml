@@ -6,7 +6,6 @@ edition = "2024"
 [workspace]
 resolver = "3"
 members = [
-  "spinac/entry",
   "spinac/parser",
   "spinac/lex",
   "spinac/common",
@@ -21,7 +20,7 @@ sess = {path = "spinac/sess"}
 err = {path = "spinac/err"}
 
 [[bin]]
-path = "spinac/entry/main.rs"
+path = "spinac/main.rs"
 name = "spinac"
 
 [dependencies]
