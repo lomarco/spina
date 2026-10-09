@@ -1,28 +1,4 @@
-[package]
-name = "spina"
-version = "0.1.0"
-edition = "2024"
-
-[[bin]]
-path = "crates/core/main.rs"
-name = "spina"
-
 [workspace]
 members = [
-    "crates/parser",
-    "crates/lex",
-    "crates/common",
-    "crates/session",
-    "crates/errors"
+  "compiler/spina"
 ]
-
-[dependencies]
-parser = {path = "crates/parser"}
-session = {path = "crates/session"}
-errors = {path = "crates/errors"}
-
-[workspace.dependencies]
-common = {path = "crates/common"}
-lex = {path = "crates/lex"}
-session = {path = "crates/session"}
-errors = {path = "crates/errors"}
