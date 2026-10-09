@@ -203,7 +203,7 @@ impl Parser {
     }
 
     fn parse_item_kind(&self, sp: Span) -> PResult<Option<ItemKind>> {
-        if self.check_fn_front_matter() {
+        if self.is_fn() {
             let (ident, decl, body) = self.parse_fn(sp)?;
             Ok(Some(ItemKind::Fn(Box::new(Fn {
                 ident,
