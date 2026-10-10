@@ -1,4 +1,7 @@
-use std::ops::Range;
+use std::{
+    ops::Range,
+    collections::HashMap,
+};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Span {
