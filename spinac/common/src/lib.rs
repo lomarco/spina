@@ -25,13 +25,7 @@ impl Span {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct Symbol(pub String); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
-
-impl From<&str> for Symbol {
-    fn from(s: &str) -> Self {
-        Symbol(s.to_string())
-    }
-}
+pub struct Symbol(u32); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
 
 pub struct Ident {
     pub name: Symbol,
