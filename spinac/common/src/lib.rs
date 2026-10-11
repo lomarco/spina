@@ -24,6 +24,22 @@ impl Span {
     }
 }
 
+pub struct Interner {
+    hs: HashMap<&'static str, u32>,
+}
+
+impl Interner {
+    pub fn new(init: &[&'static str]) -> Self {
+        let hs_size = init.len();
+        let mut hs: HashMap<&str, u32> = HashMap::with_capacity(hs_size);
+
+        for v in init {
+            hs.entry(v);
+        }
+        Interner { hs }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Symbol(u32); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
 
