@@ -3,6 +3,12 @@ use std::{
     collections::HashMap,
 };
 
+use std::sync::LazyLock;
+
+pub static INTERNER: LazyLock<Interner> = LazyLock::new(|| {
+    Interner::new(KEYWORDS)
+});
+
 macro_rules! keywords {
     ($($name:ident: $str:literal),* $(,)?) => {
         pub const KEYWORDS: &[&str] = &[$($str),*];
