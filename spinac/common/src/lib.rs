@@ -66,7 +66,7 @@ impl Interner {
         for v in init {
             hs.entry(v);
         }
-        Interner { hs }
+        Interner { hs } // TODO: Add key as index from 1 to ...
     }
 }
 
