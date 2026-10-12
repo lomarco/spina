@@ -3,6 +3,30 @@ use std::{
     collections::HashMap,
 };
 
+macro_rules! keywords {
+    ($($name:ident: $str:literal),* $(,)?) => {
+        pub const KEYWORDS: &[&str] = &[$($str),*];
+        #[allow(non_upper_case_globals)]
+        pub mod kw {
+            keywords!(@consts 0u32; $($name), *);
+        }
+    };
+    (@consts $i:expr; $name:ident $(, $rest:ident)*) => {
+        pub const $name: crate::Symbol = crate::Symbol::new($i);
+        keywords!(@consts $i + 1; $($rest),*);
+    };
+    (@consts $i:expr;) => {};
+}
+
+keywords! {
+    Let: "let",
+    If: "if",
+    For: "for",
+    While: "while",
+    // TODO: Add the rest keywords
+    // ...
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct Span {
     pub start: u32,
