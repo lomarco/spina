@@ -67,6 +67,12 @@ impl Interner {
 #[derive(Debug, PartialEq, Clone)]
 pub struct Symbol(u32); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
 
+impl Symbol {
+    pub const fn new(n: u32) -> Self {
+        Self(n)
+    }
+}
+
 pub struct Ident {
     pub name: Symbol,
     pub span: Span,
