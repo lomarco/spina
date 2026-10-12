@@ -77,6 +77,10 @@ impl Symbol {
     pub const fn new(n: u32) -> Self {
         Self(n)
     }
+
+    pub fn intern(s: &str) -> Self {
+        INTERNER.intern(s)
+    }
 }
 
 pub struct Ident {
