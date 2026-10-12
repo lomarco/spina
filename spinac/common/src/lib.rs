@@ -55,7 +55,7 @@ impl Span {
 }
 
 pub struct Interner {
-    hs: HashMap<&'static str, u32>,
+    hs: HashMap<&'static str, Symbol>,
 }
 
 impl Interner {
@@ -67,6 +67,10 @@ impl Interner {
             hs.entry(v);
         }
         Interner { hs } // TODO: Add key as index from 1 to ...
+    }
+
+    pub fn intern(&self, s: &str) -> Symbol {
+        ;
     }
 }
 
