@@ -61,13 +61,15 @@ pub struct Interner {
 
 impl Interner {
     pub fn new(init: &[&'static str]) -> Self {
-        let hs_size = init.len();
-        let mut hs: HashMap<&str, u32> = HashMap::with_capacity(hs_size);
+        let size = init.len();
+        let mut hs: HashMap<&'static str, Symbol> = HashMap::with_capacity(size);
+        let mut strs: Vec<&'static str> = Vec::with_capacity(size);
 
         for v in init {
-            hs.entry(v);
+            hs.insert(v, Symbol::new(strs.len() as u32));
+            strs.push(v);
         }
-        Interner { hs } // TODO: Add key as index from 1 to ...
+        Interner { hs, strs }
     }
 
     pub fn intern(&self, s: &str) -> Symbol {
