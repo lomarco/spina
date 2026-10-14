@@ -65,8 +65,8 @@ impl Interner {
         let mut hs: HashMap<&'static str, Symbol> = HashMap::with_capacity(size);
         let mut strs: Vec<&'static str> = Vec::with_capacity(size);
 
-        for v in init {
-            hs.insert(v, Symbol::new(strs.len() as u32));
+        for (i, v) in init.iter().enumerate() {
+            hs.insert(v, Symbol::new(i as u32));
             strs.push(v);
         }
         Interner { hs, strs }
