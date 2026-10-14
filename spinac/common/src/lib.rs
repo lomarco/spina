@@ -56,6 +56,7 @@ impl Span {
 
 pub struct Interner {
     hs: HashMap<&'static str, Symbol>,
+    strs: Vec<&'static str>
 }
 
 impl Interner {
