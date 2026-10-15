@@ -4,9 +4,10 @@ use std::{
 };
 
 use std::sync::LazyLock;
+use std::sync::Mutex;
 
-pub static INTERNER: LazyLock<Interner> = LazyLock::new(|| {
-    Interner::new(KEYWORDS)
+static INTERNER: LazyLock<Mutex<Interner>> = LazyLock::new(|| {
+    Mutex::new(Interner::new(KEYWORDS))
 });
 
 macro_rules! keywords {
@@ -93,8 +94,8 @@ impl Symbol {
         Self(n)
     }
 
-    pub fn intern(s: &str) -> Self {
-        INTERNER.intern(s)
+    pub fn intern(s: &'static str) -> Self {
+        INTERNER.lock().unwrap().intern(s)
     }
 }
 
