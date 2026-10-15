@@ -72,12 +72,20 @@ impl Interner {
         Interner { hs, strs }
     }
 
-    pub fn intern(&self, s: &str) -> Symbol {
-        ;
+    pub fn intern(&mut self, s: &'static str) -> Symbol {
+        if let Some(&symbol) = self.hs.get(s) {
+            return symbol;
+        }
+
+        let id = self.strs.len() as u32;
+
+        self.hs.insert(s, Symbol::new(id));
+        self.strs.push(s);
+        Symbol(id)
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Symbol(u32); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
 
 impl Symbol {
