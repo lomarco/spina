@@ -15,12 +15,9 @@ pub struct Session {
 //    ;
 //}
 
-impl Session {
+impl Session { // TODO: Delete this excess struct
 }
 
-pub struct Source (String);
-
 pub struct ParseSess { // TODO: Delete this excess struct
-    pub source: Source,
     // TODO: Add the rest fields
 }

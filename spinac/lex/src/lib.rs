@@ -1,6 +1,6 @@
 use logos::Logos; // TODO: Rewrite it for myself
 use common::{Span, Ident, Ty, Symbol};
-use errors::Diag;
+use err::Diag;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")]
@@ -166,7 +166,7 @@ pub enum TokenKind {
     CloseBracket,
 
 
-    #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| Symbol(lex.slice().to_string()))]
+    #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| Symbol::intern(lex.slice()))]
     Ident(Symbol),
 
     // TODO: Replace it to Literal(LiteralKind)
@@ -221,11 +221,8 @@ impl Token {
         }
     }
 
-    fn is_keyword(&self, kw: Symbol) -> bool {
-        matches!(
-            ident.name.0.as_str(),
-            "fn" | "let" | "for" | "while" // ...
-        )
+    pub fn is_keyword(&self, kw: Symbol) -> bool {
+        self.ident().is_some_and(|id| id.name == kw)
     }
 }
 
@@ -259,8 +256,8 @@ impl TokenStream {
         Self(tss)
     }
 
-    pub fn get(&self, idx: usize) -> Option<Token> {
-        self.get(idx) // TODO: Fix it
+    pub fn get(&self, idx: usize) -> Option<&Token> {
+        self.0.get(idx)
     }
 }
 

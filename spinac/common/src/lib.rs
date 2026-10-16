@@ -1,4 +1,38 @@
-use std::ops::Range;
+use std::{
+    ops::Range,
+    collections::HashMap,
+};
+
+use std::sync::LazyLock;
+use std::sync::Mutex;
+
+static INTERNER: LazyLock<Mutex<Interner>> = LazyLock::new(|| {
+    Mutex::new(Interner::new(KEYWORDS))
+});
+
+macro_rules! keywords {
+    ($($name:ident: $str:literal),* $(,)?) => {
+        pub const KEYWORDS: &[&str] = &[$($str),*];
+        #[allow(non_upper_case_globals)]
+        pub mod kw {
+            keywords!(@consts 0u32; $($name), *);
+        }
+    };
+    (@consts $i:expr; $name:ident $(, $rest:ident)*) => {
+        pub const $name: crate::Symbol = crate::Symbol::new($i);
+        keywords!(@consts $i + 1; $($rest),*);
+    };
+    (@consts $i:expr;) => {};
+}
+
+keywords! {
+    Let: "let",
+    If: "if",
+    For: "for",
+    While: "while",
+    // TODO: Add the rest keywords
+    // ...
+}
 
 #[derive(Debug, Copy, Clone)]
 pub struct Span {
@@ -21,12 +55,51 @@ impl Span {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct Symbol(pub String); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
+pub struct Interner {
+    hs: HashMap<Box<str>, Symbol>,
+    strs: Vec<Box<str>>
+}
 
-impl From<&str> for Symbol {
-    fn from(s: &str) -> Self {
-        Symbol(s.to_string())
+impl Interner {
+    pub fn new(init: &[&str]) -> Self {
+        let size = init.len();
+        let mut hs: HashMap<Box<str>, Symbol> = HashMap::with_capacity(size);
+        let mut strs: Vec<Box<str>> = Vec::with_capacity(size);
+
+        for (i, v) in init.iter().enumerate() {
+            let owned: Box<str> = Box::from(*v);
+
+            hs.insert(owned.clone(), Symbol::new(i as u32));
+            strs.push(owned);
+        }
+        Interner { hs, strs }
+    }
+
+    pub fn intern(&mut self, s: &str) -> Symbol {
+        if let Some(&symbol) = self.hs.get(s) {
+            return symbol;
+        }
+
+        let id = self.strs.len() as u32;
+
+        let owned: Box<str> = Box::from(s);
+
+        self.hs.insert(owned.clone(), Symbol::new(id)); ////////
+        self.strs.push(owned);
+        Symbol(id)
+    }
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub struct Symbol(u32); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
+
+impl Symbol {
+    pub const fn new(n: u32) -> Self {
+        Self(n)
+    }
+
+    pub fn intern(s: &str) -> Self {
+        INTERNER.lock().unwrap().intern(s)
     }
 }
 

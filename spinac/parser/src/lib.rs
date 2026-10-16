@@ -6,14 +6,12 @@ use std::{
 };
 use common::{Span, Ident, Ty, Symbol};
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
-use session::{Session, ParseSess, Input};
-use errors::{Diag, PResult};
+use sess::{Session, ParseSess, Input};
+use err::{Diag, PResult};
 
 // TODO: Add dcx
 
-pub struct Unit {
-    pub items: Vec<Item>,
-}
+pub struct Unit(Vec<Item>);
 
 pub enum LitKind {
     Bool, // AST only, must never appear in a `Token`
@@ -167,7 +165,7 @@ pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
     unwrap_or_emit_fatal(match &sess.input {
         Input::File(file) => new_parser_from_file(&sess.psess, file, None),
         Input::Str(str) => new_parser_from_str(&sess.psess, str),
-    }).parse_unit()
+    }).parse_unit().unwrap_or_else(|parse_error| parse_error.emit().raise())
 }
 
 pub struct Parser {
@@ -186,8 +184,7 @@ impl Parser {
     }
 
     pub fn parse_unit(&self) -> PResult<Unit> {
-        let items = parse_items()?;
-        Ok(Unit { items })
+        Ok(Unit(parse_items()))
     }
 
     fn parse_items(&self) -> PResult<Vec<Item>> {
@@ -201,12 +198,62 @@ impl Parser {
         }
     }
 
+    fn parse_item(&self) -> PResult<Option<Item>> {
+        Ok(self.parse_item_kind(self.token.span)?.map(|kind| Item { kind, span }))
+    }
+
+    fn parse_item_kind(&self, sp: Span) -> PResult<Option<ItemKind>> {
+        if self.is_fn() {
+            let (ident, decl, body) = self.parse_fn(sp)?;
+            Ok(Some(ItemKind::Fn(Box::new(Fn {
+                ident,
+                ty,
+                body,
+            }))))
+        } else { // TODO: Add const item parse
+            Ok(None)
+        }
+    }
+
     fn parse_fn(&self, sp: Span) -> PResult<(Ident, FnDecl, Box<Block>)> {
         let fn_span = self.token.span;
         let ident = self.parse_ident()?;
         let decl = self.parse_fn_decl()?;
         let body = self.parse_fn_body()?;
         Ok((ident, decl, body))
+    }
+
+    fn parse_fn_body(&self) -> PResult<Box<Block>> {
+        if !eat(TokenKind::OpenBrace) {
+            return Err("Missing fn OpenBrace".as_string());
+        }
+
+        let exprs: Vec<Expr> = Vec::with_capacity(1024);
+
+        self.bump();
+
+        while self.token != TokenKind::Eof
+            && self.token != TokenKind::CloseBrace
+            && self.token != TokenKind::Semi {
+                exprs.pust(parse_expr()?);
+        }
+
+        Ok(Box::new(Block { exprs, span: sp }))
+    }
+
+    fn parse_expr(&self) -> PResult<Expr> { // TODO: Add Interner
+        ;
+
+        let expr = if self.token.is_keyword() {
+            ;
+        } else if self.token.is_keyword() {
+            ;
+        }
+
+        Ok(match self.token.kind {
+            TokenKind::Ident.is_keyword() => parse_let()?,
+            // TODO: Add the rest ExprKind::*
+        })
     }
 
     fn parse_ident(&self) -> PResult<Ident> {
@@ -304,6 +351,10 @@ impl Parser {
                 ident.span),
             span: ident.span // FIXME: Replace it to real span
         })
+    }
+
+    fn parse_init(&self) -> PResult<Expr> {
+        ;
     }
 }
 
