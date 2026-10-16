@@ -10,6 +10,36 @@ static INTERNER: LazyLock<Mutex<Interner>> = LazyLock::new(|| {
     Mutex::new(Interner::new(KEYWORDS))
 });
 
+macro_rules! scalar {
+    ($($name:ident: $str:literal),* $(,)?) => {
+        pub const SCALAR: &[&str] = &[$($str),*];
+        #[allow(non_upper_case_globals)]
+        pub mod ty {
+            scalar!(@consts 0u32; $($name), *);
+        }
+    };
+    (@consts $i:expr; $name:ident $(, $rest:ident)*) => {
+        pub const $name: crate::Symbol = crate::Symbol::new($i);
+        scalar!(@consts $i + 1; $($rest),*);
+    };
+    (@consts $i:expr;) => {};
+}
+
+scalar! {
+    I8: "i8",
+    U8: "u8",
+    I16: "i16",
+    U16: "U16",
+    I32: "i32",
+    U32: "U32",
+    I64: "i64",
+    U64: "U64",
+    I128: "i128",
+    U128: "U128",
+    Isize: "isize",
+    Usize: "usize",
+}
+
 macro_rules! keywords {
     ($($name:ident: $str:literal),* $(,)?) => {
         pub const KEYWORDS: &[&str] = &[$($str),*];
