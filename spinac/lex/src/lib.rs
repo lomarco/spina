@@ -217,11 +217,8 @@ impl Token {
         }
     }
 
-    pub fn ty(&self) -> Option<Ty> {
-        match self.kind {
-            TokenKind::Ident(name) => Some(Ty::new()),
-            _ => None,
-        }
+    pub fn is_ty(&self, ty: Symbol) -> bool {
+        self.ident().is_some_and(|id| id.name == ty)
     }
 
     pub fn is_keyword(&self, kw: Symbol) -> bool {
