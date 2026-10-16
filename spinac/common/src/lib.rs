@@ -56,32 +56,36 @@ impl Span {
 }
 
 pub struct Interner {
-    hs: HashMap<&'static str, Symbol>,
-    strs: Vec<&'static str>
+    hs: HashMap<Box<str>, Symbol>,
+    strs: Vec<Box<str>>
 }
 
 impl Interner {
-    pub fn new(init: &[&'static str]) -> Self {
+    pub fn new(init: &[&str]) -> Self {
         let size = init.len();
-        let mut hs: HashMap<&'static str, Symbol> = HashMap::with_capacity(size);
-        let mut strs: Vec<&'static str> = Vec::with_capacity(size);
+        let mut hs: HashMap<Box<str>, Symbol> = HashMap::with_capacity(size);
+        let mut strs: Vec<Box<str>> = Vec::with_capacity(size);
 
         for (i, v) in init.iter().enumerate() {
-            hs.insert(v, Symbol::new(i as u32));
-            strs.push(v);
+            let owned: Box<str> = Box::from(*v);
+
+            hs.insert(owned.clone(), Symbol::new(i as u32));
+            strs.push(owned);
         }
         Interner { hs, strs }
     }
 
-    pub fn intern(&mut self, s: &'static str) -> Symbol {
+    pub fn intern(&mut self, s: &str) -> Symbol {
         if let Some(&symbol) = self.hs.get(s) {
             return symbol;
         }
 
         let id = self.strs.len() as u32;
 
-        self.hs.insert(s, Symbol::new(id));
-        self.strs.push(s);
+        let owned: Box<str> = Box::from(s);
+
+        self.hs.insert(owned.clone(), Symbol::new(id)); ////////
+        self.strs.push(owned);
         Symbol(id)
     }
 }
@@ -94,7 +98,7 @@ impl Symbol {
         Self(n)
     }
 
-    pub fn intern(s: &'static str) -> Self {
+    pub fn intern(s: &str) -> Self {
         INTERNER.lock().unwrap().intern(s)
     }
 }
