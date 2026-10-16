@@ -1,5 +1,5 @@
 use logos::Logos; // TODO: Rewrite it for myself
-use common::{Span, Ident, Ty, Symbol};
+use common::{Span, Ident, Symbol};
 use err::Diag;
 
 #[derive(Logos, Debug, PartialEq, Clone, Copy)]
