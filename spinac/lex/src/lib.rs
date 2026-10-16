@@ -256,8 +256,8 @@ impl TokenStream {
         Self(tss)
     }
 
-    pub fn get(&self, idx: usize) -> Option<Token> {
-        self.get(idx) // TODO: Fix it
+    pub fn get(&self, idx: usize) -> Option<&Token> {
+        self.0.get(idx)
     }
 }
 
