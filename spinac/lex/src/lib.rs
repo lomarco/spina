@@ -2,7 +2,7 @@ use logos::Logos; // TODO: Rewrite it for myself
 use common::{Span, Ident, Ty, Symbol};
 use err::Diag;
 
-#[derive(Logos, Debug, PartialEq)]
+#[derive(Logos, Debug, PartialEq, Clone, Copy)]
 #[logos(skip r"[ \t\n\f]+")]
 pub enum TokenKind {
     #[token("=")]
@@ -193,6 +193,7 @@ pub enum TokenKind {
 
 pub const DUMMY_SP: Span = Span { start: 0, end: 0 };
 
+#[derive(Clone, Copy)]
 pub struct Token {
     pub kind: TokenKind,
     pub span: Span,
@@ -242,10 +243,10 @@ impl TokenCursor {
 
     pub fn next_and_bump(&mut self) -> Token {
         self.bump();
-        match self.stream.get(self.next_idx) {
-            Some(next_tok) => return next_tok,
-            None => return Token::new(TokenKind::Eof, DUMMY_SP),
-        }
+        self.stream
+            .get(self.next_idx)
+            .cloned()
+            .unwrap_or_else(|| Token::new(TokenKind::Eof, DUMMY_SP))
     }
 }
 
