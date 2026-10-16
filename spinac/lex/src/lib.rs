@@ -209,9 +209,11 @@ impl Token {
     }
 
     pub fn ident(&self) -> Option<Ident> {
-        match &self.kind {
-            TokenKind::Ident(name) => Some(Ident::new(name.clone(), self.span)),
-            _ => None,
+        if let TokenKind::Ident(name) = &self.kind {
+            Some(Ident::new(name.clone(), self.span))
+        }
+        else {
+            None
         }
     }
 
