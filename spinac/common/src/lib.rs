@@ -34,7 +34,7 @@ keywords! {
     // ...
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Span {
     pub start: u32,
     pub end: u32,

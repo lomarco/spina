@@ -193,7 +193,7 @@ pub enum TokenKind {
 
 pub const DUMMY_SP: Span = Span { start: 0, end: 0 };
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct Token {
     pub kind: TokenKind,
     pub span: Span,
