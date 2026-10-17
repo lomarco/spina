@@ -7,7 +7,7 @@ use std::sync::LazyLock;
 use std::sync::Mutex;
 
 static INTERNER: LazyLock<Mutex<Interner>> = LazyLock::new(|| {
-    Mutex::new(Interner::new(KEYWORDS))
+    Mutex::new(Interner::new(SYMBOLS))
 });
 
 macro_rules! symbols {
@@ -19,8 +19,7 @@ macro_rules! symbols {
             $($ty_name:ident : $ty_str:literal),* $(,)?
         }
     ) => {
-        pub const KEYWORDS: &[&str] = &[$($kw_str),*];
-        pub const TYPES: &[&str] = &[$($ty_str),*];
+        pub const SYMBOLS: &[&str] = &[$($kw_str,)* $($ty_str,)*];
 
         #[allow(non_upper_case_globals)]
         pub mod kw {
