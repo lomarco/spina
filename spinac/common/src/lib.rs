@@ -131,6 +131,10 @@ impl Interner {
         self.strs.push(owned);
         Symbol(id)
     }
+
+    fn get_str(&self, symbol: Symbol) -> &str {
+        &self.strs[symbol.0 as usize]
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
