@@ -57,6 +57,12 @@ impl Diag {
         unreachable!();
     }
 
+    pub fn emit_fatal(self) -> ! {
+        assert_eq!(self.level, Level::Fatal);
+        self.emit();
+        unreachable!();
+    }
+
     pub fn emit(&self) {
         eprintln!("Error: {}:, {:#?}", self.message, self.span); // TODO: Add gen diagnostic text with level, ermess, exit-code, span and extract
                    // of code
