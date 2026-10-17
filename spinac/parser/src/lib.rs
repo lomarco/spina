@@ -171,6 +171,7 @@ pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
 pub struct Parser {
     psess: &ParseSess,
     pub token: Token,
+    pub prev_token: Token,
     token_cursor: TokenCursor,
 }
 
@@ -179,6 +180,7 @@ impl Parser {
         Parser {
             psess,
             token: Token::dummy(),
+            prev_token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),
         }
     }
@@ -334,7 +336,7 @@ impl Parser {
         self.bump_with(token);
     }
 
-    fn bump_with(&self, next_token: Token) {
+    fn bump_with(&mut self, next_token: Token) {
         self.prev_token = replace(&mut self.token, next_token)
     }
 
