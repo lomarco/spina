@@ -151,7 +151,7 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) ->
         Diag::fatal(msg)
     });
 
-    let stream = flex(cont.as_str())?;
+    let stream = flex(&cont)?;
 
     let parser = Parser::new(psess, stream);
     Ok(parser)
