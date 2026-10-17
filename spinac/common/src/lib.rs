@@ -148,6 +148,10 @@ impl Symbol {
     pub fn intern(s: &str) -> Self {
         INTERNER.lock().unwrap().intern(s)
     }
+
+    pub fn as_str(&self) -> String {
+        INTERNER.lock().unwrap().get_str(*self).to_owned()
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
