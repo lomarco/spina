@@ -188,11 +188,15 @@ pub struct Parser {
 
 impl Parser {
     pub fn new(stream: TokenStream) -> Self {
-        Parser {
+        let mut parser = Parser {
             token: Token::dummy(),
             prev_token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),
-        }
+        };
+
+        parser.bump();
+
+        parser
     }
 
     pub fn parse_unit(&mut self) -> PResult<Unit> {
