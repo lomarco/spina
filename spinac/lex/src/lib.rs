@@ -1,6 +1,6 @@
-use logos::Logos; // TODO: Rewrite it for myself
-use common::{Span, Ident, Symbol};
+use common::{Ident, Span, Symbol};
 use err::Diag;
+use logos::Logos; // TODO: Rewrite it for myself
 
 #[derive(Logos, Debug, PartialEq, Clone, Copy)]
 #[logos(skip r"[ \t\n\f]+")]
@@ -98,7 +98,6 @@ pub enum TokenKind {
     #[token(">>=")]
     ShrEq,
 
-
     #[token("@")]
     At,
 
@@ -165,7 +164,6 @@ pub enum TokenKind {
     #[token("]")]
     CloseBracket,
 
-
     #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| Symbol::intern(lex.slice()))]
     Ident(Symbol),
 
@@ -184,7 +182,6 @@ pub enum TokenKind {
     // TODO ^
     //      |
     //      |
-
     Dummy,
 
     #[end]
@@ -211,8 +208,7 @@ impl Token {
     pub fn ident(&self) -> Option<Ident> {
         if let TokenKind::Ident(name) = &self.kind {
             Some(Ident::new(name.clone(), self.span))
-        }
-        else {
+        } else {
             None
         }
     }
@@ -228,12 +224,15 @@ impl Token {
 
 pub struct TokenCursor {
     stream: TokenStream,
-    next_idx: usize
+    next_idx: usize,
 }
 
 impl TokenCursor {
     pub fn new(stream: TokenStream) -> Self {
-        TokenCursor { stream: stream, next_idx: 0}
+        TokenCursor {
+            stream: stream,
+            next_idx: 0,
+        }
     }
 
     fn bump(&mut self) {
@@ -275,11 +274,11 @@ pub fn flex(content: &str) -> Result<TokenStream, Vec<Diag>> {
             Ok(token) => tokens.push(Token::new(token, Span::from(span))),
             Err(_) => {
                 let position = span.start;
-                let ch = content[span.clone()]
-                    .chars()
-                    .next()
-                    .unwrap();
-                errs.push(Diag::err(format!("unexpected char '{ch}' on position '{position}'"), Span::from(span)));
+                let ch = content[span.clone()].chars().next().unwrap();
+                errs.push(Diag::err(
+                    format!("unexpected char '{ch}' on position '{position}'"),
+                    Span::from(span),
+                ));
             }
         }
     }

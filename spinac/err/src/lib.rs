@@ -1,12 +1,8 @@
+use common::Span;
 use std::{
-    panic::{
-        resume_unwind,
-        catch_unwind,
-        AssertUnwindSafe
-    },
+    panic::{AssertUnwindSafe, catch_unwind, resume_unwind},
     process::ExitCode,
 };
-use common::Span;
 
 pub type PResult<T> = Result<T, Diag>;
 
@@ -45,7 +41,11 @@ pub struct Diag {
 
 impl Diag {
     fn new(level: Level, message: String, span: Option<Span>) -> Self {
-        Self { level, message, span }
+        Self {
+            level,
+            message,
+            span,
+        }
     }
 
     pub fn err(message: String, span: Span) -> Self {
@@ -57,7 +57,8 @@ impl Diag {
         unreachable!();
     }
 
-    pub fn emit_fatal(self) -> ! { // TODO: Remove me
+    pub fn emit_fatal(self) -> ! {
+        // TODO: Remove me
         assert_eq!(self.level, Level::Fatal);
         self.emit();
         unreachable!();
@@ -65,7 +66,7 @@ impl Diag {
 
     pub fn emit(&self) {
         eprintln!("Error: {}:, {:#?}", self.message, self.span); // TODO: Add gen diagnostic text with level, ermess, exit-code, span and extract
-                   // of code
+        // of code
         if let Level::Fatal = self.level {
             raise()
         }

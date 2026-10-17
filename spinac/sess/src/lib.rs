@@ -13,7 +13,7 @@ pub struct Session {
 impl Session {
     pub fn new(path: &str) -> Self {
         Self {
-            input: Input::File(PathBuf::from(path))
+            input: Input::File(PathBuf::from(path)),
         }
     }
 }

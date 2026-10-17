@@ -1,14 +1,9 @@
-use std::{
-    ops::Range,
-    collections::HashMap,
-};
+use std::{collections::HashMap, ops::Range};
 
 use std::sync::LazyLock;
 use std::sync::Mutex;
 
-static INTERNER: LazyLock<Mutex<Interner>> = LazyLock::new(|| {
-    Mutex::new(Interner::new(SYMBOLS))
-});
+static INTERNER: LazyLock<Mutex<Interner>> = LazyLock::new(|| Mutex::new(Interner::new(SYMBOLS)));
 
 macro_rules! symbols {
     (
@@ -87,7 +82,7 @@ impl From<Range<usize>> for Span {
     fn from(r: Range<usize>) -> Self {
         Self {
             start: r.start as u32,
-            end: r.end as u32
+            end: r.end as u32,
         }
     }
 }
@@ -100,7 +95,7 @@ impl Span {
 
 pub struct Interner {
     hs: HashMap<Box<str>, Symbol>,
-    strs: Vec<Box<str>>
+    strs: Vec<Box<str>>,
 }
 
 impl Interner {

@@ -1,13 +1,8 @@
-use std::{
-    fs::read_to_string,
-    path::Path,
-    mem::replace,
-    io::ErrorKind,
-};
-use common::{Span, Ident, Ty, Symbol, ty, UintTy, IntTy, kw};
-use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
-use sess::{Session, Input};
+use common::{Ident, IntTy, Span, Symbol, Ty, UintTy, kw, ty};
 use err::{Diag, PResult, raise};
+use lex::{Token, TokenCursor, TokenKind, TokenStream, flex};
+use sess::{Input, Session};
+use std::{fs::read_to_string, io::ErrorKind, mem::replace, path::Path};
 
 // TODO: Add dcx
 
@@ -104,7 +99,7 @@ pub enum BinOpKind {
 #[derive(Debug)]
 pub struct BinOp {
     kind: BinOpKind,
-    span: Span
+    span: Span,
 }
 
 #[derive(Debug)]
@@ -152,10 +147,13 @@ pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
 }
 
 pub fn new_parser_from_file(path: &Path) -> Result<Parser, Vec<Diag>> {
-    let cont = read_to_string(path).unwrap_or_else(|e| { // TODO: Maybe delete unwrap_or_else
+    let cont = read_to_string(path).unwrap_or_else(|e| {
+        // TODO: Maybe delete unwrap_or_else
         let msg = match e.kind() {
             ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
-            ErrorKind::PermissionDenied => format!("permission denied when opening file `{}`", path.display()),
+            ErrorKind::PermissionDenied => {
+                format!("permission denied when opening file `{}`", path.display())
+            }
             ErrorKind::IsADirectory => format!("`{}` is a directory", path.display()),
             _ => format!("couldn't read `{}`: {}", path.display(), e),
         };
@@ -173,14 +171,17 @@ fn new_parser_from_str(str: &String) -> Result<Parser, Vec<Diag>> {
     Ok(Parser::new(flex(str)?))
 }
 
-pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
+pub fn parse(sess: &Session) -> Unit {
+    // TODO: Add new_parser_from_source_str
     unwrap_or_emit_fatal(match &sess.input {
         Input::File(file) => new_parser_from_file(file),
         Input::Str(str) => new_parser_from_str(str),
-    }).parse_unit().unwrap_or_else(|parse_error| {
+    })
+    .parse_unit()
+    .unwrap_or_else(|parse_error| {
         parse_error.emit();
         raise()
-    } )
+    })
 }
 
 pub struct Parser {
@@ -226,12 +227,9 @@ impl Parser {
     fn parse_item_kind(&mut self) -> PResult<Option<ItemKind>> {
         if self.is_fn() {
             let (ident, decl, body) = self.parse_fn()?;
-            Ok(Some(ItemKind::Fn(Box::new(Fn {
-                ident,
-                decl,
-                body,
-            }))))
-        } else { // TODO: Add const item parse
+            Ok(Some(ItemKind::Fn(Box::new(Fn { ident, decl, body }))))
+        } else {
+            // TODO: Add const item parse
             Ok(None)
         }
     }
@@ -249,7 +247,10 @@ impl Parser {
 
     fn parse_ty_annot(&mut self) -> PResult<Ty> {
         if !self.check(TokenKind::Colon) {
-            return Err(Diag::err(format!("Expected Colon, found {:#?}", self.token.kind).to_string(), self.token.span))
+            return Err(Diag::err(
+                format!("Expected Colon, found {:#?}", self.token.kind).to_string(),
+                self.token.span,
+            ));
         }
         self.bump();
         Ok(self.parse_ty()?)
@@ -257,18 +258,25 @@ impl Parser {
 
     fn parse_fn_body(&mut self) -> PResult<Box<Block>> {
         if !self.eat(TokenKind::OpenBrace) {
-            return Err(Diag::err("Missing fn OpenBrace".to_string(), self.token.span));
+            return Err(Diag::err(
+                "Missing fn OpenBrace".to_string(),
+                self.token.span,
+            ));
         }
 
         let mut exprs: Vec<Expr> = Vec::with_capacity(1024);
 
         while self.token.kind != TokenKind::Eof
             && self.token.kind != TokenKind::CloseBrace
-            && self.token.kind != TokenKind::Semi {
-                exprs.push(self.parse_expr()?);
+            && self.token.kind != TokenKind::Semi
+        {
+            exprs.push(self.parse_expr()?);
         }
 
-        Ok(Box::new(Block { exprs, span: self.token.span }))
+        Ok(Box::new(Block {
+            exprs,
+            span: self.token.span,
+        }))
     }
 
     fn parse_expr(&mut self) -> PResult<Expr> {
@@ -280,7 +288,10 @@ impl Parser {
     }
 
     fn parse_ident(&mut self) -> PResult<Ident> {
-        let ident = self.token.ident().ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
+        let ident = self
+            .token
+            .ident()
+            .ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
         self.bump();
         Ok(ident)
     }
@@ -313,9 +324,19 @@ impl Parser {
                 ty::Isize => Ty::new(common::TyKind::Int(IntTy::Isize), self.token.span),
                 ty::Usize => Ty::new(common::TyKind::Uint(UintTy::Usize), self.token.span),
 
-                _ => return Err(Diag::err(format!("Expected ty, found {:#?}", self.token.kind).to_string(), self.token.span))
-            } // TODO: Rewrite this hard code
-            _ => return Err(Diag::err(format!("Expected ty, found {:#?}", self.token.kind).to_string(), self.token.span))
+                _ => {
+                    return Err(Diag::err(
+                        format!("Expected ty, found {:#?}", self.token.kind).to_string(),
+                        self.token.span,
+                    ));
+                }
+            }, // TODO: Rewrite this hard code
+            _ => {
+                return Err(Diag::err(
+                    format!("Expected ty, found {:#?}", self.token.kind).to_string(),
+                    self.token.span,
+                ));
+            }
         };
         self.bump();
         Ok(ty)
@@ -370,11 +391,17 @@ impl Parser {
     }
     fn parse_let(&mut self) -> PResult<Expr> {
         self.bump();
-        let ident = self.token.ident().ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
+        let ident = self
+            .token
+            .ident()
+            .ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
 
         self.bump();
         if !self.eat(TokenKind::Colon) {
-            return Err(Diag::err(format!("Expected Colon, found {:?}", self.token.kind).to_string(), self.token.span));
+            return Err(Diag::err(
+                format!("Expected Colon, found {:?}", self.token.kind).to_string(),
+                self.token.span,
+            ));
         }
 
         let ty = self.parse_ty()?;
@@ -387,11 +414,8 @@ impl Parser {
 
         let init = self.parse_init()?;
         Ok(Expr {
-            kind: ExprKind::Let(Box::new(ident),
-                Box::new(ty),
-                Box::new(init),
-                ident.span),
-            span: ident.span // FIXME: Replace it to real span
+            kind: ExprKind::Let(Box::new(ident), Box::new(ty), Box::new(init), ident.span),
+            span: ident.span, // FIXME: Replace it to real span
         })
     }
 
