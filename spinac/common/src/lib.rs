@@ -49,7 +49,7 @@ macro_rules! symbols {
     (@count $i:expr;) => {
         $i
     };
-}
+} // TODO: Fix symbols order
 
 symbols! {
     keywords {
