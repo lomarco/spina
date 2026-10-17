@@ -279,6 +279,13 @@ impl Parser {
             exprs.push(self.parse_expr()?);
         }
 
+        if !self.eat(TokenKind::CloseBrace) {
+            return Err(Diag::err(
+                "Missing fn CloseBrace".to_string(),
+                self.token.span,
+            ));
+        }
+
         Ok(Box::new(Block {
             exprs,
             span: self.token.span,
