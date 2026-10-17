@@ -270,18 +270,10 @@ impl Parser {
     }
 
     fn parse_param(&mut self) -> PResult<Param> {
-        let ident = self.parse_fn_param_ident_colon()?;
-        let ty = self.parse_ty()?;
+        let ident = self.parse_ident()?;
+        let ty = self.parse_ty_annot()?;
 
         Ok(Param { ty, ident })
-    }
-
-    fn parse_fn_param_ident_colon(&mut self) -> PResult<Ident> {
-        let ident = self.parse_ident()?;
-        if !self.eat(TokenKind::Colon) {
-            return Err(Diag::err("Expected colon".to_string(), self.token.span));
-        }
-        Ok(ident)
     }
 
     fn parse_ty(&mut self) -> PResult<Ty> {
