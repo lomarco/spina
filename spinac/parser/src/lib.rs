@@ -6,7 +6,7 @@ use std::{
 };
 use common::{Span, Ident, Ty, Symbol, ty, UintTy, IntTy, kw};
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
-use sess::{Session, ParseSess, Input};
+use sess::{Session, Input};
 use err::{Diag, PResult, raise};
 
 // TODO: Add dcx
@@ -139,7 +139,7 @@ pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
     })
 }
 
-pub fn new_parser_from_file(psess: &ParseSess, path: &Path) -> Result<Parser, Vec<Diag>> {
+pub fn new_parser_from_file(path: &Path) -> Result<Parser, Vec<Diag>> {
     let cont = read_to_string(path).unwrap_or_else(|e| { // TODO: Maybe delete unwrap_or_else
         let msg = match e.kind() {
             ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
@@ -153,32 +153,30 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path) -> Result<Parser, Ve
 
     let stream = flex(&cont)?;
 
-    let parser = Parser::new(psess, stream);
+    let parser = Parser::new(stream);
     Ok(parser)
 }
 
-fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, Vec<Diag>> {
-    Ok(Parser::new(psess, flex(str)?))
+fn new_parser_from_str(str: &String) -> Result<Parser, Vec<Diag>> {
+    Ok(Parser::new(flex(str)?))
 }
 
 pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
     unwrap_or_emit_fatal(match &sess.input {
-        Input::File(file) => new_parser_from_file(&sess.psess, file),
-        Input::Str(str) => new_parser_from_str(&sess.psess, str),
+        Input::File(file) => new_parser_from_file(file),
+        Input::Str(str) => new_parser_from_str(str),
     }).parse_unit().unwrap_or_else(|parse_error| parse_error.emit_fatal())
 }
 
 pub struct Parser {
-    psess: &ParseSess,
     pub token: Token,
     pub prev_token: Token,
     token_cursor: TokenCursor,
 }
 
 impl Parser {
-    pub fn new(psess: &ParseSess, stream: TokenStream) -> Self {
+    pub fn new(stream: TokenStream) -> Self {
         Parser {
-            psess,
             token: Token::dummy(),
             prev_token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),

@@ -1,4 +1,4 @@
-use sess::{Session, ParseSess, build_session};
+use sess::Session;
 use parser::parse;
 use err::catch_fatal_error_marker;
 
