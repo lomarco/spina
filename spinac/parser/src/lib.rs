@@ -198,7 +198,7 @@ impl Parser {
         }
     }
 
-    fn parse_item(&self) -> PResult<Option<Item>> {
+    fn parse_item(&mut self) -> PResult<Option<Item>> {
         let span = self.token.span;
         let kind = self.parse_item_kind(span)?;
         Ok(kind.map(|kind| Item { kind, span }))
