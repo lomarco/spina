@@ -131,6 +131,10 @@ impl Interner {
         self.strs.push(owned);
         Symbol(id)
     }
+
+    fn get_str(&self, symbol: Symbol) -> &str {
+        &self.strs[symbol.0 as usize]
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -143,6 +147,10 @@ impl Symbol {
 
     pub fn intern(s: &str) -> Self {
         INTERNER.lock().unwrap().intern(s)
+    }
+
+    pub fn as_str(&self) -> String {
+        INTERNER.lock().unwrap().get_str(*self).to_owned()
     }
 }
 
