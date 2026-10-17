@@ -183,11 +183,11 @@ impl Parser {
         }
     }
 
-    pub fn parse_unit(&self) -> PResult<Unit> {
+    pub fn parse_unit(&mut self) -> PResult<Unit> {
         Ok(Unit(self.parse_items()?))
     }
 
-    fn parse_items(&self) -> PResult<Vec<Item>> {
+    fn parse_items(&mut self) -> PResult<Vec<Item>> {
         let mut items = Vec::with_capacity(128);
 
         loop {
