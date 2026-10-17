@@ -1,8 +1,8 @@
 use logos::Logos; // TODO: Rewrite it for myself
-use common::{Span, Ident, Ty, Symbol};
+use common::{Span, Ident, Symbol};
 use err::Diag;
 
-#[derive(Logos, Debug, PartialEq)]
+#[derive(Logos, Debug, PartialEq, Clone, Copy)]
 #[logos(skip r"[ \t\n\f]+")]
 pub enum TokenKind {
     #[token("=")]
@@ -193,6 +193,7 @@ pub enum TokenKind {
 
 pub const DUMMY_SP: Span = Span { start: 0, end: 0 };
 
+#[derive(Clone, Copy, PartialEq)]
 pub struct Token {
     pub kind: TokenKind,
     pub span: Span,
@@ -208,17 +209,16 @@ impl Token {
     }
 
     pub fn ident(&self) -> Option<Ident> {
-        match &self.kind {
-            TokenKind::Ident(name) => Some(Ident::new(name.clone(), self.span)),
-            _ => None,
+        if let TokenKind::Ident(name) = &self.kind {
+            Some(Ident::new(name.clone(), self.span))
+        }
+        else {
+            None
         }
     }
 
-    pub fn ty(&self) -> Option<Ty> {
-        match self.kind {
-            TokenKind::Ident(name) => Some(Ty::new()),
-            _ => None,
-        }
+    pub fn is_ty(&self, ty: Symbol) -> bool {
+        self.ident().is_some_and(|id| id.name == ty)
     }
 
     pub fn is_keyword(&self, kw: Symbol) -> bool {
@@ -242,10 +242,10 @@ impl TokenCursor {
 
     pub fn next_and_bump(&mut self) -> Token {
         self.bump();
-        match self.stream.get(self.next_idx) {
-            Some(next_tok) => return next_tok,
-            None => return Token::new(TokenKind::Eof, DUMMY_SP),
-        }
+        self.stream
+            .get(self.next_idx)
+            .cloned()
+            .unwrap_or_else(|| Token::new(TokenKind::Eof, DUMMY_SP))
     }
 }
 

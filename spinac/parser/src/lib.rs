@@ -4,10 +4,10 @@ use std::{
     mem::replace,
     io::ErrorKind,
 };
-use common::{Span, Ident, Ty, Symbol};
+use common::{Span, Ident, Ty, Symbol, ty, UintTy, IntTy, kw};
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
-use sess::{Session, ParseSess, Input};
-use err::{Diag, PResult};
+use sess::{Session, Input};
+use err::{Diag, PResult, raise};
 
 // TODO: Add dcx
 
@@ -117,7 +117,7 @@ pub enum ExprKind {
     Call(Box<Expr>, Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
-    Let(Box<Ident>, Box<Expr>, Span),
+    Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
     Index(Box<Expr>, Box<Expr>, Span),
@@ -139,8 +139,8 @@ pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
     })
 }
 
-pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, Vec<Diag>> {
-    let cont = read_to_string(path).map_err(|e| {
+pub fn new_parser_from_file(path: &Path) -> Result<Parser, Vec<Diag>> {
+    let cont = read_to_string(path).unwrap_or_else(|e| { // TODO: Maybe delete unwrap_or_else
         let msg = match e.kind() {
             ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
             ErrorKind::PermissionDenied => format!("permission denied when opening file `{}`", path.display()),
@@ -151,44 +151,44 @@ pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) ->
         Diag::fatal(msg)
     });
 
-    let stream = flex(cont.as_str())?;
+    let stream = flex(&cont)?;
 
-    let parser = Parser::new(psess, stream);
+    let parser = Parser::new(stream);
     Ok(parser)
 }
 
-fn new_parser_from_str(psess: &ParseSess, str: &String) -> Result<Parser, Vec<Diag>> {
-    Ok(Parser::new(psess, flex(str)?))
+fn new_parser_from_str(str: &String) -> Result<Parser, Vec<Diag>> {
+    Ok(Parser::new(flex(str)?))
 }
 
 pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
     unwrap_or_emit_fatal(match &sess.input {
-        Input::File(file) => new_parser_from_file(&sess.psess, file, None),
-        Input::Str(str) => new_parser_from_str(&sess.psess, str),
-    }).parse_unit().unwrap_or_else(|parse_error| parse_error.emit().raise())
+        Input::File(file) => new_parser_from_file(file),
+        Input::Str(str) => new_parser_from_str(str),
+    }).parse_unit().unwrap_or_else(|parse_error| parse_error.emit_fatal())
 }
 
 pub struct Parser {
-    psess: &ParseSess,
     pub token: Token,
+    pub prev_token: Token,
     token_cursor: TokenCursor,
 }
 
 impl Parser {
-    pub fn new(psess: &ParseSess, stream: TokenStream) -> Self {
+    pub fn new(stream: TokenStream) -> Self {
         Parser {
-            psess,
             token: Token::dummy(),
+            prev_token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),
         }
     }
 
-    pub fn parse_unit(&self) -> PResult<Unit> {
-        Ok(Unit(parse_items()))
+    pub fn parse_unit(&mut self) -> PResult<Unit> {
+        Ok(Unit(self.parse_items()?))
     }
 
-    fn parse_items(&self) -> PResult<Vec<Item>> {
-        let items = Vec::with_capacity(128);
+    fn parse_items(&mut self) -> PResult<Vec<Item>> {
+        let mut items = Vec::with_capacity(128);
 
         loop {
             let Some(item) = self.parse_item()? else {
@@ -198,15 +198,18 @@ impl Parser {
         }
     }
 
-    fn parse_item(&self) -> PResult<Option<Item>> {
-        Ok(self.parse_item_kind(self.token.span)?.map(|kind| Item { kind, span }))
+    fn parse_item(&mut self) -> PResult<Option<Item>> {
+        let span = self.token.span;
+        let kind = self.parse_item_kind()?;
+        Ok(kind.map(|kind| Item { kind, span }))
     }
 
-    fn parse_item_kind(&self, sp: Span) -> PResult<Option<ItemKind>> {
+    fn parse_item_kind(&mut self) -> PResult<Option<ItemKind>> {
         if self.is_fn() {
-            let (ident, decl, body) = self.parse_fn(sp)?;
+            let (ident, decl, ty, body) = self.parse_fn()?;
             Ok(Some(ItemKind::Fn(Box::new(Fn {
                 ident,
+                decl,
                 ty,
                 body,
             }))))
@@ -215,81 +218,102 @@ impl Parser {
         }
     }
 
-    fn parse_fn(&self, sp: Span) -> PResult<(Ident, FnDecl, Box<Block>)> {
-        let fn_span = self.token.span;
-        let ident = self.parse_ident()?;
-        let decl = self.parse_fn_decl()?;
-        let body = self.parse_fn_body()?;
-        Ok((ident, decl, body))
+    fn is_fn(&self) -> bool {
+        self.token.is_keyword(kw::Fn)
     }
 
-    fn parse_fn_body(&self) -> PResult<Box<Block>> {
-        if !eat(TokenKind::OpenBrace) {
-            return Err("Missing fn OpenBrace".as_string());
+    fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Ty, Box<Block>)> {
+        let ident = self.parse_ident()?;
+        let decl = self.parse_fn_decl()?;
+        let ty = self.parse_ty_annot()?;
+        let body = self.parse_fn_body()?;
+        Ok((ident, decl, ty, body))
+    }
+
+    fn parse_ty_annot(&mut self) -> PResult<Ty> {
+        if !self.eat(TokenKind::Colon) {
+            return Err(Diag::err("Expected Colon".to_string(), self.token.span))
+        }
+        self.bump();
+        Ok(self.parse_ty()?)
+    }
+
+    fn parse_fn_body(&mut self) -> PResult<Box<Block>> {
+        if !self.eat(TokenKind::OpenBrace) {
+            return Err(Diag::err("Missing fn OpenBrace".to_string(), self.token.span));
         }
 
-        let exprs: Vec<Expr> = Vec::with_capacity(1024);
+        let mut exprs: Vec<Expr> = Vec::with_capacity(1024);
 
         self.bump();
 
-        while self.token != TokenKind::Eof
-            && self.token != TokenKind::CloseBrace
-            && self.token != TokenKind::Semi {
-                exprs.pust(parse_expr()?);
+        while self.token.kind != TokenKind::Eof
+            && self.token.kind != TokenKind::CloseBrace
+            && self.token.kind != TokenKind::Semi {
+                exprs.push(self.parse_expr()?);
         }
 
-        Ok(Box::new(Block { exprs, span: sp }))
+        Ok(Box::new(Block { exprs, span: self.token.span }))
     }
 
-    fn parse_expr(&self) -> PResult<Expr> { // TODO: Add Interner
-        ;
-
-        let expr = if self.token.is_keyword() {
-            ;
-        } else if self.token.is_keyword() {
-            ;
+    fn parse_expr(&mut self) -> PResult<Expr> {
+        if self.token.is_keyword(kw::Let) {
+            self.parse_let()
+        } else {
+            Err(Diag::err("Expected keyword".to_string(), self.token.span))
         }
-
-        Ok(match self.token.kind {
-            TokenKind::Ident.is_keyword() => parse_let()?,
-            // TODO: Add the rest ExprKind::*
-        })
     }
 
-    fn parse_ident(&self) -> PResult<Ident> {
-        let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
+    fn parse_ident(&mut self) -> PResult<Ident> {
+        let ident = self.token.ident().ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
         self.bump();
         Ok(ident)
     }
 
-    fn parse_param(&self) -> PResult<Param> {
-        let ident = self.parse_fn_param_ident_colon()?;
-        let ty = self.parse_ty()?;
+    fn parse_param(&mut self) -> PResult<Param> {
+        let ident = self.parse_ident()?;
+        let ty = self.parse_ty_annot()?;
 
         Ok(Param { ty, ident })
     }
 
-    fn parse_fn_param_ident_colon(&self) -> PResult<Ident> {
-        let ident = self.parse_ident()?;
-        if !self.eat(TokenKind::Colon) {
-            return Err(Diag::err("Expected colon".as_string(), self.token.span));
-        }
-        Ok(ident)
-    }
+    fn parse_ty(&mut self) -> PResult<Ty> {
+        let ty = match self.token.ident() {
+            Some(ident) => match ident.name {
+                ty::I8 => Ty::new(common::TyKind::Int(IntTy::I8), self.token.span),
+                ty::U8 => Ty::new(common::TyKind::Uint(UintTy::U8), self.token.span),
 
-    fn parse_ty(&self) -> PResult<Ty> {
-        let ty = self.token.ty().ok_or_else(|| Diag::err("Expected ty".to_string(), self.token.span))?;
+                ty::I16 => Ty::new(common::TyKind::Int(IntTy::I16), self.token.span),
+                ty::U16 => Ty::new(common::TyKind::Uint(UintTy::U16), self.token.span),
+
+                ty::I32 => Ty::new(common::TyKind::Int(IntTy::I32), self.token.span),
+                ty::U32 => Ty::new(common::TyKind::Uint(UintTy::U32), self.token.span),
+
+                ty::I64 => Ty::new(common::TyKind::Int(IntTy::I64), self.token.span),
+                ty::U64 => Ty::new(common::TyKind::Uint(UintTy::U64), self.token.span),
+
+                ty::I128 => Ty::new(common::TyKind::Int(IntTy::I128), self.token.span),
+                ty::U128 => Ty::new(common::TyKind::Uint(UintTy::U128), self.token.span),
+
+                ty::Isize => Ty::new(common::TyKind::Int(IntTy::Isize), self.token.span),
+                ty::Usize => Ty::new(common::TyKind::Uint(UintTy::Usize), self.token.span),
+
+                _ => return Err(Diag::err("Expected ty".to_string(), self.token.span))
+            } // TODO: Rewrite this hard code
+            _ => return Err(Diag::err("Expected ty".to_string(), self.token.span))
+        };
         self.bump();
         Ok(ty)
     }
 
-    fn parse_fn_params(&self) -> PResult<Vec<Param>> {
-        if self.token != TokenKind::OpenParen {
-            return Err(Diag::err("Missing fn params".as_string(), self.token.span));
+    fn parse_fn_params(&mut self) -> PResult<Vec<Param>> {
+        if self.token.kind != TokenKind::OpenParen {
+            return Err(Diag::err("Missing fn params".to_string(), self.token.span));
         }
-        let params: Vec<Param> = Vec::new();
-        while (token.kind != TokenKind::Eof || token.kind != TokenKind::CloseParen) {
-            params.push(parse_param()?);
+
+        let mut params: Vec<Param> = Vec::new();
+        while self.token.kind != TokenKind::Eof || self.token.kind != TokenKind::CloseParen {
+            params.push(self.parse_param()?);
 
             if !self.eat(TokenKind::Comma) {
                 break;
@@ -299,8 +323,8 @@ impl Parser {
         Ok(params)
     }
 
-    fn eat(&self, tok: TokenKind) -> bool {
-        let is_present = check(tok);
+    fn eat(&mut self, tok: TokenKind) -> bool {
+        let is_present = self.check(tok);
         if is_present {
             self.bump()
         };
@@ -308,45 +332,45 @@ impl Parser {
     }
 
     fn check(&self, tok: TokenKind) -> bool {
-        self.token == tok
+        self.token.kind == tok
     }
 
-    fn bump(&self) {
-        self.bump_with(self.token_cursor.next_and_bump())
+    fn bump(&mut self) {
+        let token = self.token_cursor.next_and_bump();
+        self.bump_with(token);
     }
 
-    fn bump_with(&self, next_token: Token) {
+    fn bump_with(&mut self, next_token: Token) {
         self.prev_token = replace(&mut self.token, next_token)
     }
 
-    fn parse_fn_decl(&self) -> PResult<FnDecl> {
+    fn parse_fn_decl(&mut self) -> PResult<FnDecl> {
         Ok(FnDecl {
             params: self.parse_fn_params()?,
             ty: self.parse_ty()?,
         })
     }
-    fn parse_let(&self) -> PResult<Expr> {
-        if !eat(TokenKind::Ident) {
-            return Err(Diag::err("Expected ident".to_string(), self.token.span));
-        }
+    fn parse_let(&mut self) -> PResult<Expr> {
+        self.bump();
         let ident = self.token.ident().ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
 
-        if !eat(TokenKind::Colon) {
+        if !self.eat(TokenKind::Colon) {
             return Err(Diag::err("Expected Colon".to_string(), self.token.span));
         }
         self.bump();
 
         let ty = self.parse_ty()?;
 
-        if !eat(TokenKind::Eq) {
+        if !self.eat(TokenKind::Eq) {
             return Err(Diag::err("Expected Eq".to_string(), self.token.span));
         }
 
         self.bump();
 
-        let init = parse_init();
+        let init = self.parse_init()?;
         Ok(Expr {
             kind: ExprKind::Let(Box::new(ident),
+                Box::new(ty),
                 Box::new(init),
                 ident.span),
             span: ident.span // FIXME: Replace it to real span
@@ -366,8 +390,9 @@ pub struct ConstItem {
 
 pub struct Fn {
     pub ident: Ident,
-    pub ty: Box<Ty>,
-    pub body: Option<Box<Block>>,
+    pub decl: FnDecl,
+    pub ty: Ty,
+    pub body: Box<Block>,
 }
 
 pub enum ItemKind {

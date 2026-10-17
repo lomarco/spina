@@ -10,31 +10,75 @@ static INTERNER: LazyLock<Mutex<Interner>> = LazyLock::new(|| {
     Mutex::new(Interner::new(KEYWORDS))
 });
 
-macro_rules! keywords {
-    ($($name:ident: $str:literal),* $(,)?) => {
-        pub const KEYWORDS: &[&str] = &[$($str),*];
+macro_rules! symbols {
+    (
+        keywords {
+            $($kw_name:ident : $kw_str:literal),* $(,)?
+        }
+        types {
+            $($ty_name:ident : $ty_str:literal),* $(,)?
+        }
+    ) => {
+        pub const KEYWORDS: &[&str] = &[$($kw_str),*];
+        pub const TYPES: &[&str] = &[$($ty_str),*];
+
         #[allow(non_upper_case_globals)]
         pub mod kw {
-            keywords!(@consts 0u32; $($name), *);
+            symbols!(@consts 0u32; $($kw_name), *);
+        }
+
+        #[allow(non_upper_case_globals)]
+        pub mod ty {
+            symbols!(
+                @consts
+                symbols!(@count 0u32; $($kw_name), *);
+                $($ty_name), *
+            );
         }
     };
+
     (@consts $i:expr; $name:ident $(, $rest:ident)*) => {
         pub const $name: crate::Symbol = crate::Symbol::new($i);
-        keywords!(@consts $i + 1; $($rest),*);
+        symbols!(@consts $i + 1; $($rest),*);
     };
     (@consts $i:expr;) => {};
+
+    (@count $i:expr; $name:ident $(, $rest:ident)*) => {
+        symbols!(@count $i + 1; $($rest),*)
+    };
+    (@count $i:expr;) => {
+        $i
+    };
+} // TODO: Fix symbols order
+
+symbols! {
+    keywords {
+        Let: "let",
+        If: "if",
+        For: "for",
+        While: "while",
+        Fn: "fn",
+        // TODO: Add the rest keywords
+        // // ...
+    }
+
+    types {
+        I8: "i8",
+        U8: "u8",
+        I16: "i16",
+        U16: "u16",
+        I32: "i32",
+        U32: "u32",
+        I64: "i64",
+        U64: "u64",
+        I128: "i128",
+        U128: "u128",
+        Isize: "isize",
+        Usize: "usize",
+    }
 }
 
-keywords! {
-    Let: "let",
-    If: "if",
-    For: "for",
-    While: "while",
-    // TODO: Add the rest keywords
-    // ...
-}
-
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Span {
     pub start: u32,
     pub end: u32,
@@ -84,14 +128,14 @@ impl Interner {
 
         let owned: Box<str> = Box::from(s);
 
-        self.hs.insert(owned.clone(), Symbol::new(id)); ////////
+        self.hs.insert(owned.clone(), Symbol::new(id));
         self.strs.push(owned);
         Symbol(id)
     }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub struct Symbol(u32); // TODO: Add Interner as HashTable (id: u32 -> Symbol: String)
+pub struct Symbol(u32);
 
 impl Symbol {
     pub const fn new(n: u32) -> Self {
@@ -103,6 +147,7 @@ impl Symbol {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Ident {
     pub name: Symbol,
     pub span: Span,
