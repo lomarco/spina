@@ -225,11 +225,10 @@ impl Parser {
 
     fn parse_item_kind(&mut self) -> PResult<Option<ItemKind>> {
         if self.is_fn() {
-            let (ident, decl, ty, body) = self.parse_fn()?;
+            let (ident, decl, body) = self.parse_fn()?;
             Ok(Some(ItemKind::Fn(Box::new(Fn {
                 ident,
                 decl,
-                ty,
                 body,
             }))))
         } else { // TODO: Add const item parse
@@ -241,18 +240,16 @@ impl Parser {
         self.token.is_keyword(kw::Fn)
     }
 
-    fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Ty, Box<Block>)> {
-        self.bump();
+    fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Box<Block>)> {
         let ident = self.parse_ident()?;
         let decl = self.parse_fn_decl()?;
-        let ty = self.parse_ty_annot()?;
         let body = self.parse_fn_body()?;
-        Ok((ident, decl, ty, body))
+        Ok((ident, decl, body))
     }
 
     fn parse_ty_annot(&mut self) -> PResult<Ty> {
-        if !self.eat(TokenKind::Colon) {
-            return Err(Diag::err("Expected Colon".to_string(), self.token.span))
+        if !self.check(TokenKind::Colon) {
+            return Err(Diag::err(format!("Expected Colon, found {:#?}", self.token.kind).to_string(), self.token.span))
         }
         self.bump();
         Ok(self.parse_ty()?)
@@ -318,9 +315,9 @@ impl Parser {
                 ty::Isize => Ty::new(common::TyKind::Int(IntTy::Isize), self.token.span),
                 ty::Usize => Ty::new(common::TyKind::Uint(UintTy::Usize), self.token.span),
 
-                _ => return Err(Diag::err("Expected ty".to_string(), self.token.span))
+                _ => return Err(Diag::err(format!("Expected ty, found {:#?}", self.token.kind).to_string(), self.token.span))
             } // TODO: Rewrite this hard code
-            _ => return Err(Diag::err("Expected ty".to_string(), self.token.span))
+            _ => return Err(Diag::err(format!("Expected ty, found {:#?}", self.token.kind).to_string(), self.token.span))
         };
         self.bump();
         Ok(ty)
@@ -331,14 +328,16 @@ impl Parser {
             return Err(Diag::err("Missing fn params".to_string(), self.token.span));
         }
 
+        self.bump();
         let mut params: Vec<Param> = Vec::new();
-        while self.token.kind != TokenKind::Eof || self.token.kind != TokenKind::CloseParen {
+        while !matches!(self.token.kind, TokenKind::Eof | TokenKind::CloseParen) {
             params.push(self.parse_param()?);
 
             if !self.eat(TokenKind::Comma) {
                 break;
             }
         }
+        self.bump();
 
         Ok(params)
     }
@@ -365,9 +364,10 @@ impl Parser {
     }
 
     fn parse_fn_decl(&mut self) -> PResult<FnDecl> {
+        self.bump();
         Ok(FnDecl {
             params: self.parse_fn_params()?,
-            ty: self.parse_ty()?,
+            ty: self.parse_ty_annot()?,
         })
     }
     fn parse_let(&mut self) -> PResult<Expr> {
@@ -413,7 +413,6 @@ pub struct ConstItem {
 pub struct Fn {
     pub ident: Ident,
     pub decl: FnDecl,
-    pub ty: Ty,
     pub body: Box<Block>,
 }
 
