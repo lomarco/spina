@@ -345,9 +345,7 @@ impl Parser {
         })
     }
     fn parse_let(&mut self) -> PResult<Expr> {
-        if !self.eat(TokenKind::Ident) {
-            return Err(Diag::err("Expected ident".to_string(), self.token.span));
-        }
+        self.bump();
         let ident = self.token.ident().ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
 
         if !self.eat(TokenKind::Colon) {
