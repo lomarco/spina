@@ -11,8 +11,10 @@ use err::{Diag, PResult, raise};
 
 // TODO: Add dcx
 
-pub struct Unit(Vec<Item>);
+#[derive(Debug)]
+pub struct Unit(pub Vec<Item>);
 
+#[derive(Debug)]
 pub enum LitKind {
     Bool, // AST only, must never appear in a `Token`
     Byte,
@@ -27,33 +29,39 @@ pub enum LitKind {
     CStrRaw(u8),
 }
 
+#[derive(Debug)]
 pub struct Param {
     pub ty: Ty,
     pub ident: Ident,
 }
 
+#[derive(Debug)]
 pub struct FnDecl {
     pub params: Vec<Param>,
     pub ty: Ty,
 }
 
+#[derive(Debug)]
 pub struct Lit {
     pub kind: LitKind,
     pub symbol: Symbol,
     pub suffix: Option<Symbol>,
 }
 
+#[derive(Debug)]
 pub struct ForLoop {
     pub ident: Box<Ident>,
     pub iter: Box<Expr>,
     pub body: Box<Block>,
 }
 
+#[derive(Debug)]
 pub struct Block {
     pub exprs: Vec<Expr>,
     pub span: Span,
 }
 
+#[derive(Debug)]
 pub enum BinOpKind {
     /// The `+` operator (addition)
     Add,
@@ -93,11 +101,13 @@ pub enum BinOpKind {
     Gt,
 }
 
+#[derive(Debug)]
 pub struct BinOp {
     kind: BinOpKind,
     span: Span
 }
 
+#[derive(Debug)]
 pub enum UnOp {
     /// The `*` operator for dereferencing
     Deref,
@@ -107,11 +117,13 @@ pub enum UnOp {
     Neg,
 }
 
+#[derive(Debug)]
 pub struct Expr {
     pub kind: ExprKind,
     pub span: Span,
 }
 
+#[derive(Debug)]
 pub enum ExprKind {
     Array(Vec<Box<Expr>>),
     Call(Box<Expr>, Vec<Box<Expr>>),
@@ -382,12 +394,14 @@ impl Parser {
     }
 }
 
+#[derive(Debug)]
 pub struct ConstItem {
     pub ident: Ident,
     pub ty: Box<Ty>,
     pub body: Option<Box<Expr>>,
 }
 
+#[derive(Debug)]
 pub struct Fn {
     pub ident: Ident,
     pub decl: FnDecl,
@@ -395,11 +409,13 @@ pub struct Fn {
     pub body: Box<Block>,
 }
 
+#[derive(Debug)]
 pub enum ItemKind {
     Const(Box<ConstItem>),
     Fn(Box<Fn>),
 }
 
+#[derive(Debug)]
 pub struct Item {
     pub kind: ItemKind,
     pub span: Span,

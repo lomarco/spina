@@ -4,7 +4,6 @@ use err::catch_fatal_error_marker;
 
 use std::{
     env, // FIXME: Replace this code to clap
-    fs::read_to_string,
     process::ExitCode,
 };
 
@@ -20,7 +19,7 @@ fn run() {
     let sess = Session::new(filename);
     let unit = parse(&sess); // TODO: Move all file opening logic to parse_from_file
 
-    println!("{unit}"); // FIXME
+    println!("{unit:#?}"); // FIXME
 }
 
 fn main() -> ExitCode {

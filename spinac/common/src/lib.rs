@@ -159,6 +159,7 @@ impl Ident {
     }
 }
 
+#[derive(Debug)]
 pub enum FloatTy {
     F16,
     F32,
@@ -166,6 +167,7 @@ pub enum FloatTy {
     F128,
 }
 
+#[derive(Debug)]
 pub enum UintTy {
     Usize,
     U8,
@@ -175,6 +177,7 @@ pub enum UintTy {
     U128,
 }
 
+#[derive(Debug)]
 pub enum IntTy {
     Isize,
     I8,
@@ -184,6 +187,7 @@ pub enum IntTy {
     I128,
 }
 
+#[derive(Debug)]
 pub enum TyKind {
     Array(Box<Ty>, u32),
     Ptr(Box<Ty>),
@@ -197,6 +201,7 @@ pub enum TyKind {
     Dummy,
 }
 
+#[derive(Debug)]
 pub struct Ty {
     pub kind: TyKind,
     pub span: Span,
