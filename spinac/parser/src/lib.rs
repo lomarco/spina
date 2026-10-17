@@ -262,8 +262,6 @@ impl Parser {
 
         let mut exprs: Vec<Expr> = Vec::with_capacity(1024);
 
-        self.bump();
-
         while self.token.kind != TokenKind::Eof
             && self.token.kind != TokenKind::CloseBrace
             && self.token.kind != TokenKind::Semi {
