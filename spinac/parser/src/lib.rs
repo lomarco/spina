@@ -117,7 +117,7 @@ pub enum ExprKind {
     Call(Box<Expr>, Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
-    Let(Box<Ident>, Box<Expr>, Span),
+    Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
     Index(Box<Expr>, Box<Expr>, Span),
@@ -364,6 +364,7 @@ impl Parser {
         let init = self.parse_init()?;
         Ok(Expr {
             kind: ExprKind::Let(Box::new(ident),
+                Box::new(ty),
                 Box::new(init),
                 ident.span),
             span: ident.span // FIXME: Replace it to real span
