@@ -140,7 +140,7 @@ pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
 }
 
 pub fn new_parser_from_file(psess: &ParseSess, path: &Path, sp: Option<Span>) -> Result<Parser, Vec<Diag>> {
-    let cont = read_to_string(path).map_err(|e| {
+    let cont = read_to_string(path).unwrap_or_else(|e| { // TODO: Maybe delete unwrap_or_else
         let msg = match e.kind() {
             ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
             ErrorKind::PermissionDenied => format!("permission denied when opening file `{}`", path.display()),
