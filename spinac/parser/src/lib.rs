@@ -208,7 +208,7 @@ impl Parser {
 
     fn parse_item_kind(&self, sp: Span) -> PResult<Option<ItemKind>> {
         if self.is_fn() {
-            let (ident, decl, body) = self.parse_fn(sp)?;
+            let (ident, decl, body) = self.parse_fn()?;
             Ok(Some(ItemKind::Fn(Box::new(Fn {
                 ident,
                 ty,
@@ -219,8 +219,7 @@ impl Parser {
         }
     }
 
-    fn parse_fn(&mut self, sp: Span) -> PResult<(Ident, FnDecl, Box<Block>)> {
-        let fn_span = self.token.span;
+    fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Box<Block>)> {
         let ident = self.parse_ident()?;
         let decl = self.parse_fn_decl()?;
         let body = self.parse_fn_body()?;
