@@ -57,6 +57,7 @@ symbols! {
         If: "if",
         For: "for",
         While: "while",
+        Fn: "fn",
         // TODO: Add the rest keywords
         // // ...
     }

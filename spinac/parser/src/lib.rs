@@ -218,7 +218,10 @@ impl Parser {
         }
     }
 
-    fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Box<Block>)> {
+    fn is_fn(&self) -> bool {
+        self.token.is_keyword(kw::Fn)
+    }
+
     fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Ty, Box<Block>)> {
         let ident = self.parse_ident()?;
         let decl = self.parse_fn_decl()?;
