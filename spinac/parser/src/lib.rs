@@ -204,11 +204,12 @@ impl Parser {
         Ok(kind.map(|kind| Item { kind, span }))
     }
 
-    fn parse_item_kind(&self, sp: Span) -> PResult<Option<ItemKind>> {
+    fn parse_item_kind(&mut self, sp: Span) -> PResult<Option<ItemKind>> {
         if self.is_fn() {
-            let (ident, decl, body) = self.parse_fn()?;
+            let (ident, decl, ty, body) = self.parse_fn()?;
             Ok(Some(ItemKind::Fn(Box::new(Fn {
                 ident,
+                decl,
                 ty,
                 body,
             }))))
@@ -218,10 +219,12 @@ impl Parser {
     }
 
     fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Box<Block>)> {
+    fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Ty, Box<Block>)> {
         let ident = self.parse_ident()?;
         let decl = self.parse_fn_decl()?;
+        let ty = self.parse_ty_annot()?;
         let body = self.parse_fn_body()?;
-        Ok((ident, decl, body))
+        Ok((ident, decl, ty, body))
     }
 
     fn parse_fn_body(&mut self) -> PResult<Box<Block>> {
@@ -383,8 +386,9 @@ pub struct ConstItem {
 
 pub struct Fn {
     pub ident: Ident,
-    pub ty: Box<Ty>,
-    pub body: Option<Box<Block>>,
+    pub decl: FnDecl,
+    pub ty: Ty,
+    pub body: Box<Block>,
 }
 
 pub enum ItemKind {
