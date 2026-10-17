@@ -3,13 +3,13 @@ use parser::parse;
 use err::catch_fatal_error_marker;
 
 use std::{
-    env, // FIXME: Replace this code to clap
+    env::args, // FIXME: Replace this code to clap
     process::ExitCode,
 };
 
 fn run() {
     // FIXME: Replace this code to clap
-    let args: Vec<String> = env::args().collect();
+    let args: Vec<String> = args().collect();
     if args.len() != 2 {
         println!("usage: {}: <filename> ", args[0]);
     }
