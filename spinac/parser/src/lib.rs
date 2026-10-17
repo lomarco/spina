@@ -184,11 +184,11 @@ impl Parser {
     }
 
     pub fn parse_unit(&self) -> PResult<Unit> {
-        Ok(Unit(parse_items()))
+        Ok(Unit(self.parse_items()?))
     }
 
     fn parse_items(&self) -> PResult<Vec<Item>> {
-        let items = Vec::with_capacity(128);
+        let mut items = Vec::with_capacity(128);
 
         loop {
             let Some(item) = self.parse_item()? else {
@@ -199,7 +199,9 @@ impl Parser {
     }
 
     fn parse_item(&self) -> PResult<Option<Item>> {
-        Ok(self.parse_item_kind(self.token.span)?.map(|kind| Item { kind, span }))
+        let span = self.token.span;
+        let kind = self.parse_item_kind(span)?;
+        Ok(kind.map(|kind| Item { kind, span }))
     }
 
     fn parse_item_kind(&self, sp: Span) -> PResult<Option<ItemKind>> {
@@ -223,61 +225,53 @@ impl Parser {
         Ok((ident, decl, body))
     }
 
-    fn parse_fn_body(&self) -> PResult<Box<Block>> {
-        if !eat(TokenKind::OpenBrace) {
-            return Err("Missing fn OpenBrace".as_string());
+    fn parse_fn_body(&mut self) -> PResult<Box<Block>> {
+        if !self.eat(TokenKind::OpenBrace) {
+            return Err(Diag::err("Missing fn OpenBrace".to_string(), self.token.span));
         }
 
-        let exprs: Vec<Expr> = Vec::with_capacity(1024);
+        let mut exprs: Vec<Expr> = Vec::with_capacity(1024);
 
         self.bump();
 
-        while self.token != TokenKind::Eof
-            && self.token != TokenKind::CloseBrace
-            && self.token != TokenKind::Semi {
-                exprs.pust(parse_expr()?);
+        while self.token.kind != TokenKind::Eof
+            && self.token.kind != TokenKind::CloseBrace
+            && self.token.kind != TokenKind::Semi {
+                exprs.push(self.parse_expr()?);
         }
 
-        Ok(Box::new(Block { exprs, span: sp }))
+        Ok(Box::new(Block { exprs, span: self.token.span }))
     }
 
     fn parse_expr(&self) -> PResult<Expr> { // TODO: Add Interner
-        ;
-
-        let expr = if self.token.is_keyword() {
-            ;
-        } else if self.token.is_keyword() {
-            ;
-        }
-
         Ok(match self.token.kind {
-            TokenKind::Ident.is_keyword() => parse_let()?,
+            TokenKind::Ident.is_keyword(kw::Let) => parse_let()?,
             // TODO: Add the rest ExprKind::*
         })
     }
 
-    fn parse_ident(&self) -> PResult<Ident> {
-        let ident = self.token.ident().ok_or_else(|| "Expected ident".to_string())?;
+    fn parse_ident(&mut self) -> PResult<Ident> {
+        let ident = self.token.ident().ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
         self.bump();
         Ok(ident)
     }
 
-    fn parse_param(&self) -> PResult<Param> {
+    fn parse_param(&mut self) -> PResult<Param> {
         let ident = self.parse_fn_param_ident_colon()?;
         let ty = self.parse_ty()?;
 
         Ok(Param { ty, ident })
     }
 
-    fn parse_fn_param_ident_colon(&self) -> PResult<Ident> {
+    fn parse_fn_param_ident_colon(&mut self) -> PResult<Ident> {
         let ident = self.parse_ident()?;
         if !self.eat(TokenKind::Colon) {
-            return Err(Diag::err("Expected colon".as_string(), self.token.span));
+            return Err(Diag::err("Expected colon".to_string(), self.token.span));
         }
         Ok(ident)
     }
 
-    fn parse_ty(&self) -> PResult<Ty> {
+    fn parse_ty(&mut self) -> PResult<Ty> {
         let ty = match self.token.ident() {
             Some(ident) => match ident.name {
                 ty::I8 => Ty::new(common::TyKind::Int(IntTy::I8), self.token.span),
@@ -306,13 +300,14 @@ impl Parser {
         Ok(ty)
     }
 
-    fn parse_fn_params(&self) -> PResult<Vec<Param>> {
-        if self.token != TokenKind::OpenParen {
-            return Err(Diag::err("Missing fn params".as_string(), self.token.span));
+    fn parse_fn_params(&mut self) -> PResult<Vec<Param>> {
+        if self.token.kind != TokenKind::OpenParen {
+            return Err(Diag::err("Missing fn params".to_string(), self.token.span));
         }
-        let params: Vec<Param> = Vec::new();
-        while (token.kind != TokenKind::Eof || token.kind != TokenKind::CloseParen) {
-            params.push(parse_param()?);
+
+        let mut params: Vec<Param> = Vec::new();
+        while self.token.kind != TokenKind::Eof || self.token.kind != TokenKind::CloseParen {
+            params.push(self.parse_param()?);
 
             if !self.eat(TokenKind::Comma) {
                 break;
@@ -322,8 +317,8 @@ impl Parser {
         Ok(params)
     }
 
-    fn eat(&self, tok: TokenKind) -> bool {
-        let is_present = check(tok);
+    fn eat(&mut self, tok: TokenKind) -> bool {
+        let is_present = self.check(tok);
         if is_present {
             self.bump()
         };
@@ -331,43 +326,44 @@ impl Parser {
     }
 
     fn check(&self, tok: TokenKind) -> bool {
-        self.token == tok
+        self.token.kind == tok
     }
 
-    fn bump(&self) {
-        self.bump_with(self.token_cursor.next_and_bump())
+    fn bump(&mut self) {
+        let token = self.token_cursor.next_and_bump();
+        self.bump_with(token);
     }
 
     fn bump_with(&self, next_token: Token) {
         self.prev_token = replace(&mut self.token, next_token)
     }
 
-    fn parse_fn_decl(&self) -> PResult<FnDecl> {
+    fn parse_fn_decl(&mut self) -> PResult<FnDecl> {
         Ok(FnDecl {
             params: self.parse_fn_params()?,
             ty: self.parse_ty()?,
         })
     }
-    fn parse_let(&self) -> PResult<Expr> {
-        if !eat(TokenKind::Ident) {
+    fn parse_let(&mut self) -> PResult<Expr> {
+        if !self.eat(TokenKind::Ident) {
             return Err(Diag::err("Expected ident".to_string(), self.token.span));
         }
         let ident = self.token.ident().ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
 
-        if !eat(TokenKind::Colon) {
+        if !self.eat(TokenKind::Colon) {
             return Err(Diag::err("Expected Colon".to_string(), self.token.span));
         }
         self.bump();
 
         let ty = self.parse_ty()?;
 
-        if !eat(TokenKind::Eq) {
+        if !self.eat(TokenKind::Eq) {
             return Err(Diag::err("Expected Eq".to_string(), self.token.span));
         }
 
         self.bump();
 
-        let init = parse_init();
+        let init = self.parse_init()?;
         Ok(Expr {
             kind: ExprKind::Let(Box::new(ident),
                 Box::new(init),
