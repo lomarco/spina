@@ -219,7 +219,7 @@ impl Parser {
         }
     }
 
-    fn parse_fn(&self, sp: Span) -> PResult<(Ident, FnDecl, Box<Block>)> {
+    fn parse_fn(&mut self, sp: Span) -> PResult<(Ident, FnDecl, Box<Block>)> {
         let fn_span = self.token.span;
         let ident = self.parse_ident()?;
         let decl = self.parse_fn_decl()?;
