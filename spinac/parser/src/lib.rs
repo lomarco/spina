@@ -232,7 +232,7 @@ impl Parser {
             Ok(None)
         } else {
             // TODO: Add const item parse
-            Err(Diag::err(format!("Expected item, found {:?}", self.token), self.token.span))
+            Err(Diag::err(format!("Expected item, found {:?}", self.token.kind), self.token.span))
         }
     }
 
