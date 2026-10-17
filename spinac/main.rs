@@ -19,7 +19,7 @@ fn run() {
     let sess = Session::new(filename);
     let unit = parse(&sess); // TODO: Move all file opening logic to parse_from_file
 
-    println!("{unit}"); // FIXME
+    println!("{unit:#?}"); // FIXME
 }
 
 fn main() -> ExitCode {
