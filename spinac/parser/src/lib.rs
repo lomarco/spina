@@ -256,11 +256,12 @@ impl Parser {
         Ok(Box::new(Block { exprs, span: self.token.span }))
     }
 
-    fn parse_expr(&self) -> PResult<Expr> { // TODO: Add Interner
-        Ok(match self.token.kind {
-            TokenKind::Ident.is_keyword(kw::Let) => parse_let()?,
-            // TODO: Add the rest ExprKind::*
-        })
+    fn parse_expr(&mut self) -> PResult<Expr> {
+        if self.token.is_keyword(kw::Let) {
+            self.parse_let()
+        } else {
+            Err(Diag::err("Expected keyword".to_string(), self.token.span))
+        }
     }
 
     fn parse_ident(&mut self) -> PResult<Ident> {
