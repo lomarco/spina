@@ -228,14 +228,20 @@ impl Parser {
         if self.is_fn() {
             let (ident, decl, body) = self.parse_fn()?;
             Ok(Some(ItemKind::Fn(Box::new(Fn { ident, decl, body }))))
+        } else if self.is_eof() {
+            Ok(None)
         } else {
             // TODO: Add const item parse
-            Ok(None)
+            Err(Diag::err(format!("Expected item, found {:?}", self.token), self.token.span))
         }
     }
 
     fn is_fn(&self) -> bool {
         self.token.is_keyword(kw::Fn)
+    }
+
+    fn is_eof(&self) -> bool {
+        self.token.kind == TokenKind::Eof
     }
 
     fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Box<Block>)> {
