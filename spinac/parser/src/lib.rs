@@ -4,7 +4,7 @@ use std::{
     mem::replace,
     io::ErrorKind,
 };
-use common::{Span, Ident, Ty, Symbol};
+use common::{Span, Ident, Ty, Symbol, ty, UintTy, IntTy};
 use lex::{Token, TokenStream, TokenCursor, TokenKind, flex};
 use sess::{Session, ParseSess, Input};
 use err::{Diag, PResult, raise};
@@ -278,7 +278,30 @@ impl Parser {
     }
 
     fn parse_ty(&self) -> PResult<Ty> {
-        let ty = self.token.ty().ok_or_else(|| Diag::err("Expected ty".to_string(), self.token.span))?;
+        let ty = match self.token.ident() {
+            Some(ident) => match ident.name {
+                ty::I8 => Ty::new(common::TyKind::Int(IntTy::I8), self.token.span),
+                ty::U8 => Ty::new(common::TyKind::Uint(UintTy::U8), self.token.span),
+
+                ty::I16 => Ty::new(common::TyKind::Int(IntTy::I16), self.token.span),
+                ty::U16 => Ty::new(common::TyKind::Uint(UintTy::U16), self.token.span),
+
+                ty::I32 => Ty::new(common::TyKind::Int(IntTy::I32), self.token.span),
+                ty::U32 => Ty::new(common::TyKind::Uint(UintTy::U32), self.token.span),
+
+                ty::I64 => Ty::new(common::TyKind::Int(IntTy::I64), self.token.span),
+                ty::U64 => Ty::new(common::TyKind::Uint(UintTy::U64), self.token.span),
+
+                ty::I128 => Ty::new(common::TyKind::Int(IntTy::I128), self.token.span),
+                ty::U128 => Ty::new(common::TyKind::Uint(UintTy::U128), self.token.span),
+
+                ty::Isize => Ty::new(common::TyKind::Int(IntTy::Isize), self.token.span),
+                ty::Usize => Ty::new(common::TyKind::Uint(UintTy::Usize), self.token.span),
+
+                _ => return Err(Diag::err("Expected ty".to_string(), self.token.span))
+            } // TODO: Rewrite this hard code
+            _ => return Err(Diag::err("Expected ty".to_string(), self.token.span))
+        };
         self.bump();
         Ok(ty)
     }
