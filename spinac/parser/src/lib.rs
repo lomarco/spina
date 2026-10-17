@@ -177,7 +177,10 @@ pub fn parse(sess: &Session) -> Unit { // TODO: Add new_parser_from_source_str
     unwrap_or_emit_fatal(match &sess.input {
         Input::File(file) => new_parser_from_file(file),
         Input::Str(str) => new_parser_from_str(str),
-    }).parse_unit().unwrap_or_else(|parse_error| parse_error.emit_fatal())
+    }).parse_unit().unwrap_or_else(|parse_error| {
+        parse_error.emit();
+        raise()
+    } )
 }
 
 pub struct Parser {
