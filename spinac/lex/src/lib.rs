@@ -241,11 +241,14 @@ impl TokenCursor {
     }
 
     pub fn next_and_bump(&mut self) -> Token {
-        self.bump();
-        self.stream
+        let token = self
+            .stream
             .get(self.next_idx)
             .cloned()
-            .unwrap_or_else(|| Token::new(TokenKind::Eof, DUMMY_SP))
+            .unwrap_or_else(|| Token::new(TokenKind::Eof, DUMMY_SP));
+
+        self.bump();
+        token
     }
 }
 
