@@ -239,6 +239,7 @@ impl Parser {
     }
 
     fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Ty, Box<Block>)> {
+        self.bump();
         let ident = self.parse_ident()?;
         let decl = self.parse_fn_decl()?;
         let ty = self.parse_ty_annot()?;
