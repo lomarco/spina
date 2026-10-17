@@ -17,8 +17,8 @@ fn run() {
     let filename = &args[1];
     // FIXME: Replace this code to clap
 
-    let sess = build_session(filename);
-    let unit = parse(sess); // TODO: Move all file opening logic to parse_from_file
+    let sess = Session::new(filename);
+    let unit = parse(&sess); // TODO: Move all file opening logic to parse_from_file
 
     println!("{unit}"); // FIXME
 }
