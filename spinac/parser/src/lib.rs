@@ -230,6 +230,14 @@ impl Parser {
         Ok((ident, decl, ty, body))
     }
 
+    fn parse_ty_annot(&mut self) -> PResult<Ty> {
+        if !self.eat(TokenKind::Colon) {
+            return Err(Diag::err("Expected Colon".to_string(), self.token.span))
+        }
+        self.bump();
+        Ok(self.parse_ty()?)
+    }
+
     fn parse_fn_body(&mut self) -> PResult<Box<Block>> {
         if !self.eat(TokenKind::OpenBrace) {
             return Err(Diag::err("Missing fn OpenBrace".to_string(), self.token.span));
