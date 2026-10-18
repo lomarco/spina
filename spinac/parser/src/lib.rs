@@ -423,9 +423,9 @@ impl Parser {
             return Err(Diag::err("Expected Eq".to_string(), self.token.span));
         }
 
+        let init = self.parse_init()?;
         self.bump();
 
-        let init = self.parse_init()?;
         Ok(Expr {
             kind: ExprKind::Let(Box::new(ident), Box::new(ty), Box::new(init), ident.span),
             span: ident.span, // FIXME: Replace it to real span
