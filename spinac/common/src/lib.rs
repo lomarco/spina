@@ -215,7 +215,7 @@ impl Ty {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LitKind {
     Bool, // AST only, must never appear in a `Token`
     Byte,
@@ -230,7 +230,7 @@ pub enum LitKind {
     CStrRaw(u8),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Lit {
     pub kind: LitKind,
     pub symbol: Symbol,

@@ -1,4 +1,4 @@
-use common::{Ident, Span, Symbol, Lit};
+use common::{Ident, Span, Symbol, Lit, LitKind};
 use err::Diag;
 use logos::Logos; // TODO: Rewrite it for myself
 
@@ -168,17 +168,17 @@ pub enum TokenKind {
     Ident(Symbol),
 
     // TODO: Replace it to Literal(LiteralKind)
-    #[regex(r"[0-9]+")]
-    IntLiteral,
+    #[regex(r"[0-9]+", |lex| Lit::new(LitKind::Integer, Symbol::intern(lex.slice())))]
+    IntLiteral(Lit),
 
-    #[regex(r"[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?")]
-    FloatLiteral,
+    #[regex(r"[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?", |lex| Lit::new(LitKind::Float, Symbol::intern(lex.slice())))]
+    FloatLiteral(Lit),
 
-    #[regex(r#""([^"\\]|\\.)*""#)]
-    StringLiteral,
+    #[regex(r#""([^"\\]|\\.)*""#, |lex| Lit::new(LitKind::Str, Symbol::intern(lex.slice())))]
+    StringLiteral(Lit),
 
-    #[regex(r#"'([^'\\]|\\.)'"#)]
-    CharLiteral,
+    #[regex(r#"'([^'\\]|\\.)'"#, |lex| Lit::new(LitKind::Char, Symbol::intern(lex.slice())))]
+    CharLiteral(Lit),
     // TODO ^
     //      |
     //      |
