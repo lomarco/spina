@@ -97,6 +97,19 @@ pub struct Expr {
 }
 
 #[derive(Debug)]
+pub enum StmtKind {
+    Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
+    Semi(Box<Expr>),
+    Empty,
+}
+
+#[derive(Debug)]
+pub struct Stmt {
+    pub kind: StmtKind,
+    pub span: Span,
+}
+
+#[derive(Debug)]
 pub enum ExprKind {
     Array(Vec<Box<Expr>>),
     Call(Box<Expr>, Vec<Box<Expr>>),
