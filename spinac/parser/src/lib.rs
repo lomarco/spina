@@ -254,6 +254,15 @@ impl Parser {
         Ok(self.parse_ty()?)
     }
 
+    fn parse_stmts(&mut self) -> PResult<Stmt> {
+        let kind = parse_stmt_kind();
+        let span = self.token.span;
+        Ok(Stmt {
+            kind,
+            span
+        })
+    }
+
     fn parse_fn_body(&mut self) -> PResult<Box<Block>> {
         if !self.eat(TokenKind::OpenBrace) {
             return Err(Diag::err(
