@@ -100,6 +100,7 @@ pub struct Expr {
 pub enum StmtKind {
     Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     Semi(Box<Expr>),
+    Expr(Box<Expr>),
     Empty,
 }
 
@@ -115,7 +116,6 @@ pub enum ExprKind {
     Call(Box<Expr>, Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
-    Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
     Index(Box<Expr>, Box<Expr>, Span),
