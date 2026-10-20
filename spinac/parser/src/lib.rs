@@ -10,21 +10,6 @@ use std::{fs::read_to_string, io::ErrorKind, mem::replace, path::Path};
 pub struct Unit(pub Vec<Item>);
 
 #[derive(Debug)]
-pub enum LitKind {
-    Bool, // AST only, must never appear in a `Token`
-    Byte,
-    Char,
-    Integer, // e.g. `1`, `1u8`, `1f32`
-    Float,   // e.g. `1.`, `1.0`, `1e3f32`
-    Str,
-    StrRaw(u8), // raw string delimited by `n` hash symbols
-    ByteStr,
-    ByteStrRaw(u8), // raw byte string delimited by `n` hash symbols
-    CStr,
-    CStrRaw(u8),
-}
-
-#[derive(Debug)]
 pub struct Param {
     pub ty: Ty,
     pub ident: Ident,
@@ -34,13 +19,6 @@ pub struct Param {
 pub struct FnDecl {
     pub params: Vec<Param>,
     pub ty: Ty,
-}
-
-#[derive(Debug)]
-pub struct Lit {
-    pub kind: LitKind,
-    pub symbol: Symbol,
-    pub suffix: Option<Symbol>,
 }
 
 #[derive(Debug)]
