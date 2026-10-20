@@ -1,4 +1,4 @@
-use common::{Ident, IntTy, Span, Symbol, Ty, UintTy, kw, ty};
+use common::{Ident, IntTy, Span, Symbol, Ty, UintTy, kw, ty, Lit, LitKind};
 use err::{Diag, PResult, raise};
 use lex::{Token, TokenCursor, TokenKind, TokenStream, flex};
 use sess::{Input, Session};
@@ -30,7 +30,7 @@ pub struct ForLoop {
 
 #[derive(Debug)]
 pub struct Block {
-    pub exprs: Vec<Expr>,
+    pub stmts: Vec<Stmt>,
     pub span: Span,
 }
 
@@ -271,13 +271,13 @@ impl Parser {
             ));
         }
 
-        let mut exprs: Vec<Expr> = Vec::with_capacity(1024);
+        let mut stmts: Vec<Stmt> = Vec::with_capacity(1024);
 
         while self.token.kind != TokenKind::Eof
             && self.token.kind != TokenKind::CloseBrace
             && self.token.kind != TokenKind::Semi
         {
-            exprs.push(self.parse_expr()?);
+            stmts.push(self.parse_stmts()?);
         }
 
         if !self.eat(TokenKind::CloseBrace) {
@@ -288,7 +288,7 @@ impl Parser {
         }
 
         Ok(Box::new(Block {
-            exprs,
+            stmts,
             span: self.token.span,
         }))
     }
