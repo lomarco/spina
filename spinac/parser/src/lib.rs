@@ -254,7 +254,14 @@ impl Parser {
         Ok(self.parse_ty()?)
     }
 
-    fn parse_stmts(&mut self) -> PResult<Stmt> {
+    fn parse_stmt_kind(&self) -> PResult<StmtKind> {
+        let expr = if self.token.is_keyword(kw::Let) {
+            self.parse_let()
+        } else { // TODO: Add the rest stmts
+            Err(Diag::err(format!("Expected statement, found {:#?}", self.token.kind).to_string(), self.token.span))));
+        }
+    }
+
     fn parse_stmt(&mut self) -> PResult<Stmt> {
         let kind = parse_stmt_kind();
         let span = self.token.span;
