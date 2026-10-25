@@ -1,4 +1,4 @@
-use common::{Ident, IntTy, Span, Symbol, Ty, UintTy, kw, ty};
+use common::{Ident, IntTy, Span, Symbol, Ty, UintTy, kw, ty, Lit, LitKind};
 use err::{Diag, PResult, raise};
 use lex::{Token, TokenCursor, TokenKind, TokenStream, flex};
 use sess::{Input, Session};
@@ -8,21 +8,6 @@ use std::{fs::read_to_string, io::ErrorKind, mem::replace, path::Path};
 
 #[derive(Debug)]
 pub struct Unit(pub Vec<Item>);
-
-#[derive(Debug)]
-pub enum LitKind {
-    Bool, // AST only, must never appear in a `Token`
-    Byte,
-    Char,
-    Integer, // e.g. `1`, `1u8`, `1f32`
-    Float,   // e.g. `1.`, `1.0`, `1e3f32`
-    Str,
-    StrRaw(u8), // raw string delimited by `n` hash symbols
-    ByteStr,
-    ByteStrRaw(u8), // raw byte string delimited by `n` hash symbols
-    CStr,
-    CStrRaw(u8),
-}
 
 #[derive(Debug)]
 pub struct Param {
@@ -37,13 +22,6 @@ pub struct FnDecl {
 }
 
 #[derive(Debug)]
-pub struct Lit {
-    pub kind: LitKind,
-    pub symbol: Symbol,
-    pub suffix: Option<Symbol>,
-}
-
-#[derive(Debug)]
 pub struct ForLoop {
     pub ident: Box<Ident>,
     pub iter: Box<Expr>,
@@ -52,7 +30,7 @@ pub struct ForLoop {
 
 #[derive(Debug)]
 pub struct Block {
-    pub exprs: Vec<Expr>,
+    pub stmts: Vec<Stmt>,
     pub span: Span,
 }
 
@@ -119,12 +97,25 @@ pub struct Expr {
 }
 
 #[derive(Debug)]
+pub enum StmtKind {
+    Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
+    Semi(Box<Expr>),
+    Expr(Box<Expr>),
+    Empty,
+}
+
+#[derive(Debug)]
+pub struct Stmt {
+    pub kind: StmtKind,
+    pub span: Span,
+}
+
+#[derive(Debug)]
 pub enum ExprKind {
     Array(Vec<Box<Expr>>),
     Call(Box<Expr>, Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
-    Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
     Index(Box<Expr>, Box<Expr>, Span),
@@ -228,9 +219,11 @@ impl Parser {
         if self.is_fn() {
             let (ident, decl, body) = self.parse_fn()?;
             Ok(Some(ItemKind::Fn(Box::new(Fn { ident, decl, body }))))
+        } else if self.is_eof() {
+            Ok(None)
         } else {
             // TODO: Add const item parse
-            Ok(None)
+            Err(Diag::err(format!("Expected item, found {:?}", self.token.kind), self.token.span))
         }
     }
 
@@ -238,7 +231,12 @@ impl Parser {
         self.token.is_keyword(kw::Fn)
     }
 
+    fn is_eof(&self) -> bool {
+        self.token.kind == TokenKind::Eof
+    }
+
     fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Box<Block>)> {
+        self.bump();
         let ident = self.parse_ident()?;
         let decl = self.parse_fn_decl()?;
         let body = self.parse_fn_body()?;
@@ -256,6 +254,23 @@ impl Parser {
         Ok(self.parse_ty()?)
     }
 
+    fn parse_stmt_kind(&self) -> PResult<StmtKind> {
+        let expr = if self.token.is_keyword(kw::Let) {
+            self.parse_let()
+        } else { // TODO: Add the rest stmts
+            Err(Diag::err(format!("Expected statement, found {:#?}", self.token.kind).to_string(), self.token.span))));
+        }
+    }
+
+    fn parse_stmt(&mut self) -> PResult<Stmt> {
+        let kind = parse_stmt_kind();
+        let span = self.token.span;
+        Ok(Stmt {
+            kind,
+            span
+        })
+    }
+
     fn parse_fn_body(&mut self) -> PResult<Box<Block>> {
         if !self.eat(TokenKind::OpenBrace) {
             return Err(Diag::err(
@@ -264,17 +279,24 @@ impl Parser {
             ));
         }
 
-        let mut exprs: Vec<Expr> = Vec::with_capacity(1024);
+        let mut stmts: Vec<Stmt> = Vec::with_capacity(1024);
 
         while self.token.kind != TokenKind::Eof
             && self.token.kind != TokenKind::CloseBrace
             && self.token.kind != TokenKind::Semi
         {
-            exprs.push(self.parse_expr()?);
+            stmts.push(self.parse_stmt()?);
+        }
+
+        if !self.eat(TokenKind::CloseBrace) {
+            return Err(Diag::err(
+                "Missing fn CloseBrace".to_string(),
+                self.token.span,
+            ));
         }
 
         Ok(Box::new(Block {
-            exprs,
+            stmts,
             span: self.token.span,
         }))
     }
@@ -283,7 +305,7 @@ impl Parser {
         if self.token.is_keyword(kw::Let) {
             self.parse_let()
         } else {
-            Err(Diag::err("Expected keyword".to_string(), self.token.span))
+            Err(Diag::err(format!("Expected keyword, found {:#?}", self.token.kind).to_string(), self.token.span))
         }
     }
 
@@ -383,7 +405,6 @@ impl Parser {
     }
 
     fn parse_fn_decl(&mut self) -> PResult<FnDecl> {
-        self.bump();
         Ok(FnDecl {
             params: self.parse_fn_params()?,
             ty: self.parse_ty_annot()?,
@@ -410,17 +431,13 @@ impl Parser {
             return Err(Diag::err("Expected Eq".to_string(), self.token.span));
         }
 
+        let init = self.parse_expr()?;
         self.bump();
 
-        let init = self.parse_init()?;
         Ok(Expr {
             kind: ExprKind::Let(Box::new(ident), Box::new(ty), Box::new(init), ident.span),
             span: ident.span, // FIXME: Replace it to real span
         })
-    }
-
-    fn parse_init(&self) -> PResult<Expr> {
-        ;
     }
 }
 
