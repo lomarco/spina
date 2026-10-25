@@ -255,6 +255,7 @@ impl Parser {
     }
 
     fn parse_stmts(&mut self) -> PResult<Stmt> {
+    fn parse_stmt(&mut self) -> PResult<Stmt> {
         let kind = parse_stmt_kind();
         let span = self.token.span;
         Ok(Stmt {
@@ -277,7 +278,7 @@ impl Parser {
             && self.token.kind != TokenKind::CloseBrace
             && self.token.kind != TokenKind::Semi
         {
-            stmts.push(self.parse_stmts()?);
+            stmts.push(self.parse_stmt()?);
         }
 
         if !self.eat(TokenKind::CloseBrace) {
