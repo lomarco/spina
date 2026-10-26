@@ -302,8 +302,8 @@ impl Parser {
     }
 
     fn parse_expr(&mut self) -> PResult<Expr> {
-        if self.token.is_keyword(kw::Let) {
-            self.parse_let()
+        if self.check(TokenKind::IntLiteral()) {
+            self.parse_lit()
         } else {
             Err(Diag::err(format!("Expected expr, found {:#?}", self.token.kind).to_string(), self.token.span))
         }
