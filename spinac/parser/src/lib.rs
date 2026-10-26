@@ -305,7 +305,7 @@ impl Parser {
         if self.token.is_keyword(kw::Let) {
             self.parse_let()
         } else {
-            Err(Diag::err(format!("Expected keyword, found {:#?}", self.token.kind).to_string(), self.token.span))
+            Err(Diag::err(format!("Expected expr, found {:#?}", self.token.kind).to_string(), self.token.span))
         }
     }
 
