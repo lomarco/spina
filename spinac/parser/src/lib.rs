@@ -432,6 +432,10 @@ impl Parser {
         }
 
         let init = self.parse_expr()?;
+
+        if self.token.kind != TokenKind::Semi {
+            return Err(Diag::err("Expected Semi".to_string(), self.token.span))
+        }
         self.bump();
 
         Ok(StmtKind::Let(Box::new(ident), Box::new(ty), Box::new(init), ident.span))
