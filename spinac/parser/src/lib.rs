@@ -254,16 +254,16 @@ impl Parser {
         Ok(self.parse_ty()?)
     }
 
-    fn parse_stmt_kind(&self) -> PResult<StmtKind> {
-        let expr = if self.token.is_keyword(kw::Let) {
-            self.parse_let()?
+    fn parse_stmt_kind(&mut self) -> PResult<StmtKind> {
+        if self.token.is_keyword(kw::Let) {
+            self.parse_let()
         } else { // TODO: Add the rest stmts
             return Err(Diag::err(format!("Expected statement, found {:#?}", self.token.kind).to_string(), self.token.span))
-        };
+        }
     }
 
     fn parse_stmt(&mut self) -> PResult<Stmt> {
-        let kind = parse_stmt_kind();
+        let kind = self.parse_stmt_kind()?;
         let span = self.token.span;
         Ok(Stmt {
             kind,
@@ -410,7 +410,7 @@ impl Parser {
             ty: self.parse_ty_annot()?,
         })
     }
-    fn parse_let(&mut self) -> PResult<Expr> {
+    fn parse_let(&mut self) -> PResult<StmtKind> {
         self.bump();
         let ident = self
             .token
@@ -434,10 +434,7 @@ impl Parser {
         let init = self.parse_expr()?;
         self.bump();
 
-        Ok(Expr {
-            kind: ExprKind::Let(Box::new(ident), Box::new(ty), Box::new(init), ident.span),
-            span: ident.span, // FIXME: Replace it to real span
-        })
+        Ok(StmtKind::Let(Box::new(ident), Box::new(ty), Box::new(init), ident.span))
     }
 }
 
