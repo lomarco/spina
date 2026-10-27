@@ -1,4 +1,4 @@
-use common::{Ident, IntTy, Span, Symbol, Ty, UintTy, kw, ty, Lit, LitKind};
+use common::{Ident, IntTy, Span, Ty, UintTy, kw, ty, Lit};
 use err::{Diag, PResult, raise};
 use lex::{Token, TokenCursor, TokenKind, TokenStream, flex};
 use sess::{Input, Session};
