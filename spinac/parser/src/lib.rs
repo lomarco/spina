@@ -96,6 +96,15 @@ pub struct Expr {
     pub span: Span,
 }
 
+impl Expr {
+    fn new(kind: ExprKind, span: Span) -> Self {
+        Expr {
+            kind,
+            span
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum StmtKind {
     Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
