@@ -98,7 +98,7 @@ pub struct Expr {
 
 impl Expr {
     fn new(kind: ExprKind, span: Span) -> Self {
-        Expr {
+        Self {
             kind,
             span
         }
