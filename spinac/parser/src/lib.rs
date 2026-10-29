@@ -544,14 +544,7 @@ impl Parser {
             .ok_or_else(|| Diag::err("Expected ident".to_string(), self.token.span))?;
 
         self.bump();
-        if !self.eat(TokenKind::Colon) {
-            return Err(Diag::err(
-                format!("Expected Colon, found {:?}", self.token.kind).to_string(),
-                self.token.span,
-            ));
-        }
-
-        let ty = self.parse_ty()?;
+        let ty = self.parse_ty_annot()?;
 
         if !self.eat(TokenKind::Eq) {
             return Err(Diag::err("Expected Eq".to_string(), self.token.span));
