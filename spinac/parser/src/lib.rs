@@ -230,6 +230,14 @@ impl Parser {
         if self.is_fn() {
             let (ident, decl, body) = self.parse_fn()?;
             Ok(Some(ItemKind::Fn(Box::new(Fn { ident, decl, body }))))
+        } else if self.is_const() {
+            let (ident, ty, expr) = self.parse_const()?;
+            Ok(Some(ItemKind::Const(
+                Box::new(ident),
+                Box::new(ty),
+                Box::new(expr),
+                self.token.span,
+            )))
         } else if self.is_eof() {
             Ok(None)
         } else {
@@ -245,8 +253,12 @@ impl Parser {
         self.token.is_keyword(kw::Fn)
     }
 
+    fn is_const(&self) -> bool {
+        self.token.is_keyword(kw::Const)
+    }
+
     fn is_eof(&self) -> bool {
-        self.token.kind == TokenKind::Eof
+        self.check(TokenKind::Eof)
     }
 
     fn parse_fn(&mut self) -> PResult<(Ident, FnDecl, Box<Block>)> {
@@ -255,6 +267,16 @@ impl Parser {
         let decl = self.parse_fn_decl()?;
         let body = self.parse_fn_body()?;
         Ok((ident, decl, body))
+    }
+
+    fn parse_const(&mut self) -> PResult<(Ident, Ty, Expr)> {
+        self.bump();
+
+        let ident = self.parse_ident()?;
+        let ty = self.parse_ty()?;
+        let expr = self.parse_expr()?;
+
+        Ok((ident, ty, expr))
     }
 
     fn parse_ty_annot(&mut self) -> PResult<Ty> {
@@ -508,6 +530,7 @@ impl Parser {
 
     fn parse_let(&mut self) -> PResult<StmtKind> {
         self.bump();
+
         let ident = self
             .token
             .ident()
@@ -544,13 +567,6 @@ impl Parser {
 }
 
 #[derive(Debug)]
-pub struct ConstItem {
-    pub ident: Ident,
-    pub ty: Box<Ty>,
-    pub body: Option<Box<Expr>>,
-}
-
-#[derive(Debug)]
 pub struct Fn {
     pub ident: Ident,
     pub decl: FnDecl,
@@ -559,7 +575,7 @@ pub struct Fn {
 
 #[derive(Debug)]
 pub enum ItemKind {
-    Const(Box<ConstItem>),
+    Const(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     Fn(Box<Fn>),
 }
 

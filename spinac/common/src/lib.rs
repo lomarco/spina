@@ -48,6 +48,7 @@ macro_rules! symbols {
 symbols! {
     keywords {
         Let: "let",
+        Const: "const",
         If: "if",
         For: "for",
         While: "while",
