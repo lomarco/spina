@@ -133,6 +133,7 @@ pub enum ExprKind {
     Continue(), // FIXME: Add Label
 
     Lit(Lit),
+    Ident(Ident),
     ForLoop(Box<ForLoop>),
     Loop(Box<Block>, Span),
 }
@@ -316,13 +317,35 @@ impl Parser {
         } else {
             Err(Diag::err(format!("Expected expr, found {:#?}", self.token.kind).to_string(), self.token.span))
     fn parse_factor(&mut self) -> PResult<Expr> {
-        if self.eat(TokenKind::OpenParen) {
-            let node = self.parse_expr();
-            // TODO: Add self.bump() to parse_expr()
-            if !self.eat(TokenKind::CloseParen) {
-                return Err(Diag::err("Missing fn CloseParen".to_string(), self.token.span));
-            }
-            return node;
+        match self.token.kind {
+            TokenKind::OpenParen => {
+                self.bump();
+                let node = self.parse_expr();
+                // TODO: Add self.bump() to parse_expr()
+                if !self.eat(TokenKind::CloseParen) {
+                    return Err(Diag::err("Missing fn CloseParen".to_string(), self.token.span));
+                }
+                return node;
+            },
+
+            TokenKind::Ident(name) => {
+                self.bump();
+                Ok(Expr::new(ExprKind::Ident(Ident { name, span: self.token.span }), self.token.span))
+            },
+
+            TokenKind::FloatLiteral(flit) => {
+                self.bump();
+                Ok(Expr::new(ExprKind::Lit(flit), self.token.span))
+            },
+
+            TokenKind::IntLiteral(ilit) => {
+                self.bump();
+                Ok(Expr::new(ExprKind::Lit(ilit), self.token.span))
+            },
+
+            _ => {
+                Err(Diag::err(format!("Expected expr, found: {:#?}", self.token.kind).to_string(), self.token.span))
+            },
         }
     }
 
