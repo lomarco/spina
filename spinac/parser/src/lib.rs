@@ -365,7 +365,7 @@ impl Parser {
     }
 
     fn parse_fn_params(&mut self) -> PResult<Vec<Param>> {
-        if self.token.kind != TokenKind::OpenParen {
+        if !self.check(TokenKind::OpenParen) {
             return Err(Diag::err("Missing fn params".to_string(), self.token.span));
         }
 
@@ -433,7 +433,7 @@ impl Parser {
 
         let init = self.parse_expr()?;
 
-        if self.token.kind != TokenKind::Semi {
+        if !self.check(TokenKind::Semi) {
             return Err(Diag::err("Expected Semi".to_string(), self.token.span))
         }
         self.bump();
