@@ -306,6 +306,14 @@ impl Parser {
             self.parse_lit()
         } else {
             Err(Diag::err(format!("Expected expr, found {:#?}", self.token.kind).to_string(), self.token.span))
+    fn parse_factor(&mut self) -> PResult<Expr> {
+        if self.eat(TokenKind::OpenParen) {
+            let node = self.parse_expr();
+            // TODO: Add self.bump() to parse_expr()
+            if !self.eat(TokenKind::CloseParen) {
+                return Err(Diag::err("Missing fn CloseParen".to_string(), self.token.span));
+            }
+            return node;
         }
     }
 
