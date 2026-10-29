@@ -464,10 +464,6 @@ impl Parser {
         self.token.kind == tok
     }
 
-    fn check_ident(&self) -> bool {
-        matches!(self.token.kind, TokenKind::Ident(_))
-    }
-
     fn bump(&mut self) {
         let token = self.token_cursor.next_and_bump();
         self.bump_with(token);
