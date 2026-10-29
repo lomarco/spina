@@ -321,10 +321,26 @@ impl Parser {
     }
 
     fn parse_expr(&mut self) -> PResult<Expr> {
-        if self.check(TokenKind::IntLiteral()) {
-            self.parse_lit()
-        } else {
-            Err(Diag::err(format!("Expected expr, found {:#?}", self.token.kind).to_string(), self.token.span))
+        let mut lhs = self.parse_term()?;
+
+        loop {
+            let op = match self.token.kind {
+                TokenKind::Plus => BinOp::new(BinOpKind::Add, self.token.span),
+                TokenKind::Minus => BinOp::new(BinOpKind::Sub, self.token.span),
+                _ => break,
+            };
+
+            self.bump();
+
+            let rhs = self.parse_term()?;
+
+            lhs = Expr::new(ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)), self.token.span);
+        }
+
+
+        Ok(lhs)
+    }
+
     fn parse_term(&mut self) -> PResult<Expr> {
         let mut lhs = self.parse_factor()?;
 
