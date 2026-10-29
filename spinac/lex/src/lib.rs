@@ -207,7 +207,7 @@ impl Token {
 
     pub fn ident(&self) -> Option<Ident> {
         if let TokenKind::Ident(name) = &self.kind {
-            Some(Ident::new(name.clone(), self.span))
+            Some(Ident::new(*name, self.span))
         } else {
             None
         }
@@ -230,7 +230,7 @@ pub struct TokenCursor {
 impl TokenCursor {
     pub fn new(stream: TokenStream) -> Self {
         TokenCursor {
-            stream: stream,
+            stream,
             next_idx: 0,
         }
     }

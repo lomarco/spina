@@ -76,8 +76,8 @@ pub enum BinOpKind {
 
 #[derive(Debug)]
 pub struct BinOp {
-    kind: BinOpKind,
-    span: Span,
+    pub kind: BinOpKind,
+    pub span: Span,
 }
 
 impl BinOp {
@@ -171,7 +171,7 @@ pub fn new_parser_from_file(path: &Path) -> Result<Parser, Vec<Diag>> {
     Ok(parser)
 }
 
-fn new_parser_from_str(str: &String) -> Result<Parser, Vec<Diag>> {
+fn new_parser_from_str(str: &str) -> Result<Parser, Vec<Diag>> {
     Ok(Parser::new(flex(str)?))
 }
 
@@ -267,7 +267,7 @@ impl Parser {
             ));
         }
         self.bump();
-        Ok(self.parse_ty()?)
+        self.parse_ty()
     }
 
     fn parse_stmt_kind(&mut self) -> PResult<StmtKind> {
@@ -275,10 +275,10 @@ impl Parser {
             self.parse_let()
         } else {
             // TODO: Add the rest stmts
-            return Err(Diag::err(
+            Err(Diag::err(
                 format!("Expected statement, found {:#?}", self.token.kind).to_string(),
                 self.token.span,
-            ));
+            ))
         }
     }
 
@@ -376,7 +376,7 @@ impl Parser {
                         self.token.span,
                     ));
                 }
-                return node;
+                node
             }
 
             TokenKind::Ident(name) => {
