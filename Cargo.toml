@@ -27,3 +27,9 @@ name = "spinac"
 parser = {path = "spinac/parser"}
 sess = {path = "spinac/sess"}
 err = {path = "spinac/err"}
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
