@@ -1,4 +1,4 @@
-use common::{Ident, Span, Symbol, Lit, LitKind};
+use common::{Ident, Lit, LitKind, Span, Symbol};
 use err::Diag;
 use logos::Logos; // TODO: Rewrite it for myself
 

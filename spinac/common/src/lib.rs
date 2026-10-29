@@ -238,9 +238,6 @@ pub struct Lit {
 
 impl Lit {
     pub fn new(kind: LitKind, symbol: Symbol) -> Self {
-        Self {
-            kind,
-            symbol,
-        }
+        Self { kind, symbol }
     }
 }

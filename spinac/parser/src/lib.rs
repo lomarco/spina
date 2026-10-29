@@ -1,4 +1,4 @@
-use common::{Ident, IntTy, Span, Ty, UintTy, kw, ty, Lit};
+use common::{Ident, IntTy, Lit, Span, Ty, UintTy, kw, ty};
 use err::{Diag, PResult, raise};
 use lex::{Token, TokenCursor, TokenKind, TokenStream, flex};
 use sess::{Input, Session};
@@ -82,10 +82,7 @@ pub struct BinOp {
 
 impl BinOp {
     fn new(kind: BinOpKind, span: Span) -> Self {
-        Self {
-            kind,
-            span
-        }
+        Self { kind, span }
     }
 }
 
@@ -107,10 +104,7 @@ pub struct Expr {
 
 impl Expr {
     fn new(kind: ExprKind, span: Span) -> Self {
-        Self {
-            kind,
-            span
-        }
+        Self { kind, span }
     }
 }
 
@@ -242,7 +236,10 @@ impl Parser {
             Ok(None)
         } else {
             // TODO: Add const item parse
-            Err(Diag::err(format!("Expected item, found {:?}", self.token.kind), self.token.span))
+            Err(Diag::err(
+                format!("Expected item, found {:?}", self.token.kind),
+                self.token.span,
+            ))
         }
     }
 
@@ -276,18 +273,19 @@ impl Parser {
     fn parse_stmt_kind(&mut self) -> PResult<StmtKind> {
         if self.token.is_keyword(kw::Let) {
             self.parse_let()
-        } else { // TODO: Add the rest stmts
-            return Err(Diag::err(format!("Expected statement, found {:#?}", self.token.kind).to_string(), self.token.span))
+        } else {
+            // TODO: Add the rest stmts
+            return Err(Diag::err(
+                format!("Expected statement, found {:#?}", self.token.kind).to_string(),
+                self.token.span,
+            ));
         }
     }
 
     fn parse_stmt(&mut self) -> PResult<Stmt> {
         let kind = self.parse_stmt_kind()?;
         let span = self.token.span;
-        Ok(Stmt {
-            kind,
-            span
-        })
+        Ok(Stmt { kind, span })
     }
 
     fn parse_fn_body(&mut self) -> PResult<Box<Block>> {
@@ -334,9 +332,11 @@ impl Parser {
 
             let rhs = self.parse_term()?;
 
-            lhs = Expr::new(ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)), self.token.span);
+            lhs = Expr::new(
+                ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)),
+                self.token.span,
+            );
         }
-
 
         Ok(lhs)
     }
@@ -355,7 +355,10 @@ impl Parser {
 
             let rhs = self.parse_factor()?;
 
-            lhs = Expr::new(ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)), self.token.span);
+            lhs = Expr::new(
+                ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)),
+                self.token.span,
+            );
         }
 
         Ok(lhs)
@@ -368,29 +371,39 @@ impl Parser {
                 let node = self.parse_expr();
                 // TODO: Add self.bump() to parse_expr()
                 if !self.eat(TokenKind::CloseParen) {
-                    return Err(Diag::err("Missing fn CloseParen".to_string(), self.token.span));
+                    return Err(Diag::err(
+                        "Missing fn CloseParen".to_string(),
+                        self.token.span,
+                    ));
                 }
                 return node;
-            },
+            }
 
             TokenKind::Ident(name) => {
                 self.bump();
-                Ok(Expr::new(ExprKind::Ident(Ident { name, span: self.token.span }), self.token.span))
-            },
+                Ok(Expr::new(
+                    ExprKind::Ident(Ident {
+                        name,
+                        span: self.token.span,
+                    }),
+                    self.token.span,
+                ))
+            }
 
             TokenKind::FloatLiteral(flit) => {
                 self.bump();
                 Ok(Expr::new(ExprKind::Lit(flit), self.token.span))
-            },
+            }
 
             TokenKind::IntLiteral(ilit) => {
                 self.bump();
                 Ok(Expr::new(ExprKind::Lit(ilit), self.token.span))
-            },
+            }
 
-            _ => {
-                Err(Diag::err(format!("Expected expr, found: {:#?}", self.token.kind).to_string(), self.token.span))
-            },
+            _ => Err(Diag::err(
+                format!("Expected expr, found: {:#?}", self.token.kind).to_string(),
+                self.token.span,
+            )),
         }
     }
 
@@ -520,11 +533,16 @@ impl Parser {
         let init = self.parse_expr()?;
 
         if !self.check(TokenKind::Semi) {
-            return Err(Diag::err("Expected Semi".to_string(), self.token.span))
+            return Err(Diag::err("Expected Semi".to_string(), self.token.span));
         }
         self.bump();
 
-        Ok(StmtKind::Let(Box::new(ident), Box::new(ty), Box::new(init), ident.span))
+        Ok(StmtKind::Let(
+            Box::new(ident),
+            Box::new(ty),
+            Box::new(init),
+            ident.span,
+        ))
     }
 }
 
