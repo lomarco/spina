@@ -1,4 +1,4 @@
-use common::{Ident, IntTy, Span, Symbol, Ty, UintTy, kw, ty, Lit, LitKind};
+use common::{Ident, IntTy, Span, Ty, UintTy, kw, ty, Lit};
 use err::{Diag, PResult, raise};
 use lex::{Token, TokenCursor, TokenKind, TokenStream, flex};
 use sess::{Input, Session};
@@ -80,6 +80,15 @@ pub struct BinOp {
     span: Span,
 }
 
+impl BinOp {
+    fn new(kind: BinOpKind, span: Span) -> Self {
+        Self {
+            kind,
+            span
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum UnOp {
     /// The `*` operator for dereferencing
@@ -94,6 +103,15 @@ pub enum UnOp {
 pub struct Expr {
     pub kind: ExprKind,
     pub span: Span,
+}
+
+impl Expr {
+    fn new(kind: ExprKind, span: Span) -> Self {
+        Self {
+            kind,
+            span
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -124,6 +142,7 @@ pub enum ExprKind {
     Continue(), // FIXME: Add Label
 
     Lit(Lit),
+    Ident(Ident),
     ForLoop(Box<ForLoop>),
     Loop(Box<Block>, Span),
 }
@@ -254,16 +273,16 @@ impl Parser {
         Ok(self.parse_ty()?)
     }
 
-    fn parse_stmt_kind(&self) -> PResult<StmtKind> {
-        let expr = if self.token.is_keyword(kw::Let) {
+    fn parse_stmt_kind(&mut self) -> PResult<StmtKind> {
+        if self.token.is_keyword(kw::Let) {
             self.parse_let()
         } else { // TODO: Add the rest stmts
-            Err(Diag::err(format!("Expected statement, found {:#?}", self.token.kind).to_string(), self.token.span))));
+            return Err(Diag::err(format!("Expected statement, found {:#?}", self.token.kind).to_string(), self.token.span))
         }
     }
 
     fn parse_stmt(&mut self) -> PResult<Stmt> {
-        let kind = parse_stmt_kind();
+        let kind = self.parse_stmt_kind()?;
         let span = self.token.span;
         Ok(Stmt {
             kind,
@@ -302,10 +321,76 @@ impl Parser {
     }
 
     fn parse_expr(&mut self) -> PResult<Expr> {
-        if self.token.is_keyword(kw::Let) {
-            self.parse_let()
-        } else {
-            Err(Diag::err(format!("Expected keyword, found {:#?}", self.token.kind).to_string(), self.token.span))
+        let mut lhs = self.parse_term()?;
+
+        loop {
+            let op = match self.token.kind {
+                TokenKind::Plus => BinOp::new(BinOpKind::Add, self.token.span),
+                TokenKind::Minus => BinOp::new(BinOpKind::Sub, self.token.span),
+                _ => break,
+            };
+
+            self.bump();
+
+            let rhs = self.parse_term()?;
+
+            lhs = Expr::new(ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)), self.token.span);
+        }
+
+
+        Ok(lhs)
+    }
+
+    fn parse_term(&mut self) -> PResult<Expr> {
+        let mut lhs = self.parse_factor()?;
+
+        loop {
+            let op = match self.token.kind {
+                TokenKind::Star => BinOp::new(BinOpKind::Mul, self.token.span),
+                TokenKind::Slash => BinOp::new(BinOpKind::Div, self.token.span),
+                _ => break,
+            };
+
+            self.bump();
+
+            let rhs = self.parse_factor()?;
+
+            lhs = Expr::new(ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)), self.token.span);
+        }
+
+        Ok(lhs)
+    }
+
+    fn parse_factor(&mut self) -> PResult<Expr> {
+        match self.token.kind {
+            TokenKind::OpenParen => {
+                self.bump();
+                let node = self.parse_expr();
+                // TODO: Add self.bump() to parse_expr()
+                if !self.eat(TokenKind::CloseParen) {
+                    return Err(Diag::err("Missing fn CloseParen".to_string(), self.token.span));
+                }
+                return node;
+            },
+
+            TokenKind::Ident(name) => {
+                self.bump();
+                Ok(Expr::new(ExprKind::Ident(Ident { name, span: self.token.span }), self.token.span))
+            },
+
+            TokenKind::FloatLiteral(flit) => {
+                self.bump();
+                Ok(Expr::new(ExprKind::Lit(flit), self.token.span))
+            },
+
+            TokenKind::IntLiteral(ilit) => {
+                self.bump();
+                Ok(Expr::new(ExprKind::Lit(ilit), self.token.span))
+            },
+
+            _ => {
+                Err(Diag::err(format!("Expected expr, found: {:#?}", self.token.kind).to_string(), self.token.span))
+            },
         }
     }
 
@@ -365,7 +450,7 @@ impl Parser {
     }
 
     fn parse_fn_params(&mut self) -> PResult<Vec<Param>> {
-        if self.token.kind != TokenKind::OpenParen {
+        if !self.check(TokenKind::OpenParen) {
             return Err(Diag::err("Missing fn params".to_string(), self.token.span));
         }
 
@@ -410,7 +495,8 @@ impl Parser {
             ty: self.parse_ty_annot()?,
         })
     }
-    fn parse_let(&mut self) -> PResult<Expr> {
+
+    fn parse_let(&mut self) -> PResult<StmtKind> {
         self.bump();
         let ident = self
             .token
@@ -432,12 +518,13 @@ impl Parser {
         }
 
         let init = self.parse_expr()?;
+
+        if !self.check(TokenKind::Semi) {
+            return Err(Diag::err("Expected Semi".to_string(), self.token.span))
+        }
         self.bump();
 
-        Ok(Expr {
-            kind: ExprKind::Let(Box::new(ident), Box::new(ty), Box::new(init), ident.span),
-            span: ident.span, // FIXME: Replace it to real span
-        })
+        Ok(StmtKind::Let(Box::new(ident), Box::new(ty), Box::new(init), ident.span))
     }
 }
 
