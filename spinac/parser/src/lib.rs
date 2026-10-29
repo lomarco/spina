@@ -273,8 +273,15 @@ impl Parser {
         self.bump();
 
         let ident = self.parse_ident()?;
-        let ty = self.parse_ty()?;
+        let ty = self.parse_ty_annot()?;
+
+        self.bump();
         let expr = self.parse_expr()?;
+
+        if !self.check(TokenKind::Semi) {
+            return Err(Diag::err(format!("Expected Semi, found {:#?}", self.token.kind), self.token.span));
+        }
+        self.bump();
 
         Ok((ident, ty, expr))
     }
