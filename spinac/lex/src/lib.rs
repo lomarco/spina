@@ -167,7 +167,6 @@ pub enum TokenKind {
     #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| Symbol::intern(lex.slice()))]
     Ident(Symbol),
 
-    // TODO: Replace it to Literal(LiteralKind)
     #[regex(r"[0-9]+", |lex| Lit::new(LitKind::Integer, Symbol::intern(lex.slice())))]
     IntLiteral(Lit),
 
@@ -179,9 +178,7 @@ pub enum TokenKind {
 
     #[regex(r#"'([^'\\]|\\.)'"#, |lex| Lit::new(LitKind::Char, Symbol::intern(lex.slice())))]
     CharLiteral(Lit),
-    // TODO ^
-    //      |
-    //      |
+
     Dummy,
 
     #[end]
@@ -262,8 +259,6 @@ impl TokenStream {
         self.0.get(idx)
     }
 }
-
-// TODO: Add TokenStream struct
 
 pub fn flex(content: &str) -> Result<TokenStream, Vec<Diag>> {
     let mut tokens: Vec<Token> = Vec::with_capacity(512);

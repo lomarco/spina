@@ -58,7 +58,6 @@ impl Diag {
     }
 
     pub fn emit_fatal(self) -> ! {
-        // TODO: Remove me
         assert_eq!(self.level, Level::Fatal);
         self.emit();
         unreachable!();

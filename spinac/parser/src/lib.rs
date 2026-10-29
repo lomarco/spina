@@ -4,8 +4,6 @@ use lex::{Token, TokenCursor, TokenKind, TokenStream, flex};
 use sess::{Input, Session};
 use std::{fs::read_to_string, io::ErrorKind, mem::replace, path::Path};
 
-// TODO: Add dcx
-
 #[derive(Debug)]
 pub struct Unit(pub Vec<Item>);
 
@@ -274,7 +272,6 @@ impl Parser {
         if self.token.is_keyword(kw::Let) {
             self.parse_let()
         } else {
-            // TODO: Add the rest stmts
             Err(Diag::err(
                 format!("Expected statement, found {:#?}", self.token.kind).to_string(),
                 self.token.span,
