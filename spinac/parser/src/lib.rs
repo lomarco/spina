@@ -422,6 +422,7 @@ impl Parser {
             ty: self.parse_ty_annot()?,
         })
     }
+
     fn parse_let(&mut self) -> PResult<StmtKind> {
         self.bump();
         let ident = self
