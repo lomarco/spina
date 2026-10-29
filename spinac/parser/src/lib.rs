@@ -325,6 +325,26 @@ impl Parser {
             self.parse_lit()
         } else {
             Err(Diag::err(format!("Expected expr, found {:#?}", self.token.kind).to_string(), self.token.span))
+    fn parse_term(&mut self) -> PResult<Expr> {
+        let mut lhs = self.parse_factor()?;
+
+        loop {
+            let op = match self.token.kind {
+                TokenKind::Star => BinOp::new(BinOpKind::Mul, self.token.span),
+                TokenKind::Slash => BinOp::new(BinOpKind::Div, self.token.span),
+                _ => break,
+            };
+
+            self.bump();
+
+            let rhs = self.parse_factor()?;
+
+            lhs = Expr::new(ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)), self.token.span);
+        }
+
+        Ok(lhs)
+    }
+
     fn parse_factor(&mut self) -> PResult<Expr> {
         match self.token.kind {
             TokenKind::OpenParen => {
