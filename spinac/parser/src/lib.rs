@@ -80,6 +80,15 @@ pub struct BinOp {
     span: Span,
 }
 
+impl BinOp {
+    fn new(kind: BinOpKind, span: Span) -> Self {
+        Self {
+            kind,
+            span
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum UnOp {
     /// The `*` operator for dereferencing
