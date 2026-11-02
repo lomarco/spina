@@ -718,4 +718,89 @@ mod tests {
         assert!(matches!(paren_lhs.kind, ExprKind::Lit(_)));
         assert!(matches!(paren_rhs.kind, ExprKind::Lit(_)));
     }
+
+    fn token_spans(s: &str) -> Vec<Span> {
+        let stream = flex(s).unwrap();
+        let mut cursor = TokenCursor::new(stream);
+
+        let mut spans = Vec::new();
+
+        loop {
+            let token = cursor.next_and_bump();
+            spans.push(token.span);
+
+            if token.kind == TokenKind::Eof {
+                break;
+            }
+        }
+
+        spans
+    }
+
+    #[test]
+    fn ident_expr_has_ident_token_span() {
+        let spans = token_spans("foo");
+        let expr = expr("foo");
+
+        let ExprKind::Ident(ident) = expr.kind else {
+            panic!("expected ident expression, got {expr:?}");
+        };
+
+        assert_eq!(ident.get_span(), spans[0]);
+        assert_eq!(expr.span, spans[0]);
+    }
+
+    #[test]
+    fn int_literal_expr_has_literal_token_span() {
+        let spans = token_spans("42");
+        let expr = expr("42");
+
+        assert_eq!(expr.span, spans[0]);
+    }
+
+    #[test]
+    fn let_ident_has_ident_token_span() {
+        let src = "let a: i32 = 2;";
+        let spans = token_spans(src);
+
+        let stmt = stmt(src);
+
+        let StmtKind::Let(ident, _, _, _) = stmt.kind else {
+            panic!("expected let statement, got {stmt:?}");
+        };
+
+        assert_eq!(ident.get_span(), spans[1]);
+    }
+
+    #[test]
+    fn let_stmt_has_let_keyword_span() {
+        let src = "let a: i32 = 2;";
+        let spans = token_spans(src);
+
+        let stmt = stmt(src);
+
+        assert_eq!(stmt.span, spans[0]);
+    }
+
+    #[test]
+    fn binary_expr_has_operator_or_operand_span_not_eof_span() {
+        let src = "1 + 2";
+        let spans = token_spans(src);
+
+        let expr = expr(src);
+
+        assert_ne!(expr.span, *spans.last().unwrap());
+
+        assert_eq!(expr.span, spans[1]);
+    }
+
+    #[test]
+    fn const_item_has_const_keyword_span() {
+        let src = "const X: i32 = 1;";
+        let spans = token_spans(src);
+
+        let unit = unit(src);
+
+        assert_eq!(unit.0[0].span, spans[0]);
+    }
 }
