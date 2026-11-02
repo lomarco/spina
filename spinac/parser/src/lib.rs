@@ -356,14 +356,13 @@ impl Parser {
                 _ => break,
             };
 
+            let span = op.span;
+
             self.bump();
 
             let rhs = self.parse_term()?;
 
-            lhs = Expr::new(
-                ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)),
-                self.token.span,
-            );
+            lhs = Expr::new(ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)), span);
         }
 
         Ok(lhs)
