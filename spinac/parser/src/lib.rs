@@ -915,4 +915,42 @@ mod tests {
         assert_eq!(ident.get_name_str(), "foo");
         assert_eq!(exprs.len(), 0);
     }
+
+    #[test]
+    fn math_expr_call() {
+        let src = "(foo() + 2) / s";
+
+        let expr = expr(src);
+
+        let ExprKind::Binary(div_op, div_lhs, div_rhs) = expr.kind else {
+            panic!("expected division expression");
+        };
+
+        assert!(matches!(div_op.kind, BinOpKind::Div));
+
+        let ExprKind::Binary(add_op, add_lhs, add_rhs) = div_lhs.kind else {
+            panic!("expected addition expression");
+        };
+
+        assert!(matches!(add_op.kind, BinOpKind::Add));
+
+        let ExprKind::Call(ident, args) = add_lhs.kind else {
+            panic!("expected call expression");
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(args.len(), 0);
+
+        let ExprKind::Lit(Lit::Integer(value)) = add_rhs.kind else {
+            panic!("expected integer literal");
+        };
+
+        assert_eq!(value, 2);
+
+        let ExprKind::Ident(ident) = div_rhs.kind else {
+            panic!("expected identifier");
+        };
+
+        assert_eq!(ident.get_name_str(), "s");
+    }
 }
