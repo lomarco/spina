@@ -837,7 +837,6 @@ mod tests {
         assert_eq!(second, 2);
     }
 
-
     #[test]
     fn one_arg_call_stmt() {
         let src = "foo(a);";
