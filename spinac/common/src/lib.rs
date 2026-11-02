@@ -233,28 +233,9 @@ impl Ty {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum LitKind {
-    Bool, // AST only, must never appear in a `Token`
-    Byte,
-    Char,
-    Integer, // e.g. `1`, `1u8`, `1f32`
-    Float,   // e.g. `1.`, `1.0`, `1e3f32`
-    Str,
-    StrRaw(u8), // raw string delimited by `n` hash symbols
-    ByteStr,
-    ByteStrRaw(u8), // raw byte string delimited by `n` hash symbols
-    CStr,
-    CStrRaw(u8),
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Lit {
-    kind: LitKind,
-    symbol: Symbol,
-}
-
-impl Lit {
-    pub fn new(kind: LitKind, symbol: Symbol) -> Self {
-        Self { kind, symbol }
-    }
+pub enum Lit {
+    Char(char),
+    Integer(u128),
+    Float(f64),
+    Str(Symbol),
 }

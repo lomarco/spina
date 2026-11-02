@@ -1,4 +1,4 @@
-use common::{Ident, Lit, LitKind, Span, Symbol};
+use common::{Ident, Lit, Span, Symbol};
 use err::Diag;
 use logos::Logos; // TODO: Rewrite it for myself
 
@@ -167,16 +167,16 @@ pub enum TokenKind {
     #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| Symbol::intern(lex.slice()))]
     Ident(Symbol),
 
-    #[regex(r"[0-9]+", |lex| Lit::new(LitKind::Integer, Symbol::intern(lex.slice())))]
+    #[regex(r"[0-9]+", |lex| lex.slice().parse::<u128>().ok().map(Lit::Integer))]
     IntLiteral(Lit),
 
-    #[regex(r"[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?", |lex| Lit::new(LitKind::Float, Symbol::intern(lex.slice())))]
+    #[regex(r"[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?", |lex| lex.slice().parse::<f64>().ok().map(Lit::Float))]
     FloatLiteral(Lit),
 
-    #[regex(r#""([^"\\]|\\.)*""#, |lex| Lit::new(LitKind::Str, Symbol::intern(lex.slice())))]
+    #[regex(r#""([^"\\]|\\.)*""#, |lex| Lit::Str(Symbol::intern(lex.slice())))]
     StringLiteral(Lit),
 
-    #[regex(r#"'([^'\\]|\\.)'"#, |lex| Lit::new(LitKind::Char, Symbol::intern(lex.slice())))]
+    #[regex(r#"'([^'\\]|\\.)'"#, |lex| lex.slice().parse::<char>().ok().map(Lit::Char))]
     CharLiteral(Lit),
 
     Dummy,
