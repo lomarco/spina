@@ -806,4 +806,33 @@ mod tests {
 
         assert_eq!(unit.0[0].span, spans[0]);
     }
+
+    #[test]
+    fn call_stmt() {
+        let src = "foo(a, 2);";
+
+        let stmt = stmt(src);
+
+        let StmtKind::Semi(e) = stmt.kind else {
+            panic!();
+        };
+
+        let ExprKind::Call(ident, exprs) = e.kind else {
+            panic!();
+        };
+
+        assert_eq!(ident.get_name_str(), "foo".to_string());
+
+        let ExprKind::Ident(first) = exprs[0].kind else {
+            panic!();
+        };
+
+        assert_eq!(first.get_name_str(), "a".to_string());
+
+        let ExprKind::Lit(Lit::Integer(second)) = exprs[1].kind else {
+            panic!();
+        };
+
+        assert_eq!(second, 2);
+    }
 }
