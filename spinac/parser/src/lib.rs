@@ -409,21 +409,26 @@ impl Parser {
             }
 
             TokenKind::Ident(name) => {
-                self.bump();
-                Ok(Expr::new(
-                    ExprKind::Ident(Ident::new(name, self.token.span)),
-                    self.token.span,
-                ))
-            }
+                let span = self.token.span;
 
-            TokenKind::FloatLiteral(flit) => {
                 self.bump();
-                Ok(Expr::new(ExprKind::Lit(flit), self.token.span))
+                Ok(Expr::new(ExprKind::Ident(Ident::new(name, span)), span))
             }
 
             TokenKind::IntLiteral(ilit) => {
+                let span = self.token.span;
+
                 self.bump();
-                Ok(Expr::new(ExprKind::Lit(ilit), self.token.span))
+
+                Ok(Expr::new(ExprKind::Lit(ilit), span))
+            }
+
+            TokenKind::FloatLiteral(flit) => {
+                let span = self.token.span;
+
+                self.bump();
+
+                Ok(Expr::new(ExprKind::Lit(flit), span))
             }
 
             _ => Err(Diag::err(
