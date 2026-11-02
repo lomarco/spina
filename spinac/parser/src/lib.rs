@@ -652,4 +652,70 @@ mod tests {
         assert!(matches!(lhs.kind, ExprKind::Lit(Lit::Integer(2))));
         assert!(matches!(rhs.kind, ExprKind::Lit(Lit::Integer(3))));
     }
+
+    #[test]
+    fn parse_plus_expr() {
+        let expr = expr("2 + 3");
+
+        let ExprKind::Binary(op, lhs, rhs) = expr.kind else {
+            panic!();
+        };
+
+        assert!(matches!(op.kind, BinOpKind::Add));
+        assert!(matches!(lhs.kind, ExprKind::Lit(Lit::Integer(2))));
+        assert!(matches!(rhs.kind, ExprKind::Lit(Lit::Integer(3))));
+    }
+
+    #[test]
+    fn parse_mul_expr() {
+        let expr = expr("2 * 3");
+
+        let ExprKind::Binary(op, lhs, rhs) = expr.kind else {
+            panic!();
+        };
+
+        assert!(matches!(op.kind, BinOpKind::Mul));
+        assert!(matches!(lhs.kind, ExprKind::Lit(Lit::Integer(2))));
+        assert!(matches!(rhs.kind, ExprKind::Lit(Lit::Integer(3))));
+    }
+
+    #[test]
+    fn parse_min_expr() {
+        let expr = expr("2 - 3");
+
+        let ExprKind::Binary(op, lhs, rhs) = expr.kind else {
+            panic!();
+        };
+
+        assert!(matches!(op.kind, BinOpKind::Sub));
+        assert!(matches!(lhs.kind, ExprKind::Lit(Lit::Integer(2))));
+        assert!(matches!(rhs.kind, ExprKind::Lit(Lit::Integer(3))));
+    }
+
+    #[test]
+    fn parses_parens_expr() {
+        let expr = expr("2 - 3 / (3 - 2)");
+
+        let ExprKind::Binary(op, lhs, rhs) = expr.kind else {
+            panic!("expected binary expression, got {expr:?}");
+        };
+
+        assert!(matches!(op.kind, BinOpKind::Sub));
+        assert!(matches!(lhs.kind, ExprKind::Lit(_)));
+
+        let ExprKind::Binary(div_op, div_lhs, div_rhs) = rhs.kind else {
+            panic!("expected division on rhs, got {rhs:?}");
+        };
+
+        assert!(matches!(div_op.kind, BinOpKind::Div));
+        assert!(matches!(div_lhs.kind, ExprKind::Lit(_)));
+
+        let ExprKind::Binary(paren_op, paren_lhs, paren_rhs) = div_rhs.kind else {
+            panic!("expected parenthesized subtraction, got {div_rhs:?}");
+        };
+
+        assert!(matches!(paren_op.kind, BinOpKind::Sub));
+        assert!(matches!(paren_lhs.kind, ExprKind::Lit(_)));
+        assert!(matches!(paren_rhs.kind, ExprKind::Lit(_)));
+    }
 }
