@@ -241,7 +241,6 @@ impl Parser {
         } else if self.is_eof() {
             Ok(None)
         } else {
-            // TODO: Add const item parse
             Err(Diag::err(
                 format!("Expected item, found {:?}", self.token.kind),
                 self.token.span,
