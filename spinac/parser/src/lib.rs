@@ -608,4 +608,9 @@ mod tests {
     fn ty(s: &str) -> Ty {
         parser(s).parse_ty().unwrap()
     }
+
+    #[test]
+    fn empty_unit() {
+        assert_eq!(unit("").0.len(), 0)
+    }
 }
