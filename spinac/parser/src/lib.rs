@@ -123,7 +123,7 @@ struct Stmt {
 #[derive(Debug)]
 enum ExprKind {
     Array(Vec<Box<Expr>>),
-    Call(Box<Expr>, Vec<Box<Expr>>),
+    Call(Ident, Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
@@ -822,6 +822,7 @@ mod tests {
         };
 
         assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(exprs.len(), 2);
 
         let ExprKind::Ident(first) = exprs[0].kind else {
             panic!();
@@ -834,6 +835,31 @@ mod tests {
         };
 
         assert_eq!(second, 2);
+    }
+
+
+    #[test]
+    fn one_arg_call_stmt() {
+        let src = "foo(a);";
+
+        let stmt = stmt(src);
+
+        let StmtKind::Semi(e) = stmt.kind else {
+            panic!();
+        };
+
+        let ExprKind::Call(ident, exprs) = e.kind else {
+            panic!();
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(exprs.len(), 1);
+
+        let ExprKind::Ident(first) = exprs[0].kind else {
+            panic!();
+        };
+
+        assert_eq!(first.get_name_str(), "a");
     }
 
     #[test]
