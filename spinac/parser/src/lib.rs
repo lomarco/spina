@@ -821,13 +821,13 @@ mod tests {
             panic!();
         };
 
-        assert_eq!(ident.get_name_str(), "foo".to_string());
+        assert_eq!(ident.get_name_str(), "foo");
 
         let ExprKind::Ident(first) = exprs[0].kind else {
             panic!();
         };
 
-        assert_eq!(first.get_name_str(), "a".to_string());
+        assert_eq!(first.get_name_str(), "a");
 
         let ExprKind::Lit(Lit::Integer(second)) = exprs[1].kind else {
             panic!();
@@ -850,7 +850,7 @@ mod tests {
             panic!();
         };
 
-        assert_eq!(ident.get_name_str(), "foo".to_string());
+        assert_eq!(ident.get_name_str(), "foo");
         assert_eq!(exprs.len(), 0);
     }
 }
