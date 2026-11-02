@@ -169,7 +169,7 @@ pub fn new_parser_from_file(path: &Path) -> Result<Parser, Vec<Diag>> {
     Ok(parser)
 }
 
-fn new_parser_from_str(str: &str) -> Result<Parser, Vec<Diag>> {
+pub fn new_parser_from_str(str: &str) -> Result<Parser, Vec<Diag>> {
     Ok(Parser::new(flex(str)?))
 }
 
@@ -587,3 +587,6 @@ pub struct Item {
     pub kind: ItemKind,
     pub span: Span,
 }
+
+#[cfg(test)]
+mod tests;

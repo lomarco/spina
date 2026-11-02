@@ -33,6 +33,7 @@ pub enum Level {
     Note,
 }
 
+#[derive(Debug)]
 pub struct Diag {
     level: Level,
     message: String,
