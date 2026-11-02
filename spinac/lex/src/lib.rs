@@ -211,11 +211,11 @@ impl Token {
     }
 
     fn is_ty(&self, ty: Symbol) -> bool {
-        self.ident().is_some_and(|id| id.get_name() == ty)
+        self.ident().is_some_and(|id| id.get_symbol() == ty)
     }
 
     pub fn is_keyword(&self, kw: Symbol) -> bool {
-        self.ident().is_some_and(|id| id.get_name() == kw)
+        self.ident().is_some_and(|id| id.get_symbol() == kw)
     }
 }
 

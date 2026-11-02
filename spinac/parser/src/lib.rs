@@ -1,4 +1,4 @@
-use common::{Ident, IntTy, Lit, Span, Ty, UintTy, kw, ty};
+use common::{Ident, IntTy, Lit, Span, Ty, TyKind, UintTy, kw, ty};
 use err::{Diag, PResult, raise};
 use lex::{Token, TokenCursor, TokenKind, TokenStream, flex};
 use sess::{Input, Session};
@@ -612,5 +612,18 @@ mod tests {
     #[test]
     fn empty_unit() {
         assert_eq!(unit("").0.len(), 0)
+    }
+
+    #[test]
+    fn fn_item() {
+        let unit = unit("fn foo(): i8 {}");
+
+        let ItemKind::Fn(fn_item) = &unit.0[0].kind else {
+            panic!();
+        };
+
+        assert_eq!(fn_item.ident.get_name_str(), "foo");
+        assert_eq!(*fn_item.decl.ty.get_kind(), TyKind::Int(IntTy::I8));
+        assert!(fn_item.body.stmts.is_empty());
     }
 }

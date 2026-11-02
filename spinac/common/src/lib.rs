@@ -161,8 +161,12 @@ impl Ident {
         Ident { name, span }
     }
 
-    pub fn get_name(&self) -> Symbol {
+    pub fn get_symbol(&self) -> Symbol {
         self.name
+    }
+
+    pub fn get_name_str(&self) -> String {
+        self.name.as_str()
     }
 
     pub fn get_span(&self) -> Span {
@@ -170,7 +174,7 @@ impl Ident {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum FloatTy {
     F16,
     F32,
@@ -178,7 +182,7 @@ enum FloatTy {
     F128,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum UintTy {
     Usize,
     U8,
@@ -188,7 +192,7 @@ pub enum UintTy {
     U128,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum IntTy {
     Isize,
     I8,
@@ -198,7 +202,7 @@ pub enum IntTy {
     I128,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum TyKind {
     Array(Box<Ty>, u32),
     Ptr(Box<Ty>),
@@ -212,7 +216,7 @@ pub enum TyKind {
     Dummy,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Ty {
     kind: TyKind,
     span: Span,
@@ -221,6 +225,10 @@ pub struct Ty {
 impl Ty {
     pub fn new(kind: TyKind, span: Span) -> Self {
         Ty { kind, span }
+    }
+
+    pub fn get_kind(&self) -> &TyKind {
+        &self.kind
     }
 }
 
