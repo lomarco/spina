@@ -311,8 +311,8 @@ impl Parser {
     }
 
     fn parse_stmt(&mut self) -> PResult<Stmt> {
-        let kind = self.parse_stmt_kind()?;
         let span = self.token.span;
+        let kind = self.parse_stmt_kind()?;
         Ok(Stmt { kind, span })
     }
 
