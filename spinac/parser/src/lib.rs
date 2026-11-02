@@ -626,4 +626,17 @@ mod tests {
         assert_eq!(*fn_item.decl.ty.get_kind(), TyKind::Int(IntTy::I8));
         assert!(fn_item.body.stmts.is_empty());
     }
+
+    #[test]
+    fn let_stmt() {
+        let stmt = stmt("let a: i32 = 2;");
+
+        let StmtKind::Let(ident, ty, expr, _) = stmt.kind else {
+            panic!();
+        };
+
+        assert_eq!(ident.get_name_str(), "a");
+        assert_eq!(*ty.get_kind(), TyKind::Int(IntTy::I32));
+        assert!(matches!(expr.kind, ExprKind::Lit(Lit::Integer(2))));
+    }
 }
