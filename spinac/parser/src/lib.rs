@@ -639,4 +639,17 @@ mod tests {
         assert_eq!(*ty.get_kind(), TyKind::Int(IntTy::I32));
         assert!(matches!(expr.kind, ExprKind::Lit(Lit::Integer(2))));
     }
+
+    #[test]
+    fn parse_divs_expr() {
+        let expr = expr("2 / 3");
+
+        let ExprKind::Binary(op, lhs, rhs) = expr.kind else {
+            panic!();
+        };
+
+        assert!(matches!(op.kind, BinOpKind::Div));
+        assert!(matches!(lhs.kind, ExprKind::Lit(Lit::Integer(2))));
+        assert!(matches!(rhs.kind, ExprKind::Lit(Lit::Integer(3))));
+    }
 }
