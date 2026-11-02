@@ -901,4 +901,18 @@ mod tests {
             assert_eq!(ident.get_name_str(), expected_name);
         }
     }
+
+    #[test]
+    fn empty_args_expr_call() {
+        let src = "foo()";
+
+        let expr = expr(src);
+
+        let ExprKind::Call(ident, exprs) = expr.kind else {
+            panic!("expected call expression");
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(exprs.len(), 0);
+    }
 }
