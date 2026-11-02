@@ -879,4 +879,26 @@ mod tests {
         assert_eq!(ident.get_name_str(), "foo");
         assert_eq!(exprs.len(), 0);
     }
+
+    #[test]
+    fn multy_args_expr_call() {
+        let src = "foo(a, b, c)";
+
+        let expr = expr(src);
+
+        let ExprKind::Call(ident, exprs) = expr.kind else {
+            panic!("expected call expression");
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(exprs.len(), 3);
+
+        for (expr, expected_name) in exprs.iter().zip(["a", "b", "c"]) {
+            let ExprKind::Ident(ident) = expr.kind else {
+                panic!("expected identifier argument");
+            };
+
+            assert_eq!(ident.get_name_str(), expected_name);
+        }
+    }
 }
