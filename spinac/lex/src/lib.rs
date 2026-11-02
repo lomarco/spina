@@ -185,7 +185,7 @@ pub enum TokenKind {
     Eof,
 }
 
-pub const DUMMY_SP: Span = Span::new(0, 0);
+const DUMMY_SP: Span = Span::new(0, 0);
 
 #[derive(Clone, Copy, PartialEq)]
 pub struct Token {
@@ -194,7 +194,7 @@ pub struct Token {
 }
 
 impl Token {
-    pub const fn new(kind: TokenKind, span: Span) -> Self {
+    const fn new(kind: TokenKind, span: Span) -> Self {
         Token { kind, span }
     }
 
@@ -210,7 +210,7 @@ impl Token {
         }
     }
 
-    pub fn is_ty(&self, ty: Symbol) -> bool {
+    fn is_ty(&self, ty: Symbol) -> bool {
         self.ident().is_some_and(|id| id.get_name() == ty)
     }
 
@@ -251,11 +251,11 @@ impl TokenCursor {
 pub struct TokenStream(Vec<Token>);
 
 impl TokenStream {
-    pub fn new(tss: Vec<Token>) -> Self {
+    fn new(tss: Vec<Token>) -> Self {
         Self(tss)
     }
 
-    pub fn get(&self, idx: usize) -> Option<&Token> {
+    fn get(&self, idx: usize) -> Option<&Token> {
         self.0.get(idx)
     }
 }

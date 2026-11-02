@@ -6,8 +6,8 @@ use std::{
 
 pub type PResult<T> = Result<T, Diag>;
 
-pub struct ExplicitBug;
-pub struct FatalErrorMarker;
+struct ExplicitBug;
+struct FatalErrorMarker;
 
 pub fn raise() -> ! {
     resume_unwind(Box::new(FatalErrorMarker));
@@ -26,7 +26,7 @@ pub fn catch_fatal_error_marker<T>(f: impl FnOnce() -> T) -> ExitCode {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Level {
+enum Level {
     Bug,
     Fatal,
     Error,
@@ -58,7 +58,7 @@ impl Diag {
         unreachable!();
     }
 
-    pub fn emit_fatal(self) -> ! {
+    fn emit_fatal(self) -> ! {
         assert_eq!(self.level, Level::Fatal);
         self.emit();
         unreachable!();
