@@ -411,10 +411,7 @@ impl Parser {
             TokenKind::Ident(name) => {
                 self.bump();
                 Ok(Expr::new(
-                    ExprKind::Ident(Ident {
-                        name,
-                        span: self.token.span,
-                    }),
+                    ExprKind::Ident(Ident::new(name, self.token.span)),
                     self.token.span,
                 ))
             }
@@ -454,7 +451,7 @@ impl Parser {
 
     fn parse_ty(&mut self) -> PResult<Ty> {
         let ty = match self.token.ident() {
-            Some(ident) => match ident.name {
+            Some(ident) => match ident.get_name() {
                 ty::I8 => Ty::new(common::TyKind::Int(IntTy::I8), self.token.span),
                 ty::U8 => Ty::new(common::TyKind::Uint(UintTy::U8), self.token.span),
 
@@ -564,7 +561,7 @@ impl Parser {
             Box::new(ident),
             Box::new(ty),
             Box::new(init),
-            ident.span,
+            ident.get_span(),
         ))
     }
 }

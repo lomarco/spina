@@ -17,12 +17,12 @@ macro_rules! symbols {
         const SYMBOLS: &[&str] = &[$($kw_str,)* $($ty_str,)*];
 
         #[allow(non_upper_case_globals)]
-        mod kw {
+        pub mod kw {
             symbols!(@consts 0u32; $($kw_name), *);
         }
 
         #[allow(non_upper_case_globals)]
-        mod ty {
+        pub mod ty {
             symbols!(
                 @consts
                 symbols!(@count 0u32; $($kw_name), *);
@@ -32,7 +32,7 @@ macro_rules! symbols {
     };
 
     (@consts $i:expr; $name:ident $(, $rest:ident)*) => {
-        const $name: crate::Symbol = crate::Symbol::new($i);
+        pub const $name: crate::Symbol = crate::Symbol::new($i);
         symbols!(@consts $i + 1; $($rest),*);
     };
     (@consts $i:expr;) => {};
@@ -164,6 +164,10 @@ impl Ident {
     pub fn get_name(&self) -> Symbol {
         self.name
     }
+
+    pub fn get_span(&self) -> Span {
+        self.span
+    }
 }
 
 #[derive(Debug)]
@@ -175,7 +179,7 @@ enum FloatTy {
 }
 
 #[derive(Debug)]
-enum UintTy {
+pub enum UintTy {
     Usize,
     U8,
     U16,
@@ -185,7 +189,7 @@ enum UintTy {
 }
 
 #[derive(Debug)]
-enum IntTy {
+pub enum IntTy {
     Isize,
     I8,
     I16,
@@ -195,7 +199,7 @@ enum IntTy {
 }
 
 #[derive(Debug)]
-enum TyKind {
+pub enum TyKind {
     Array(Box<Ty>, u32),
     Ptr(Box<Ty>),
     Int(IntTy),
@@ -209,13 +213,13 @@ enum TyKind {
 }
 
 #[derive(Debug)]
-struct Ty {
+pub struct Ty {
     kind: TyKind,
     span: Span,
 }
 
 impl Ty {
-    fn new(kind: TyKind, span: Span) -> Self {
+    pub fn new(kind: TyKind, span: Span) -> Self {
         Ty { kind, span }
     }
 }
