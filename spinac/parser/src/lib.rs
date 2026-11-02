@@ -5,35 +5,35 @@ use sess::{Input, Session};
 use std::{fs::read_to_string, io::ErrorKind, mem::replace, path::Path};
 
 #[derive(Debug)]
-pub struct Unit(pub Vec<Item>);
+pub struct Unit(Vec<Item>);
 
 #[derive(Debug)]
-pub struct Param {
-    pub ty: Ty,
-    pub ident: Ident,
+struct Param {
+    ty: Ty,
+    ident: Ident,
 }
 
 #[derive(Debug)]
-pub struct FnDecl {
-    pub params: Vec<Param>,
-    pub ty: Ty,
+struct FnDecl {
+    params: Vec<Param>,
+    ty: Ty,
 }
 
 #[derive(Debug)]
-pub struct ForLoop {
-    pub ident: Box<Ident>,
-    pub iter: Box<Expr>,
-    pub body: Box<Block>,
+struct ForLoop {
+    ident: Box<Ident>,
+    iter: Box<Expr>,
+    body: Box<Block>,
 }
 
 #[derive(Debug)]
-pub struct Block {
-    pub stmts: Vec<Stmt>,
-    pub span: Span,
+struct Block {
+    stmts: Vec<Stmt>,
+    span: Span,
 }
 
 #[derive(Debug)]
-pub enum BinOpKind {
+enum BinOpKind {
     /// The `+` operator (addition)
     Add,
     /// The `-` operator (subtraction)
@@ -73,9 +73,9 @@ pub enum BinOpKind {
 }
 
 #[derive(Debug)]
-pub struct BinOp {
-    pub kind: BinOpKind,
-    pub span: Span,
+struct BinOp {
+    kind: BinOpKind,
+    span: Span,
 }
 
 impl BinOp {
@@ -85,7 +85,7 @@ impl BinOp {
 }
 
 #[derive(Debug)]
-pub enum UnOp {
+enum UnOp {
     /// The `*` operator for dereferencing
     Deref,
     /// The `!` operator for logical inversion
@@ -95,9 +95,9 @@ pub enum UnOp {
 }
 
 #[derive(Debug)]
-pub struct Expr {
-    pub kind: ExprKind,
-    pub span: Span,
+struct Expr {
+    kind: ExprKind,
+    span: Span,
 }
 
 impl Expr {
@@ -107,7 +107,7 @@ impl Expr {
 }
 
 #[derive(Debug)]
-pub enum StmtKind {
+enum StmtKind {
     Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     Semi(Box<Expr>),
     Expr(Box<Expr>),
@@ -115,13 +115,13 @@ pub enum StmtKind {
 }
 
 #[derive(Debug)]
-pub struct Stmt {
-    pub kind: StmtKind,
-    pub span: Span,
+struct Stmt {
+    kind: StmtKind,
+    span: Span,
 }
 
 #[derive(Debug)]
-pub enum ExprKind {
+enum ExprKind {
     Array(Vec<Box<Expr>>),
     Call(Box<Expr>, Vec<Box<Expr>>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
@@ -139,7 +139,7 @@ pub enum ExprKind {
     Loop(Box<Block>, Span),
 }
 
-pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
+fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
     expr.unwrap_or_else(|errs| {
         for err in errs {
             err.emit();
@@ -148,7 +148,7 @@ pub fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
     })
 }
 
-pub fn new_parser_from_file(path: &Path) -> Result<Parser, Vec<Diag>> {
+fn new_parser_from_file(path: &Path) -> Result<Parser, Vec<Diag>> {
     let cont = read_to_string(path).unwrap_or_else(|e| {
         // TODO: Maybe delete unwrap_or_else
         let msg = match e.kind() {
@@ -169,7 +169,7 @@ pub fn new_parser_from_file(path: &Path) -> Result<Parser, Vec<Diag>> {
     Ok(parser)
 }
 
-pub fn new_parser_from_str(str: &str) -> Result<Parser, Vec<Diag>> {
+fn new_parser_from_str(str: &str) -> Result<Parser, Vec<Diag>> {
     Ok(Parser::new(flex(str)?))
 }
 
@@ -186,14 +186,14 @@ pub fn parse(sess: &Session) -> Unit {
     })
 }
 
-pub struct Parser {
-    pub token: Token,
-    pub prev_token: Token,
+struct Parser {
+    token: Token,
+    prev_token: Token,
     token_cursor: TokenCursor,
 }
 
 impl Parser {
-    pub fn new(stream: TokenStream) -> Self {
+    fn new(stream: TokenStream) -> Self {
         let mut parser = Parser {
             token: Token::dummy(),
             prev_token: Token::dummy(),
@@ -205,7 +205,7 @@ impl Parser {
         parser
     }
 
-    pub fn parse_unit(&mut self) -> PResult<Unit> {
+    fn parse_unit(&mut self) -> PResult<Unit> {
         Ok(Unit(self.parse_items()?))
     }
 
@@ -570,22 +570,22 @@ impl Parser {
 }
 
 #[derive(Debug)]
-pub struct Fn {
-    pub ident: Ident,
-    pub decl: FnDecl,
-    pub body: Box<Block>,
+struct Fn {
+    ident: Ident,
+    decl: FnDecl,
+    body: Box<Block>,
 }
 
 #[derive(Debug)]
-pub enum ItemKind {
+enum ItemKind {
     Const(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     Fn(Box<Fn>),
 }
 
 #[derive(Debug)]
-pub struct Item {
-    pub kind: ItemKind,
-    pub span: Span,
+struct Item {
+    kind: ItemKind,
+    span: Span,
 }
 
 #[cfg(test)]

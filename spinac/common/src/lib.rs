@@ -14,15 +14,15 @@ macro_rules! symbols {
             $($ty_name:ident : $ty_str:literal),* $(,)?
         }
     ) => {
-        pub const SYMBOLS: &[&str] = &[$($kw_str,)* $($ty_str,)*];
+        const SYMBOLS: &[&str] = &[$($kw_str,)* $($ty_str,)*];
 
         #[allow(non_upper_case_globals)]
-        pub mod kw {
+        mod kw {
             symbols!(@consts 0u32; $($kw_name), *);
         }
 
         #[allow(non_upper_case_globals)]
-        pub mod ty {
+        mod ty {
             symbols!(
                 @consts
                 symbols!(@count 0u32; $($kw_name), *);
@@ -32,7 +32,7 @@ macro_rules! symbols {
     };
 
     (@consts $i:expr; $name:ident $(, $rest:ident)*) => {
-        pub const $name: crate::Symbol = crate::Symbol::new($i);
+        const $name: crate::Symbol = crate::Symbol::new($i);
         symbols!(@consts $i + 1; $($rest),*);
     };
     (@consts $i:expr;) => {};
@@ -75,8 +75,8 @@ symbols! {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Span {
-    pub start: u32,
-    pub end: u32,
+    start: u32,
+    end: u32,
 }
 
 impl From<Range<usize>> for Span {
@@ -89,18 +89,18 @@ impl From<Range<usize>> for Span {
 }
 
 impl Span {
-    pub fn new(start: u32, end: u32) -> Self {
+    pub const fn new(start: u32, end: u32) -> Self {
         Self { start, end }
     }
 }
 
-pub struct Interner {
+struct Interner {
     hs: HashMap<Box<str>, Symbol>,
     strs: Vec<Box<str>>,
 }
 
 impl Interner {
-    pub fn new(init: &[&str]) -> Self {
+    fn new(init: &[&str]) -> Self {
         let size = init.len();
         let mut hs: HashMap<Box<str>, Symbol> = HashMap::with_capacity(size);
         let mut strs: Vec<Box<str>> = Vec::with_capacity(size);
@@ -114,7 +114,7 @@ impl Interner {
         Interner { hs, strs }
     }
 
-    pub fn intern(&mut self, s: &str) -> Symbol {
+    fn intern(&mut self, s: &str) -> Symbol {
         if let Some(&symbol) = self.hs.get(s) {
             return symbol;
         }
@@ -137,7 +137,7 @@ impl Interner {
 pub struct Symbol(u32);
 
 impl Symbol {
-    pub const fn new(n: u32) -> Self {
+    const fn new(n: u32) -> Self {
         Self(n)
     }
 
@@ -145,25 +145,29 @@ impl Symbol {
         INTERNER.lock().unwrap().intern(s)
     }
 
-    pub fn as_str(&self) -> String {
+    fn as_str(&self) -> String {
         INTERNER.lock().unwrap().get_str(*self).to_owned()
     }
 }
 
 #[derive(Debug, Clone, Copy)]
 pub struct Ident {
-    pub name: Symbol,
-    pub span: Span,
+    name: Symbol,
+    span: Span,
 }
 
 impl Ident {
     pub fn new(name: Symbol, span: Span) -> Self {
         Ident { name, span }
     }
+
+    pub fn get_name(&self) -> Symbol {
+        self.name
+    }
 }
 
 #[derive(Debug)]
-pub enum FloatTy {
+enum FloatTy {
     F16,
     F32,
     F64,
@@ -171,7 +175,7 @@ pub enum FloatTy {
 }
 
 #[derive(Debug)]
-pub enum UintTy {
+enum UintTy {
     Usize,
     U8,
     U16,
@@ -181,7 +185,7 @@ pub enum UintTy {
 }
 
 #[derive(Debug)]
-pub enum IntTy {
+enum IntTy {
     Isize,
     I8,
     I16,
@@ -191,7 +195,7 @@ pub enum IntTy {
 }
 
 #[derive(Debug)]
-pub enum TyKind {
+enum TyKind {
     Array(Box<Ty>, u32),
     Ptr(Box<Ty>),
     Int(IntTy),
@@ -205,13 +209,13 @@ pub enum TyKind {
 }
 
 #[derive(Debug)]
-pub struct Ty {
-    pub kind: TyKind,
-    pub span: Span,
+struct Ty {
+    kind: TyKind,
+    span: Span,
 }
 
 impl Ty {
-    pub fn new(kind: TyKind, span: Span) -> Self {
+    fn new(kind: TyKind, span: Span) -> Self {
         Ty { kind, span }
     }
 }
@@ -233,8 +237,8 @@ pub enum LitKind {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Lit {
-    pub kind: LitKind,
-    pub symbol: Symbol,
+    kind: LitKind,
+    symbol: Symbol,
 }
 
 impl Lit {

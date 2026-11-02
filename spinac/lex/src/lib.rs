@@ -185,7 +185,7 @@ pub enum TokenKind {
     Eof,
 }
 
-pub const DUMMY_SP: Span = Span { start: 0, end: 0 };
+pub const DUMMY_SP: Span = Span::new(0, 0);
 
 #[derive(Clone, Copy, PartialEq)]
 pub struct Token {
@@ -211,11 +211,11 @@ impl Token {
     }
 
     pub fn is_ty(&self, ty: Symbol) -> bool {
-        self.ident().is_some_and(|id| id.name == ty)
+        self.ident().is_some_and(|id| id.get_name() == ty)
     }
 
     pub fn is_keyword(&self, kw: Symbol) -> bool {
-        self.ident().is_some_and(|id| id.name == kw)
+        self.ident().is_some_and(|id| id.get_name() == kw)
     }
 }
 
