@@ -14,7 +14,7 @@ macro_rules! symbols {
             $($ty_name:ident : $ty_str:literal),* $(,)?
         }
     ) => {
-        pub const SYMBOLS: &[&str] = &[$($kw_str,)* $($ty_str,)*];
+        const SYMBOLS: &[&str] = &[$($kw_str,)* $($ty_str,)*];
 
         #[allow(non_upper_case_globals)]
         pub mod kw {
@@ -75,8 +75,8 @@ symbols! {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Span {
-    pub start: u32,
-    pub end: u32,
+    start: u32,
+    end: u32,
 }
 
 impl From<Range<usize>> for Span {
@@ -89,18 +89,18 @@ impl From<Range<usize>> for Span {
 }
 
 impl Span {
-    pub fn new(start: u32, end: u32) -> Self {
+    pub const fn new(start: u32, end: u32) -> Self {
         Self { start, end }
     }
 }
 
-pub struct Interner {
+struct Interner {
     hs: HashMap<Box<str>, Symbol>,
     strs: Vec<Box<str>>,
 }
 
 impl Interner {
-    pub fn new(init: &[&str]) -> Self {
+    fn new(init: &[&str]) -> Self {
         let size = init.len();
         let mut hs: HashMap<Box<str>, Symbol> = HashMap::with_capacity(size);
         let mut strs: Vec<Box<str>> = Vec::with_capacity(size);
@@ -114,7 +114,7 @@ impl Interner {
         Interner { hs, strs }
     }
 
-    pub fn intern(&mut self, s: &str) -> Symbol {
+    fn intern(&mut self, s: &str) -> Symbol {
         if let Some(&symbol) = self.hs.get(s) {
             return symbol;
         }
@@ -137,7 +137,7 @@ impl Interner {
 pub struct Symbol(u32);
 
 impl Symbol {
-    pub const fn new(n: u32) -> Self {
+    const fn new(n: u32) -> Self {
         Self(n)
     }
 
@@ -145,32 +145,44 @@ impl Symbol {
         INTERNER.lock().unwrap().intern(s)
     }
 
-    pub fn as_str(&self) -> String {
+    fn as_str(&self) -> String {
         INTERNER.lock().unwrap().get_str(*self).to_owned()
     }
 }
 
 #[derive(Debug, Clone, Copy)]
 pub struct Ident {
-    pub name: Symbol,
-    pub span: Span,
+    name: Symbol,
+    span: Span,
 }
 
 impl Ident {
     pub fn new(name: Symbol, span: Span) -> Self {
         Ident { name, span }
     }
+
+    pub fn get_symbol(&self) -> Symbol {
+        self.name
+    }
+
+    pub fn get_name_str(&self) -> String {
+        self.name.as_str()
+    }
+
+    pub fn get_span(&self) -> Span {
+        self.span
+    }
 }
 
-#[derive(Debug)]
-pub enum FloatTy {
+#[derive(Debug, PartialEq)]
+enum FloatTy {
     F16,
     F32,
     F64,
     F128,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum UintTy {
     Usize,
     U8,
@@ -180,7 +192,7 @@ pub enum UintTy {
     U128,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum IntTy {
     Isize,
     I8,
@@ -190,7 +202,7 @@ pub enum IntTy {
     I128,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum TyKind {
     Array(Box<Ty>, u32),
     Ptr(Box<Ty>),
@@ -204,41 +216,26 @@ pub enum TyKind {
     Dummy,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Ty {
-    pub kind: TyKind,
-    pub span: Span,
+    kind: TyKind,
+    span: Span,
 }
 
 impl Ty {
     pub fn new(kind: TyKind, span: Span) -> Self {
         Ty { kind, span }
     }
-}
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum LitKind {
-    Bool, // AST only, must never appear in a `Token`
-    Byte,
-    Char,
-    Integer, // e.g. `1`, `1u8`, `1f32`
-    Float,   // e.g. `1.`, `1.0`, `1e3f32`
-    Str,
-    StrRaw(u8), // raw string delimited by `n` hash symbols
-    ByteStr,
-    ByteStrRaw(u8), // raw byte string delimited by `n` hash symbols
-    CStr,
-    CStrRaw(u8),
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Lit {
-    pub kind: LitKind,
-    pub symbol: Symbol,
-}
-
-impl Lit {
-    pub fn new(kind: LitKind, symbol: Symbol) -> Self {
-        Self { kind, symbol }
+    pub fn get_kind(&self) -> &TyKind {
+        &self.kind
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Lit {
+    Char(char),
+    Integer(u128),
+    Float(f64),
+    Str(Symbol),
 }
