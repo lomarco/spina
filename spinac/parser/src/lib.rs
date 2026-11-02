@@ -835,4 +835,22 @@ mod tests {
 
         assert_eq!(second, 2);
     }
+
+    #[test]
+    fn empty_call_stmt() {
+        let src = "foo();";
+
+        let stmt = stmt(src);
+
+        let StmtKind::Semi(e) = stmt.kind else {
+            panic!();
+        };
+
+        let ExprKind::Call(ident, exprs) = e.kind else {
+            panic!();
+        };
+
+        assert_eq!(ident.get_name_str(), "foo".to_string());
+        assert_eq!(exprs.len(), 0);
+    }
 }
