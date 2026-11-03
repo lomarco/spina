@@ -299,6 +299,13 @@ impl Parser {
         self.parse_ty()
     }
 
+    fn is_call(&mut self) -> bool {
+        matches!(self.token.kind, TokenKind::Ident(_))
+            && self
+                .peek()
+                .is_some_and(|next| next.kind == TokenKind::OpenParen)
+    }
+
     fn parse_stmt_kind(&mut self) -> PResult<StmtKind> {
         if self.token.is_keyword(kw::Let) {
             self.parse_let()
