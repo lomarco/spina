@@ -510,6 +510,10 @@ impl Parser {
         Ok(params)
     }
 
+    fn peek(&mut self) -> Option<&Token> {
+        self.token_cursor.peek()
+    }
+
     fn eat(&mut self, tok: TokenKind) -> bool {
         let is_present = self.check(tok);
         if is_present {
