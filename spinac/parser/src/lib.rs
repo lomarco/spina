@@ -452,8 +452,16 @@ impl Parser {
             TokenKind::Ident(name) => {
                 let span = self.token.span;
 
-                self.bump();
-                Ok(Expr::new(ExprKind::Ident(Ident::new(name, span)), span))
+                println!("{:#?}", self.token.kind);
+
+                let expr_kind = if self.is_call() {
+                    self.parse_call()?
+                } else {
+                    self.bump();
+                    ExprKind::Ident(Ident::new(name, span))
+                };
+
+                Ok(Expr::new(expr_kind, span))
             }
 
             TokenKind::IntLiteral(ilit) => {
