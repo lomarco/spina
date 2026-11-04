@@ -122,8 +122,8 @@ struct Stmt {
 
 #[derive(Debug)]
 enum ExprKind {
-    Array(Vec<Box<Expr>>),
-    Call(Ident, Vec<Box<Expr>>),
+    Array(Vec<Expr>),
+    Call(Ident, Vec<Expr>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
@@ -317,10 +317,10 @@ impl Parser {
         self.bump();
         self.expect(TokenKind::OpenParen)?;
 
-        let mut args: Vec<Box<Expr>> = Vec::new();
+        let mut args: Vec<Expr> = Vec::new();
 
         while !self.check(TokenKind::CloseParen) {
-            args.push(Box::new(self.parse_expr()?));
+            args.push(self.parse_expr()?);
             if !self.eat(TokenKind::Comma) {
                 break;
             }
