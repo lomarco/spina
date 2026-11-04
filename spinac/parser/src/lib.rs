@@ -122,8 +122,8 @@ struct Stmt {
 
 #[derive(Debug)]
 enum ExprKind {
-    Array(Vec<Box<Expr>>),
-    Call(Box<Expr>, Vec<Box<Expr>>),
+    Array(Vec<Expr>),
+    Call(Ident, Vec<Expr>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
@@ -299,12 +299,57 @@ impl Parser {
         self.parse_ty()
     }
 
+    fn is_call(&mut self) -> bool {
+        matches!(self.token.kind, TokenKind::Ident(_))
+            && self
+                .peek()
+                .is_some_and(|next| next.kind == TokenKind::OpenParen)
+    }
+
+    fn parse_call(&mut self) -> PResult<ExprKind> {
+        let Some(ident) = self.token.ident() else {
+            return Err(Diag::err(
+                format!("Expected call, found {:#?}", self.token.kind),
+                self.token.span,
+            ));
+        };
+
+        self.bump();
+        self.expect(TokenKind::OpenParen)?;
+
+        let mut args: Vec<Expr> = Vec::new();
+
+        while !self.check(TokenKind::CloseParen) {
+            args.push(self.parse_expr()?);
+            if !self.eat(TokenKind::Comma) {
+                break;
+            }
+        }
+
+        self.expect(TokenKind::CloseParen)?;
+
+        Ok(ExprKind::Call(ident, args))
+    }
+
+    fn parse_call_stmt(&mut self) -> PResult<StmtKind> {
+        let expr = Expr::new(self.parse_call()?, self.token.span);
+
+        Ok(if self.check(TokenKind::Semi) {
+            self.bump();
+            StmtKind::Semi(Box::new(expr))
+        } else {
+            StmtKind::Expr(Box::new(expr))
+        })
+    }
+
     fn parse_stmt_kind(&mut self) -> PResult<StmtKind> {
         if self.token.is_keyword(kw::Let) {
             self.parse_let()
+        } else if self.is_call() {
+            self.parse_call_stmt()
         } else {
             Err(Diag::err(
-                format!("Expected statement, found {:#?}", self.token.kind).to_string(),
+                format!("Expected stmt, found {:#?}", self.token.kind).to_string(),
                 self.token.span,
             ))
         }
@@ -326,10 +371,7 @@ impl Parser {
 
         let mut stmts: Vec<Stmt> = Vec::with_capacity(1024);
 
-        while self.token.kind != TokenKind::Eof
-            && self.token.kind != TokenKind::CloseBrace
-            && self.token.kind != TokenKind::Semi
-        {
+        while !matches!(self.token.kind, TokenKind::CloseBrace | TokenKind::Eof) {
             stmts.push(self.parse_stmt()?);
         }
 
@@ -409,8 +451,14 @@ impl Parser {
             TokenKind::Ident(name) => {
                 let span = self.token.span;
 
-                self.bump();
-                Ok(Expr::new(ExprKind::Ident(Ident::new(name, span)), span))
+                let expr_kind = if self.is_call() {
+                    self.parse_call()?
+                } else {
+                    self.bump();
+                    ExprKind::Ident(Ident::new(name, span))
+                };
+
+                Ok(Expr::new(expr_kind, span))
             }
 
             TokenKind::IntLiteral(ilit) => {
@@ -510,6 +558,21 @@ impl Parser {
         Ok(params)
     }
 
+    fn expect(&mut self, kind: TokenKind) -> PResult<()> {
+        if self.eat(kind) {
+            Ok(())
+        } else {
+            Err(Diag::err(
+                format!("Expected {kind:?}, found {:#?}", self.token.kind),
+                self.token.span,
+            ))
+        }
+    }
+
+    fn peek(&mut self) -> Option<&Token> {
+        self.token_cursor.peek()
+    }
+
     fn eat(&mut self, tok: TokenKind) -> bool {
         let is_present = self.check(tok);
         if is_present {
@@ -556,7 +619,10 @@ impl Parser {
         let init = self.parse_expr()?;
 
         if !self.check(TokenKind::Semi) {
-            return Err(Diag::err("Expected Semi".to_string(), self.token.span));
+            return Err(Diag::err(
+                format!("Expected Semi, found {:#?}", self.token.kind),
+                self.token.span,
+            ));
         }
         self.bump();
 
@@ -805,5 +871,151 @@ mod tests {
         let unit = unit(src);
 
         assert_eq!(unit.0[0].span, spans[0]);
+    }
+
+    #[test]
+    fn call_stmt() {
+        let src = "foo(a, 2);";
+
+        let stmt = stmt(src);
+
+        let StmtKind::Semi(e) = stmt.kind else {
+            panic!();
+        };
+
+        let ExprKind::Call(ident, exprs) = e.kind else {
+            panic!();
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(exprs.len(), 2);
+
+        let ExprKind::Ident(first) = exprs[0].kind else {
+            panic!();
+        };
+
+        assert_eq!(first.get_name_str(), "a");
+
+        let ExprKind::Lit(Lit::Integer(second)) = exprs[1].kind else {
+            panic!();
+        };
+
+        assert_eq!(second, 2);
+    }
+
+    #[test]
+    fn one_arg_call_stmt() {
+        let src = "foo(a);";
+
+        let stmt = stmt(src);
+
+        let StmtKind::Semi(e) = stmt.kind else {
+            panic!();
+        };
+
+        let ExprKind::Call(ident, exprs) = e.kind else {
+            panic!();
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(exprs.len(), 1);
+
+        let ExprKind::Ident(first) = exprs[0].kind else {
+            panic!();
+        };
+
+        assert_eq!(first.get_name_str(), "a");
+    }
+
+    #[test]
+    fn empty_call_stmt() {
+        let src = "foo();";
+
+        let stmt = stmt(src);
+
+        let StmtKind::Semi(e) = stmt.kind else {
+            panic!();
+        };
+
+        let ExprKind::Call(ident, exprs) = e.kind else {
+            panic!();
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(exprs.len(), 0);
+    }
+
+    #[test]
+    fn multy_args_expr_call() {
+        let src = "foo(a, b, c)";
+
+        let expr = expr(src);
+
+        let ExprKind::Call(ident, exprs) = expr.kind else {
+            panic!("expected call expression");
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(exprs.len(), 3);
+
+        for (expr, expected_name) in exprs.iter().zip(["a", "b", "c"]) {
+            let ExprKind::Ident(ident) = expr.kind else {
+                panic!("expected identifier argument");
+            };
+
+            assert_eq!(ident.get_name_str(), expected_name);
+        }
+    }
+
+    #[test]
+    fn empty_args_expr_call() {
+        let src = "foo()";
+
+        let expr = expr(src);
+
+        let ExprKind::Call(ident, exprs) = expr.kind else {
+            panic!("expected call expression");
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(exprs.len(), 0);
+    }
+
+    #[test]
+    fn math_expr_call() {
+        let src = "(foo() + 2) / s";
+
+        let expr = expr(src);
+
+        let ExprKind::Binary(div_op, div_lhs, div_rhs) = expr.kind else {
+            panic!("expected division expression");
+        };
+
+        assert!(matches!(div_op.kind, BinOpKind::Div));
+
+        let ExprKind::Binary(add_op, add_lhs, add_rhs) = div_lhs.kind else {
+            panic!("expected addition expression");
+        };
+
+        assert!(matches!(add_op.kind, BinOpKind::Add));
+
+        let ExprKind::Call(ident, args) = add_lhs.kind else {
+            panic!("expected call expression");
+        };
+
+        assert_eq!(ident.get_name_str(), "foo");
+        assert_eq!(args.len(), 0);
+
+        let ExprKind::Lit(Lit::Integer(value)) = add_rhs.kind else {
+            panic!("expected integer literal");
+        };
+
+        assert_eq!(value, 2);
+
+        let ExprKind::Ident(ident) = div_rhs.kind else {
+            panic!("expected identifier");
+        };
+
+        assert_eq!(ident.get_name_str(), "s");
     }
 }

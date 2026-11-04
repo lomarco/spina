@@ -246,6 +246,10 @@ impl TokenCursor {
         self.bump();
         token
     }
+
+    pub fn peek(&self) -> Option<&Token> {
+        self.stream.get(self.next_idx)
+    }
 }
 
 pub struct TokenStream(Vec<Token>);
