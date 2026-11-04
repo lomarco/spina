@@ -306,7 +306,7 @@ impl Parser {
                 .is_some_and(|next| next.kind == TokenKind::OpenParen)
     }
 
-    fn parse_call(&mut self) -> PResult<StmtKind> { // TODO: Add PResult<Expr>
+    fn parse_call(&mut self) -> PResult<ExprKind> {
         let Some(ident) = self.token.ident() else {
             return Err(Diag::err(
                 format!("Expected call, found {:#?}", self.token.kind),
@@ -328,7 +328,11 @@ impl Parser {
 
         self.expect(TokenKind::CloseParen)?;
 
-        let expr = Expr::new(ExprKind::Call(ident, args), self.token.span);
+        Ok(ExprKind::Call(ident, args))
+    }
+
+    fn parse_call_stmt(&mut self) -> PResult<StmtKind> {
+        let expr = Expr::new(self.parse_call()?, self.token.span);
 
         Ok(if self.check(TokenKind::Semi) {
             self.bump();
@@ -343,7 +347,7 @@ impl Parser {
         if self.token.is_keyword(kw::Let) {
             self.parse_let()
         } else if self.is_call() {
-            self.parse_call()
+            self.parse_call_stmt()
         } else {
             Err(Diag::err(
                 format!("Expected stmt, found {:#?}", self.token.kind).to_string(),
