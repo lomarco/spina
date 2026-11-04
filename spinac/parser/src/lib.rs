@@ -338,7 +338,6 @@ impl Parser {
             self.bump();
             StmtKind::Semi(Box::new(expr))
         } else {
-            println!("bye");
             StmtKind::Expr(Box::new(expr))
         })
     }
@@ -451,8 +450,6 @@ impl Parser {
 
             TokenKind::Ident(name) => {
                 let span = self.token.span;
-
-                println!("{:#?}", self.token.kind);
 
                 let expr_kind = if self.is_call() {
                     self.parse_call()?
