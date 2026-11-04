@@ -517,6 +517,17 @@ impl Parser {
         Ok(params)
     }
 
+    fn expect(&mut self, kind: TokenKind) -> PResult<()> {
+        if self.eat(kind) {
+            Ok(())
+        } else {
+            Err(Diag::err(
+                format!("Expected {kind:?}, found {:#?}", self.token.kind),
+                self.token.span,
+            ))
+        }
+    }
+
     fn peek(&mut self) -> Option<&Token> {
         self.token_cursor.peek()
     }
