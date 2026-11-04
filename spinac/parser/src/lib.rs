@@ -306,12 +306,47 @@ impl Parser {
                 .is_some_and(|next| next.kind == TokenKind::OpenParen)
     }
 
+    fn parse_call(&mut self) -> PResult<StmtKind> { // TODO: Add PResult<Expr>
+        let Some(ident) = self.token.ident() else {
+            return Err(Diag::err(
+                format!("Expected call, found {:#?}", self.token.kind),
+                self.token.span,
+            ));
+        };
+
+        self.bump();
+        self.expect(TokenKind::OpenParen)?;
+
+        let mut args: Vec<Box<Expr>> = Vec::new();
+
+        while !self.check(TokenKind::CloseParen) {
+            args.push(Box::new(self.parse_expr()?));
+            if !self.eat(TokenKind::Comma) {
+                break;
+            }
+        }
+
+        self.expect(TokenKind::CloseParen)?;
+
+        let expr = Expr::new(ExprKind::Call(ident, args), self.token.span);
+
+        Ok(if self.check(TokenKind::Semi) {
+            self.bump();
+            StmtKind::Semi(Box::new(expr))
+        } else {
+            println!("bye");
+            StmtKind::Expr(Box::new(expr))
+        })
+    }
+
     fn parse_stmt_kind(&mut self) -> PResult<StmtKind> {
         if self.token.is_keyword(kw::Let) {
             self.parse_let()
+        } else if self.is_call() {
+            self.parse_call()
         } else {
             Err(Diag::err(
-                format!("Expected statement, found {:#?}", self.token.kind).to_string(),
+                format!("Expected stmt, found {:#?}", self.token.kind).to_string(),
                 self.token.span,
             ))
         }
@@ -335,7 +370,6 @@ impl Parser {
 
         while self.token.kind != TokenKind::Eof
             && self.token.kind != TokenKind::CloseBrace
-            && self.token.kind != TokenKind::Semi
         {
             stmts.push(self.parse_stmt()?);
         }
