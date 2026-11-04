@@ -368,9 +368,7 @@ impl Parser {
 
         let mut stmts: Vec<Stmt> = Vec::with_capacity(1024);
 
-        while self.token.kind != TokenKind::Eof
-            && self.token.kind != TokenKind::CloseBrace
-        {
+        while matches!(self.token.kind, TokenKind::CloseBrace | TokenKind::Eof) {
             stmts.push(self.parse_stmt()?);
         }
 
