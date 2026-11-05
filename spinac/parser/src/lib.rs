@@ -139,6 +139,25 @@ enum ExprKind {
     Loop(Box<Block>, Span),
 }
 
+#[derive(Debug)]
+struct Fn {
+    ident: Ident,
+    decl: FnDecl,
+    body: Box<Block>,
+}
+
+#[derive(Debug)]
+enum ItemKind {
+    Const(Box<Ident>, Box<Ty>, Box<Expr>, Span),
+    Fn(Box<Fn>),
+}
+
+#[derive(Debug)]
+struct Item {
+    kind: ItemKind,
+    span: Span,
+}
+
 fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
     expr.unwrap_or_else(|errs| {
         for err in errs {
@@ -633,25 +652,6 @@ impl Parser {
             ident.get_span(),
         ))
     }
-}
-
-#[derive(Debug)]
-struct Fn {
-    ident: Ident,
-    decl: FnDecl,
-    body: Box<Block>,
-}
-
-#[derive(Debug)]
-enum ItemKind {
-    Const(Box<Ident>, Box<Ty>, Box<Expr>, Span),
-    Fn(Box<Fn>),
-}
-
-#[derive(Debug)]
-struct Item {
-    kind: ItemKind,
-    span: Span,
 }
 
 #[cfg(test)]
