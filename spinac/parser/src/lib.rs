@@ -1,6 +1,9 @@
 mod ast;
+mod expr;
 mod item;
 mod parser;
+mod stmt;
+mod ty;
 
 use ast::Unit;
 use parser::Parser;
