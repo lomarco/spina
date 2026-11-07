@@ -70,7 +70,7 @@ pub(crate) enum BinOpKind {
 
 #[derive(Debug)]
 pub(crate) struct BinOp {
-    kind: BinOpKind,
+    pub(crate) kind: BinOpKind,
     pub(crate) span: Span,
 }
 
@@ -92,8 +92,8 @@ enum UnOp {
 
 #[derive(Debug)]
 pub(crate) struct Expr {
-    kind: ExprKind,
-    span: Span,
+    pub(crate) kind: ExprKind,
+    pub(crate) span: Span,
 }
 
 impl Expr {

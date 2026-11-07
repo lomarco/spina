@@ -16,7 +16,7 @@ impl Parser {
         self.parse_ty()
     }
 
-    fn parse_ty(&mut self) -> PResult<Ty> {
+    pub(crate) fn parse_ty(&mut self) -> PResult<Ty> {
         let ty = match self.token.ident() {
             Some(ident) => match ident.get_symbol() {
                 ty::I8 => Ty::new(TyKind::Int(IntTy::I8), self.token.span),

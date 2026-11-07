@@ -5,6 +5,9 @@ mod parser;
 mod stmt;
 mod ty;
 
+#[cfg(test)]
+mod tests;
+
 use ast::Unit;
 use parser::Parser;
 

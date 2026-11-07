@@ -6,7 +6,7 @@ use err::{Diag, PResult};
 use lex::TokenKind;
 
 impl Parser {
-    fn parse_stmt(&mut self) -> PResult<Stmt> {
+    pub(crate) fn parse_stmt(&mut self) -> PResult<Stmt> {
         let span = self.token.span;
         let kind = self.parse_stmt_kind()?;
         Ok(Stmt { kind, span })
