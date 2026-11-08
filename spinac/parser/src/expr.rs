@@ -79,20 +79,12 @@ impl Parser {
                 Ok(Expr::new(expr_kind, span))
             }
 
-            TokenKind::IntLiteral(ilit) => {
+            TokenKind::IntLiteral(lit) | TokenKind::FloatLiteral(lit) => {
                 let span = self.token.span;
 
                 self.bump();
 
-                Ok(Expr::new(ExprKind::Lit(ilit), span))
-            }
-
-            TokenKind::FloatLiteral(flit) => {
-                let span = self.token.span;
-
-                self.bump();
-
-                Ok(Expr::new(ExprKind::Lit(flit), span))
+                Ok(Expr::new(ExprKind::Lit(lit), span))
             }
 
             _ => Err(Diag::err(
