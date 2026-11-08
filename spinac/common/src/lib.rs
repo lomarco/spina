@@ -221,28 +221,28 @@ pub enum TyKind {
 impl TyKind {
     pub fn from_symbol(symbol: Symbol) -> Option<Self> {
         Some(match symbol {
-            ty::I8 => TyKind::Int(IntTy::I8).into(),
-            ty::U8 => TyKind::Uint(UintTy::U8).into(),
+            ty::I8 => TyKind::Int(IntTy::I8),
+            ty::U8 => TyKind::Uint(UintTy::U8),
 
-            ty::I16 => TyKind::Int(IntTy::I16).into(),
-            ty::U16 => TyKind::Uint(UintTy::U16).into(),
+            ty::I16 => TyKind::Int(IntTy::I16),
+            ty::U16 => TyKind::Uint(UintTy::U16),
 
-            ty::I32 => TyKind::Int(IntTy::I32).into(),
-            ty::U32 => TyKind::Uint(UintTy::U32).into(),
+            ty::I32 => TyKind::Int(IntTy::I32),
+            ty::U32 => TyKind::Uint(UintTy::U32),
 
-            ty::I64 => TyKind::Int(IntTy::I64).into(),
-            ty::U64 => TyKind::Uint(UintTy::U64).into(),
+            ty::I64 => TyKind::Int(IntTy::I64),
+            ty::U64 => TyKind::Uint(UintTy::U64),
 
-            ty::I128 => TyKind::Int(IntTy::I128).into(),
-            ty::U128 => TyKind::Uint(UintTy::U128).into(),
+            ty::I128 => TyKind::Int(IntTy::I128),
+            ty::U128 => TyKind::Uint(UintTy::U128),
 
-            ty::Isize => TyKind::Int(IntTy::Isize).into(),
-            ty::Usize => TyKind::Uint(UintTy::Usize).into(),
+            ty::Isize => TyKind::Int(IntTy::Isize),
+            ty::Usize => TyKind::Uint(UintTy::Usize),
 
-            ty::F16 => TyKind::Float(FloatTy::F16).into(),
-            ty::F32 => TyKind::Float(FloatTy::F32).into(),
-            ty::F64 => TyKind::Float(FloatTy::F64).into(),
-            ty::F128 => TyKind::Float(FloatTy::F128).into(),
+            ty::F16 => TyKind::Float(FloatTy::F16),
+            ty::F32 => TyKind::Float(FloatTy::F32),
+            ty::F64 => TyKind::Float(FloatTy::F64),
+            ty::F128 => TyKind::Float(FloatTy::F128),
 
             _ => return None,
         })
