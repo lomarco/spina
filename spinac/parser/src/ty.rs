@@ -17,40 +17,20 @@ impl Parser {
     }
 
     pub(crate) fn parse_ty(&mut self) -> PResult<Ty> {
-        let ty = match self.token.ident() {
-            Some(ident) => match ident.get_symbol() {
-                ty::I8 => Ty::new(TyKind::Int(IntTy::I8), self.token.span),
-                ty::U8 => Ty::new(TyKind::Uint(UintTy::U8), self.token.span),
+        let span = self.token.span;
 
-                ty::I16 => Ty::new(TyKind::Int(IntTy::I16), self.token.span),
-                ty::U16 => Ty::new(TyKind::Uint(UintTy::U16), self.token.span),
-
-                ty::I32 => Ty::new(TyKind::Int(IntTy::I32), self.token.span),
-                ty::U32 => Ty::new(TyKind::Uint(UintTy::U32), self.token.span),
-
-                ty::I64 => Ty::new(TyKind::Int(IntTy::I64), self.token.span),
-                ty::U64 => Ty::new(TyKind::Uint(UintTy::U64), self.token.span),
-
-                ty::I128 => Ty::new(TyKind::Int(IntTy::I128), self.token.span),
-                ty::U128 => Ty::new(TyKind::Uint(UintTy::U128), self.token.span),
-
-                ty::Isize => Ty::new(TyKind::Int(IntTy::Isize), self.token.span),
-                ty::Usize => Ty::new(TyKind::Uint(UintTy::Usize), self.token.span),
-
-                _ => {
-                    return Err(Diag::err(
-                        format!("Expected ty, found {:#?}", self.token.kind).to_string(),
-                        self.token.span,
-                    ));
-                }
-            }, // TODO: Rewrite this hard code
-            _ => {
-                return Err(Diag::err(
+        let ty = self
+            .token
+            .ident()
+            .and_then(|ident| TyKind::from_symbol(ident.get_symbol()))
+            .map(|tykind| Ty::new(tykind, span))
+            .ok_or_else(|| {
+                Diag::err(
                     format!("Expected ty, found {:#?}", self.token.kind).to_string(),
-                    self.token.span,
-                ));
-            }
-        };
+                    span,
+                )
+            })?;
+
         self.bump();
         Ok(ty)
     }
