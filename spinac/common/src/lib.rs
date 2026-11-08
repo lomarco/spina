@@ -177,7 +177,7 @@ impl Ident {
 }
 
 #[derive(Debug, PartialEq)]
-enum FloatTy {
+pub enum FloatTy {
     F16,
     F32,
     F64,
