@@ -1,3 +1,5 @@
+use symbol::Symbol;
+
 macro_rules! symbols {
     (
         keywords {
