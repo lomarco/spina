@@ -2,6 +2,16 @@
 resolver = "3"
 members = ["crates/*"]
 
+[workspace.dependencies]
+diag.path = "crates/diag"
+driver.path = "crates/driver"
+err.path = "crates/err"
+lex.path = "crates/lex"
+parser.path = "crates/parser"
+sess.path = "crates/sess"
+span.path = "crates/span"
+logos = "^0.16"
+
 [profile.release]
 opt-level = 3
 lto = "fat"
