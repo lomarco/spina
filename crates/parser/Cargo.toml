@@ -1,0 +1,9 @@
+[package]
+name = "parser"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+lex.workspace = true
+err.workspace = true
+sess.workspace = true
