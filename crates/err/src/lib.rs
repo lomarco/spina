@@ -1,4 +1,4 @@
-use common::Span;
+use span::Span;
 use std::{
     panic::{AssertUnwindSafe, catch_unwind, resume_unwind},
     process::ExitCode,
