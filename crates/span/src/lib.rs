@@ -1,14 +1,22 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+use std::ops::Range;
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct Span {
+    start: u32,
+    end: u32,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl From<Range<usize>> for Span {
+    fn from(r: Range<usize>) -> Self {
+        Self {
+            start: r.start as u32,
+            end: r.end as u32,
+        }
+    }
+}
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+impl Span {
+    pub const fn new(start: u32, end: u32) -> Self {
+        Self { start, end }
     }
 }
