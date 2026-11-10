@@ -1,32 +1,6 @@
-[package]
-name = "spina"
-version = "0.1.0"
-edition = "2024"
-
 [workspace]
 resolver = "3"
-members = [
-  "spinac/parser",
-  "spinac/lex",
-  "spinac/common",
-  "spinac/err",
-  "spinac/sess",
-]
-
-[workspace.dependencies]
-common = {path = "spinac/common"}
-lex = {path = "spinac/lex"}
-sess = {path = "spinac/sess"}
-err = {path = "spinac/err"}
-
-[[bin]]
-path = "spinac/main.rs"
-name = "spinac"
-
-[dependencies]
-parser = {path = "spinac/parser"}
-sess = {path = "spinac/sess"}
-err = {path = "spinac/err"}
+members = ["crates/*"]
 
 [profile.release]
 opt-level = 3
