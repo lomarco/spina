@@ -7,6 +7,7 @@ pub enum Input {
 
 pub struct Session {
     pub input: Input,
+    pub interner: 
     // TODO: Add the rest field(f.e code_stats or timings)
 }
 
