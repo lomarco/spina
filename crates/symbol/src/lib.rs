@@ -1,11 +1,13 @@
 use std::collections::HashMap;
-use sess::Session;
+use std::sync::{LazyLock, Mutex};
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+static INTERNER: LazyLock<Mutex<Interner>> = LazyLock::new(|| Mutex::new(Interner::new(SYMBOLS)));
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Symbol(u32);
 
 impl Symbol {
-    pub const fn new(n: u32) -> Self {
+    pub(crate) const fn new(n: u32) -> Self {
         Self(n)
     }
 
