@@ -1,19 +1,15 @@
+mod cli;
+mod options;
+
 use err::catch_fatal_error_marker;
 use parser::parse;
 use sess::Session;
-use std::env::args;
 use std::process::ExitCode;
+use cli::Args;
+use clap::Parser;
 
 fn run() {
-    // FIXME: Replace this code to clap
-    let args: Vec<String> = args().collect();
-    if args.len() != 2 {
-        println!("usage: {}: <filename> ", args[0]);
-    }
-    let filename = &args[1];
-    // FIXME: Replace this code to clap
-
-    let sess = Session::new(filename);
+    let sess = Session::new(Args::parse());
     let unit = parse(&sess); // TODO: Move all file opening logic to parse_from_file
 
     println!("{unit:#?}"); // FIXME
