@@ -7,3 +7,4 @@ edition = "2024"
 sess.workspace = true
 err.workspace = true
 parser.workspace = true
+clap.workspace = true

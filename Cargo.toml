@@ -12,6 +12,7 @@ span.path = "crates/span"
 symbol.path = "crates/symbol"
 ast.path = "crates/ast"
 logos = "^0.16"
+clap = { version = "^4", features = ["derive"] }
 
 [profile.release]
 opt-level = 3
