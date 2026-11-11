@@ -1,7 +1,6 @@
 use super::*;
 use crate::ast::*;
 use crate::{new_parser_from_str, unwrap_or_emit_fatal};
-use common::{IntTy, Lit, Span, TyKind};
 use lex::{TokenCursor, TokenKind, flex};
 
 fn parser(s: &str) -> Parser {

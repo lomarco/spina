@@ -1,7 +1,6 @@
 use crate::ast::{Block, Expr, Stmt, StmtKind};
 use crate::parser::Parser;
 
-use common::kw;
 use err::{Diag, PResult};
 use lex::TokenKind;
 

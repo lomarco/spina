@@ -1,4 +1,3 @@
-use common::Ident;
 use err::{Diag, PResult};
 use lex::{Token, TokenCursor, TokenKind, TokenStream};
 use std::mem::replace;

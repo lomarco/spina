@@ -1,7 +1,6 @@
 use crate::ast::{BinOp, BinOpKind, Expr, ExprKind};
 use crate::parser::Parser;
 
-use common::Ident;
 use err::{Diag, PResult};
 use lex::TokenKind;
 

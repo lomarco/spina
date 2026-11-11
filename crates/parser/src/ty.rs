@@ -1,6 +1,5 @@
 use crate::parser::Parser;
 
-use common::{Ty, TyKind};
 use err::{Diag, PResult};
 use lex::TokenKind;
 
