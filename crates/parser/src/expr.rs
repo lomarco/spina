@@ -1,5 +1,5 @@
-use ast::{BinOp, BinOpKind, Expr, ExprKind, Ident};
 use crate::parser::Parser;
+use ast::{BinOp, BinOpKind, Expr, ExprKind, Ident};
 
 use err::{Diag, PResult};
 use lex::TokenKind;

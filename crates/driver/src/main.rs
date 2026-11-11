@@ -1,6 +1,6 @@
 use err::catch_fatal_error_marker;
-use sess::Session;
 use parser::parse;
+use sess::Session;
 use std::env::args;
 use std::process::ExitCode;
 

@@ -1,6 +1,6 @@
-use ast::{Ident, Block, Expr, Fn, FnDecl, Item, ItemKind, Param, Unit, Ty};
-use symbol::kw;
 use crate::parser::Parser;
+use ast::{Block, Expr, Fn, FnDecl, Ident, Item, ItemKind, Param, Ty, Unit};
+use symbol::kw;
 
 use err::{Diag, PResult};
 use lex::TokenKind;

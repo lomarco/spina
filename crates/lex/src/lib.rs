@@ -1,8 +1,8 @@
+use ast::{Ident, Lit};
 use err::Diag;
-use ast::{Lit, Ident};
 use logos::Logos; // TODO: Rewrite it for myself
-use symbol::Symbol;
 use span::Span;
+use symbol::Symbol;
 
 #[derive(Logos, Debug, PartialEq, Clone, Copy)]
 #[logos(skip r"[ \t\n\f]+")]

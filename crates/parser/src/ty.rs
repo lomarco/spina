@@ -1,7 +1,7 @@
 use crate::parser::Parser;
 
-use err::{Diag, PResult};
 use ast::{Ty, TyKind};
+use err::{Diag, PResult};
 use lex::TokenKind;
 
 impl Parser {
