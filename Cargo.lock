@@ -14,10 +14,10 @@ dependencies = [
 [[package]]
 name = "ast"
 version = "0.1.0"
-
-[[package]]
-name = "diag"
-version = "0.1.0"
+dependencies = [
+ "span",
+ "symbol",
+]
 
 [[package]]
 name = "driver"
@@ -30,6 +30,9 @@ dependencies = [
 [[package]]
 name = "err"
 version = "0.1.0"
+dependencies = [
+ "span",
+]
 
 [[package]]
 name = "fnv"
@@ -133,6 +136,10 @@ version = "0.1.0"
 
 [[package]]
 name = "span"
+version = "0.1.0"
+
+[[package]]
+name = "symbol"
 version = "0.1.0"
 
 [[package]]
