@@ -1,4 +1,3 @@
-mod ast;
 mod expr;
 mod item;
 mod parser;
@@ -8,12 +7,11 @@ mod ty;
 #[cfg(test)]
 mod tests;
 
-use ast::Unit;
 use parser::Parser;
-
 use err::{Diag, raise};
 use lex::flex;
 use sess::{Input, Session};
+use ast::Unit;
 use std::{fs::read_to_string, io::ErrorKind, path::Path};
 
 fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
