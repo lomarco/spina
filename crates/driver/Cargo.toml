@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 sess.workspace = true
 err.workspace = true
+parser.workspace = true
