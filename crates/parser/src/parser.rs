@@ -1,6 +1,7 @@
 use err::{Diag, PResult};
 use lex::{Token, TokenCursor, TokenKind, TokenStream};
 use std::mem::replace;
+use ast::Ident;
 
 pub(crate) struct Parser {
     pub(crate) token: Token,

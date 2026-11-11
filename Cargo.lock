@@ -24,6 +24,7 @@ name = "driver"
 version = "0.1.0"
 dependencies = [
  "err",
+ "parser",
  "sess",
 ]
 
@@ -44,8 +45,12 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 name = "lex"
 version = "0.1.0"
 dependencies = [
+ "ast",
+ "err",
  "logos",
  "sess",
+ "span",
+ "symbol",
 ]
 
 [[package]]
@@ -90,9 +95,11 @@ checksum = "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
 name = "parser"
 version = "0.1.0"
 dependencies = [
+ "ast",
  "err",
  "lex",
  "sess",
+ "symbol",
 ]
 
 [[package]]

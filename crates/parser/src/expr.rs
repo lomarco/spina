@@ -1,4 +1,4 @@
-use crate::ast::{BinOp, BinOpKind, Expr, ExprKind};
+use ast::{BinOp, BinOpKind, Expr, ExprKind, Ident};
 use crate::parser::Parser;
 
 use err::{Diag, PResult};

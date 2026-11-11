@@ -8,3 +8,4 @@ lex.workspace = true
 ast.workspace = true
 err.workspace = true
 sess.workspace = true
+symbol.workspace = true

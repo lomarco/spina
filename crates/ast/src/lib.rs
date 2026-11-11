@@ -2,18 +2,18 @@ use span::Span;
 use symbol::{Symbol, ty};
 
 #[derive(Debug)]
-pub struct Unit(pub(crate) Vec<Item>);
+pub struct Unit(pub Vec<Item>);
 
 #[derive(Debug)]
-pub(crate) struct Param {
-    pub(crate) ty: Ty,
-    pub(crate) ident: Ident,
+pub struct Param {
+    pub ty: Ty,
+    pub ident: Ident,
 }
 
 #[derive(Debug)]
-pub(crate) struct FnDecl {
-    pub(crate) params: Vec<Param>,
-    pub(crate) ty: Ty,
+pub struct FnDecl {
+    pub params: Vec<Param>,
+    pub ty: Ty,
 }
 
 #[derive(Debug)]
@@ -24,13 +24,13 @@ struct ForLoop {
 }
 
 #[derive(Debug)]
-pub(crate) struct Block {
-    pub(crate) stmts: Vec<Stmt>,
-    pub(crate) span: Span,
+pub struct Block {
+    pub stmts: Vec<Stmt>,
+    pub span: Span,
 }
 
 #[derive(Debug)]
-pub(crate) enum BinOpKind {
+pub enum BinOpKind {
     /// The `+` operator (addition)
     Add,
     /// The `-` operator (subtraction)
@@ -70,13 +70,13 @@ pub(crate) enum BinOpKind {
 }
 
 #[derive(Debug)]
-pub(crate) struct BinOp {
-    pub(crate) kind: BinOpKind,
-    pub(crate) span: Span,
+pub struct BinOp {
+    pub kind: BinOpKind,
+    pub span: Span,
 }
 
 impl BinOp {
-    pub(crate) fn new(kind: BinOpKind, span: Span) -> Self {
+    pub fn new(kind: BinOpKind, span: Span) -> Self {
         Self { kind, span }
     }
 }
@@ -92,19 +92,19 @@ enum UnOp {
 }
 
 #[derive(Debug)]
-pub(crate) struct Expr {
-    pub(crate) kind: ExprKind,
-    pub(crate) span: Span,
+pub struct Expr {
+    pub kind: ExprKind,
+    pub span: Span,
 }
 
 impl Expr {
-    pub(crate) fn new(kind: ExprKind, span: Span) -> Self {
+    pub fn new(kind: ExprKind, span: Span) -> Self {
         Self { kind, span }
     }
 }
 
 #[derive(Debug)]
-pub(crate) enum StmtKind {
+pub enum StmtKind {
     Let(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     Semi(Box<Expr>),
     Expr(Box<Expr>),
@@ -112,13 +112,13 @@ pub(crate) enum StmtKind {
 }
 
 #[derive(Debug)]
-pub(crate) struct Stmt {
-    pub(crate) kind: StmtKind,
-    pub(crate) span: Span,
+pub struct Stmt {
+    pub kind: StmtKind,
+    pub span: Span,
 }
 
 #[derive(Debug)]
-pub(crate) enum ExprKind {
+pub enum ExprKind {
     Array(Vec<Expr>),
     Call(Ident, Vec<Expr>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
@@ -137,22 +137,22 @@ pub(crate) enum ExprKind {
 }
 
 #[derive(Debug)]
-pub(crate) struct Fn {
-    pub(crate) ident: Ident,
-    pub(crate) decl: FnDecl,
-    pub(crate) body: Box<Block>,
+pub struct Fn {
+    pub ident: Ident,
+    pub decl: FnDecl,
+    pub body: Box<Block>,
 }
 
 #[derive(Debug)]
-pub(crate) enum ItemKind {
+pub enum ItemKind {
     Const(Box<Ident>, Box<Ty>, Box<Expr>, Span),
     Fn(Box<Fn>),
 }
 
 #[derive(Debug)]
-pub(crate) struct Item {
-    pub(crate) kind: ItemKind,
-    pub(crate) span: Span,
+pub struct Item {
+    pub kind: ItemKind,
+    pub span: Span,
 }
 
 #[derive(Debug, Clone, Copy)]

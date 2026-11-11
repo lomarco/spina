@@ -1,4 +1,5 @@
-use crate::ast::{Block, Expr, Stmt, StmtKind};
+use ast::{Block, Expr, Stmt, StmtKind};
+use symbol::kw;
 use crate::parser::Parser;
 
 use err::{Diag, PResult};

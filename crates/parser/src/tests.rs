@@ -1,5 +1,5 @@
 use super::*;
-use crate::ast::*;
+use ast::*;
 use crate::{new_parser_from_str, unwrap_or_emit_fatal};
 use lex::{TokenCursor, TokenKind, flex};
 
