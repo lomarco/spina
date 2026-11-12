@@ -23,6 +23,6 @@ pub struct Session {
 
 impl Session {
     pub fn new(opts: Options) -> Self {
-        todo!("HELLO")
+        Self { opts }
     }
 }
