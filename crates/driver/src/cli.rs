@@ -1,20 +1,9 @@
 use std::path::PathBuf;
-use clap::{Args, Parser, Subcommand, ValueEnum};
+use clap::{Args, Parser};
 
 #[derive(Parser)]
 #[command(version, propagate_version = true, arg_required_else_help = true)]
 pub struct Cli {
-    #[command(subcommand)]
-    pub command: Command,
-}
-
-#[derive(Subcommand)]
-pub enum Command {
-    Build(BuildArgs),
-}
-
-#[derive(Args)]
-pub struct BuildArgs {
     #[command(flatten)]
     pub input: InputArgs,
 
