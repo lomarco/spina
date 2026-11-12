@@ -1,5 +1,5 @@
+use clap::{Args, Parser, ValueEnum};
 use std::path::PathBuf;
-use clap::{Args, Parser};
 
 #[derive(Parser)]
 #[command(version, propagate_version = true, arg_required_else_help = true)]

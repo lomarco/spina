@@ -50,7 +50,7 @@ fn new_parser_from_str(str: &str) -> Result<Parser, Vec<Diag>> {
 
 pub fn parse(sess: &Session) -> Unit {
     // TODO: Add new_parser_from_source_str
-    unwrap_or_emit_fatal(match &sess.input {
+    unwrap_or_emit_fatal(match &sess.opts.input {
         Input::File(file) => new_parser_from_file(file),
         Input::Str(str) => new_parser_from_str(str),
     })
