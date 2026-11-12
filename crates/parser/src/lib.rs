@@ -25,7 +25,6 @@ fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
 
 fn new_parser_from_file(path: &Path) -> Result<Parser, Vec<Diag>> {
     let cont = read_to_string(path).unwrap_or_else(|e| {
-        // TODO: Maybe delete unwrap_or_else
         let msg = match e.kind() {
             ErrorKind::NotFound => format!("couldn't find file `{}`", path.display()),
             ErrorKind::PermissionDenied => {
