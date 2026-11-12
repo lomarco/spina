@@ -1,4 +1,5 @@
 mod cli;
+mod options;
 
 use clap::Parser;
 use cli::Cli;
@@ -8,8 +9,8 @@ use sess::Session;
 use std::process::ExitCode;
 
 fn run() {
-    let sess = Session::new(Cli::parse());
-    let unit = parse(&sess); // TODO: Move all file opening logic to parse_from_file
+    let sess = Session::new(Cli::parse().into());
+    let unit = parse(&sess);
 }
 
 fn main() -> ExitCode {

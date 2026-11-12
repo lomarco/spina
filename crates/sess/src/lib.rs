@@ -5,14 +5,24 @@ pub enum Input {
     Str(String),
 }
 
-pub struct Session {
+#[derive(Debug)]
+pub enum Stage {
+    Tok,
+    Ast,
+}
+
+pub struct Options {
     pub input: Input,
+    pub emit: Option<Stage>,
+    pub output: Option<PathBuf>,
+}
+
+pub struct Session {
+    pub opts: Options,
 }
 
 impl Session {
-    pub fn new(path: &str) -> Self {
-        Self {
-            input: Input::File(PathBuf::from(path)),
-        }
+    pub fn new(opts: Options) -> Self {
+        todo!("HELLO")
     }
 }
