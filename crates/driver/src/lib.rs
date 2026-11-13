@@ -13,6 +13,6 @@ fn run() {
     let unit = parse(&sess);
 }
 
-fn main() -> ExitCode {
+pub fn entry() -> ExitCode {
     catch_fatal_error_marker(run)
 }

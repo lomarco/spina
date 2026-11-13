@@ -3,6 +3,7 @@ resolver = "3"
 members = ["crates/*"]
 
 [workspace.dependencies]
+spinac.path = "crates/spinac"
 driver.path = "crates/driver"
 err.path = "crates/err"
 lex.path = "crates/lex"

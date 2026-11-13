@@ -1,0 +1,7 @@
+[package]
+name = "spinac"
+version = "0.0.0-test"
+edition = "2024"
+
+[dependencies]
+driver.workspace = true

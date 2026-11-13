@@ -261,6 +261,13 @@ name = "span"
 version = "0.0.0"
 
 [[package]]
+name = "spinac"
+version = "0.0.0-test"
+dependencies = [
+ "driver",
+]
+
+[[package]]
 name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

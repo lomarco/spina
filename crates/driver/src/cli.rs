@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(version, propagate_version = true, arg_required_else_help = true)]
-pub struct Cli {
+pub(crate) struct Cli {
     #[command(flatten)]
     pub input: InputArgs,
 
@@ -16,7 +16,7 @@ pub struct Cli {
 
 #[derive(Args)]
 #[group(required = true, multiple = false)]
-pub struct InputArgs {
+pub(crate) struct InputArgs {
     pub file: Option<PathBuf>,
 
     #[arg(short = 'e', long, value_name = "CODE")]
@@ -24,7 +24,7 @@ pub struct InputArgs {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-pub enum Stage {
+pub(crate) enum Stage {
     #[value(alias = "tokens")]
     Tok,
     Ast,
