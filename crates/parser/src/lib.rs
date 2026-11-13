@@ -9,9 +9,8 @@ mod tests;
 
 use ast::Unit;
 use err::{Diag, raise};
-use lex::flex;
+use lex::TokenStream;
 use parser::Parser;
-use sess::{Input, Session};
 use std::{fs::read_to_string, io::ErrorKind, path::Path};
 
 fn unwrap_or_emit_fatal<T>(expr: Result<T, Vec<Diag>>) -> T {
@@ -47,15 +46,11 @@ fn new_parser_from_str(str: &str) -> Result<Parser, Vec<Diag>> {
     Ok(Parser::new(flex(str)?))
 }
 
-pub fn parse(sess: &Session) -> Unit {
-    // TODO: Add new_parser_from_source_str
-    unwrap_or_emit_fatal(match &sess.opts.input {
-        Input::File(file) => new_parser_from_file(file),
-        Input::Str(str) => new_parser_from_str(str),
-    })
-    .parse_unit()
-    .unwrap_or_else(|parse_error| {
-        parse_error.emit();
-        raise()
-    })
+pub fn parse(stream: TokenStream) -> Unit {
+    Parser::new(stream)
+        .parse_unit()
+        .unwrap_or_else(|parse_error| {
+            parse_error.emit();
+            raise()
+        })
 }
