@@ -2,6 +2,7 @@ use super::*;
 use crate::{new_parser_from_str, unwrap_or_emit_fatal};
 use ast::*;
 use lex::{TokenCursor, TokenKind, flex};
+use span::Span;
 
 fn parser(s: &str) -> Parser {
     unwrap_or_emit_fatal(new_parser_from_str(s))
