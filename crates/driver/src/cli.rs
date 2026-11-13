@@ -2,7 +2,7 @@ use clap::{Args, Parser, ValueEnum};
 use std::path::PathBuf;
 
 #[derive(Parser)]
-#[command(version, propagate_version = true, arg_required_else_help = true)]
+#[command(name = "spinac", version, about, long_about = None, arg_required_else_help = true)]
 pub(crate) struct Cli {
     #[command(flatten)]
     pub input: InputArgs,
