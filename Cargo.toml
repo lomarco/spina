@@ -2,6 +2,9 @@
 resolver = "3"
 members = ["crates/*"]
 
+[workspace.package]
+version = "0.0.0-test"
+
 [workspace.dependencies]
 spinac.path = "crates/spinac"
 driver.path = "crates/driver"

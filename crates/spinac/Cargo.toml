@@ -1,6 +1,6 @@
 [package]
 name = "spinac"
-version = "0.0.0-test"
+version.workspace = true
 edition = "2024"
 
 [dependencies]
