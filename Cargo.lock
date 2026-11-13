@@ -121,6 +121,7 @@ version = "0.0.0-test"
 dependencies = [
  "clap",
  "err",
+ "lex",
  "parser",
  "sess",
 ]
