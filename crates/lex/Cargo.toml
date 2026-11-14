@@ -4,7 +4,6 @@ version.workspace = true
 edition = "2024"
 
 [dependencies]
-sess.workspace = true
 logos.workspace = true
 err.workspace = true
 ast.workspace = true
