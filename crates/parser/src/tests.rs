@@ -52,6 +52,20 @@ fn let_stmt() {
 }
 
 #[test]
+fn parse_error_on_missing_expr() {
+    let mut parser = parser("");
+
+    assert!(parser.parse_expr().is_err());
+}
+
+#[test]
+fn parse_error_on_missing_fn_body_brace() {
+    let mut parser = parser("fn foo(): i8 ");
+
+    assert!(parser.parse_unit().is_err());
+}
+
+#[test]
 fn parse_divs_expr() {
     let expr = expr("2 / 3");
 
