@@ -7,16 +7,11 @@ mod ty;
 #[cfg(test)]
 mod tests;
 
-use ast::Unit;
-use err::raise;
+pub use ast::Unit;
+use err::PResult;
 use lex::TokenStream;
 use parser::Parser;
 
-pub fn parse(stream: TokenStream) -> Unit {
-    Parser::new(stream)
-        .parse_unit()
-        .unwrap_or_else(|parse_error| {
-            parse_error.emit();
-            raise()
-        })
+pub fn parse(stream: TokenStream) -> PResult<Unit> {
+    Parser::new(stream).parse_unit()
 }
