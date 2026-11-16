@@ -1,18 +1,28 @@
 use std::path::PathBuf;
 
-pub enum Input {
-    File(PathBuf),
-    Str(String),
+#[derive(Debug)]
+pub enum Stage {
+    Tok,
+    Ast,
+}
+
+pub struct Options {
+    pub emit: Option<Stage>,
+    pub output: Option<PathBuf>,
+}
+
+pub struct Source {
+    pub name: Option<PathBuf>,
+    pub text: String,
 }
 
 pub struct Session {
-    pub input: Input,
+    pub opts: Options,
+    pub source: Source,
 }
 
 impl Session {
-    pub fn new(path: &str) -> Self {
-        Self {
-            input: Input::File(PathBuf::from(path)),
-        }
+    pub fn new(opts: Options, source: Source) -> Self {
+        Self { opts, source }
     }
 }

@@ -1,11 +1,11 @@
 [package]
 name = "parser"
-version = "0.1.0"
+version.workspace = true
 edition = "2024"
 
 [dependencies]
 lex.workspace = true
 ast.workspace = true
 err.workspace = true
-sess.workspace = true
 symbol.workspace = true
+span.workspace = true

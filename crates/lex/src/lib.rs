@@ -189,7 +189,7 @@ pub enum TokenKind {
 
 const DUMMY_SP: Span = Span::new(0, 0);
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Token {
     pub kind: TokenKind,
     pub span: Span,
@@ -250,6 +250,7 @@ impl TokenCursor {
     }
 }
 
+#[derive(Debug)]
 pub struct TokenStream(Vec<Token>);
 
 impl TokenStream {

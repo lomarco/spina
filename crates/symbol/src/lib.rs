@@ -91,20 +91,20 @@ impl Symbol {
 }
 
 struct Interner {
-    hs: HashMap<Box<str>, Symbol>,
-    strs: Vec<Box<str>>,
+    hs: HashMap<&'static str, Symbol>,
+    strs: Vec<&'static str>,
 }
 
 impl Interner {
     fn new(init: &[&str]) -> Self {
         let size = init.len();
-        let mut hs: HashMap<Box<str>, Symbol> = HashMap::with_capacity(size);
-        let mut strs: Vec<Box<str>> = Vec::with_capacity(size);
+        let mut hs: HashMap<&'static str, Symbol> = HashMap::with_capacity(size);
+        let mut strs: Vec<&'static str> = Vec::with_capacity(size);
 
         for (i, v) in init.iter().enumerate() {
-            let owned: Box<str> = Box::from(*v);
+            let owned: &'static str = Box::leak(Box::from(*v));
 
-            hs.insert(owned.clone(), Symbol::new(i as u32));
+            hs.insert(owned, Symbol::new(i as u32));
             strs.push(owned);
         }
         Interner { hs, strs }
@@ -117,14 +117,14 @@ impl Interner {
 
         let id = self.strs.len() as u32;
 
-        let owned: Box<str> = Box::from(s);
+        let owned: &'static str = Box::leak(Box::from(s));
 
-        self.hs.insert(owned.clone(), Symbol::new(id));
+        self.hs.insert(owned, Symbol::new(id));
         self.strs.push(owned);
         Symbol(id)
     }
 
     fn get_str(&self, symbol: Symbol) -> &str {
-        &self.strs[symbol.0 as usize]
+        self.strs[symbol.0 as usize]
     }
 }
