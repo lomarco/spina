@@ -10,8 +10,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-M_COLOR: always
-
 permissions:
   contents: read
 
