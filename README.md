@@ -1,5 +1,7 @@
 # Spina
 
+![CI](https://github.com/lomarco/spina/actions/workflows/ci.yml/badge.svg)
+
 Compile pipeline:
 ``` plain
                         +-----------------------------------------------------------------------------------------------------------------------+                         +------------------+
