@@ -17,13 +17,6 @@ pub struct FnDecl {
 }
 
 #[derive(Debug)]
-struct ForLoop {
-    ident: Box<Ident>,
-    iter: Box<Expr>,
-    body: Box<Block>,
-}
-
-#[derive(Debug)]
 pub struct Block {
     pub stmts: Vec<Stmt>,
     pub span: Span,
@@ -82,16 +75,6 @@ impl BinOp {
 }
 
 #[derive(Debug)]
-enum UnOp {
-    /// The `*` operator for dereferencing
-    Deref,
-    /// The `!` operator for logical inversion
-    Not,
-    /// The `-` operator for negation
-    Neg,
-}
-
-#[derive(Debug)]
 pub struct Expr {
     pub kind: ExprKind,
     pub span: Span,
@@ -122,7 +105,6 @@ pub enum ExprKind {
     Array(Vec<Expr>),
     Call(Ident, Vec<Expr>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
-    Unary(UnOp, Box<Expr>),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
     Index(Box<Expr>, Box<Expr>, Span),
@@ -132,7 +114,6 @@ pub enum ExprKind {
 
     Lit(Lit),
     Ident(Ident),
-    ForLoop(Box<ForLoop>),
     Loop(Box<Block>, Span),
 }
 
