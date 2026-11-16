@@ -1,6 +1,6 @@
 # Spina
 
-![CI](https://github.com/lomarco/spina/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/lomarco/spina/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/lomarco/spina/actions/workflows/ci.yml)
 
 Compile pipeline:
 ``` plain
