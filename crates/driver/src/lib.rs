@@ -34,7 +34,18 @@ fn run() {
     );
 
     let stream = unwrap_or_emit_fatal(flex(&sess.source.text));
+
+    if matches!(sess.opts.emit, Some(Stage::Tok)) {
+        println!("{stream:?}");
+        return;
+    }
+
     let unit = parse(stream);
+
+    if matches!(sess.opts.emit, Some(Stage::Ast)) {
+        println!("{unit:?}");
+        return;
+    }
 }
 
 pub fn entry() -> ExitCode {
