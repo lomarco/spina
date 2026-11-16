@@ -4,6 +4,9 @@ use logos::Logos; // TODO: Rewrite it for myself
 use span::Span;
 use symbol::Symbol;
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Logos, Debug, PartialEq, Clone, Copy)]
 #[logos(skip r"[ \t\n\f]+")]
 pub enum TokenKind {
@@ -258,7 +261,7 @@ impl TokenStream {
         Self(tss)
     }
 
-    fn get(&self, idx: usize) -> Option<&Token> {
+    pub fn get(&self, idx: usize) -> Option<&Token> {
         self.0.get(idx)
     }
 }
@@ -281,5 +284,9 @@ pub fn flex(content: &str) -> Result<TokenStream, Vec<Diag>> {
         }
     }
 
-    Ok(TokenStream::new(tokens))
+    if errs.is_empty() {
+        Ok(TokenStream::new(tokens))
+    } else {
+        Err(errs)
+    }
 }
