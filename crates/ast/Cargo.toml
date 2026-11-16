@@ -1,0 +1,8 @@
+[package]
+name = "ast"
+version.workspace = true
+edition = "2024"
+
+[dependencies]
+span.workspace = true
+symbol.workspace = true

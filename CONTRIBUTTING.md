@@ -8,6 +8,3 @@ Git flow.
 
 ## Branching Message Format
 `<type>/<short-description>[-<optional-id>]`.
-
-## Todo Style
-[todo.txt](https://github.com/todotxt/todo.txt).

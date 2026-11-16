@@ -1,0 +1,11 @@
+[package]
+name = "lex"
+version.workspace = true
+edition = "2024"
+
+[dependencies]
+logos.workspace = true
+err.workspace = true
+ast.workspace = true
+symbol.workspace = true
+span.workspace = true

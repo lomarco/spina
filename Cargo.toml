@@ -1,29 +1,25 @@
-[package]
-name = "spina"
-version = "0.1.0"
-edition = "2024"
-
 [workspace]
 resolver = "3"
-members = [
-  "spinac/parser",
-  "spinac/lex",
-  "spinac/common",
-  "spinac/err",
-  "spinac/sess",
-]
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.0.0-test"
 
 [workspace.dependencies]
-common = {path = "spinac/common"}
-lex = {path = "spinac/lex"}
-sess = {path = "spinac/sess"}
-err = {path = "spinac/err"}
+spinac.path = "crates/spinac"
+driver.path = "crates/driver"
+err.path = "crates/err"
+lex.path = "crates/lex"
+parser.path = "crates/parser"
+sess.path = "crates/sess"
+span.path = "crates/span"
+symbol.path = "crates/symbol"
+ast.path = "crates/ast"
+logos = "^0.16"
+clap = { version = "^4", features = ["derive"] }
 
-[[bin]]
-path = "spinac/main.rs"
-name = "spinac"
-
-[dependencies]
-parser = {path = "spinac/parser"}
-sess = {path = "spinac/sess"}
-err = {path = "spinac/err"}
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
