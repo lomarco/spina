@@ -18,10 +18,8 @@ struct Binding {
 
 struct BindingId(u32);
 
-type Scope = HashMap<Symbol, BindingId>;
-
 struct Resolver {
-    scopes: Vec<Scope>,
+    scopes: Vec<HashMap<Symbol, BindingId>>,
     bindings: Vec<Binding>,
 }
 
