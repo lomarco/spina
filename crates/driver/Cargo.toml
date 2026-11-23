@@ -9,3 +9,4 @@ err.workspace = true
 parser.workspace = true
 lex.workspace = true
 clap.workspace = true
+resolve.workspace = true

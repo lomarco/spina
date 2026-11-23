@@ -15,6 +15,7 @@ sess.path = "crates/sess"
 span.path = "crates/span"
 symbol.path = "crates/symbol"
 ast.path = "crates/ast"
+resolve.path = "crates/resolve"
 logos = "^0.16"
 clap = { version = "^4", features = ["derive"] }
 

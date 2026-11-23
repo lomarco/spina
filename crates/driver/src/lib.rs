@@ -8,6 +8,7 @@ use lex::{TokenStream, flex};
 use parser::{Unit, parse};
 use sess::{Options, Session, Source, Stage};
 use std::process::ExitCode;
+use resolve::resolve;
 
 #[derive(Debug)]
 pub enum CompileOutput {
@@ -27,6 +28,8 @@ pub fn compile(sess: &Session) -> Result<CompileOutput, Vec<Diag>> {
     if let Some(Stage::Ast) = sess.opts.emit {
         return Ok(CompileOutput::Ast(unit));
     }
+
+    let rast = resolve(unit)?;
 
     // TODO: Add the rests
     Ok(CompileOutput::Ast(unit))
