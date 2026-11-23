@@ -6,9 +6,9 @@ use cli::Cli;
 use err::{Diag, catch_fatal_error_marker, raise};
 use lex::{TokenStream, flex};
 use parser::{Unit, parse};
+use resolve::resolve;
 use sess::{Options, Session, Source, Stage};
 use std::process::ExitCode;
-use resolve::resolve;
 
 #[derive(Debug)]
 pub enum CompileOutput {
