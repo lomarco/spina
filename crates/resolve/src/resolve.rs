@@ -124,7 +124,7 @@ pub(crate) struct Resolver {
     pub defs: Defs,
     pub resolutions: Resolutions,
     scopes: ScopeStack,
-    diags: Vec<Diag>,
+    pub(crate) diags: Vec<Diag>,
 }
 
 impl Resolver {
