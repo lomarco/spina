@@ -2,10 +2,14 @@ use span::Span;
 use symbol::{Symbol, ty};
 
 #[derive(Debug)]
+pub struct NodeId(u32);
+
+#[derive(Debug)]
 pub struct Unit(pub Vec<Item>);
 
 #[derive(Debug)]
 pub struct Param {
+    pub id: NodeId,
     pub ty: Ty,
     pub ident: Ident,
 }
@@ -76,13 +80,14 @@ impl BinOp {
 
 #[derive(Debug)]
 pub struct Expr {
+    pub id: NodeId,
     pub kind: ExprKind,
     pub span: Span,
 }
 
 impl Expr {
-    pub fn new(kind: ExprKind, span: Span) -> Self {
-        Self { kind, span }
+    pub fn new(id: NodeId, kind: ExprKind, span: Span) -> Self {
+        Self { id, kind, span }
     }
 }
 
@@ -96,6 +101,7 @@ pub enum StmtKind {
 
 #[derive(Debug)]
 pub struct Stmt {
+    pub id: NodeId,
     pub kind: StmtKind,
     pub span: Span,
 }
@@ -132,6 +138,7 @@ pub enum ItemKind {
 
 #[derive(Debug)]
 pub struct Item {
+    pub id: NodeId,
     pub kind: ItemKind,
     pub span: Span,
 }
