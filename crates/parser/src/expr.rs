@@ -21,7 +21,11 @@ impl Parser {
 
             let rhs = self.parse_term()?;
 
-            lhs = Expr::new(ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)), span);
+            lhs = Expr::new(
+                self.node(),
+                ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)),
+                span,
+            );
         }
 
         Ok(lhs)
@@ -42,6 +46,7 @@ impl Parser {
             let rhs = self.parse_factor()?;
 
             lhs = Expr::new(
+                self.node(),
                 ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)),
                 self.token.span,
             );
@@ -75,7 +80,7 @@ impl Parser {
                     ExprKind::Ident(Ident::new(name, span))
                 };
 
-                Ok(Expr::new(expr_kind, span))
+                Ok(Expr::new(self.node(), expr_kind, span))
             }
 
             TokenKind::IntLiteral(lit) | TokenKind::FloatLiteral(lit) => {
@@ -83,7 +88,7 @@ impl Parser {
 
                 self.bump();
 
-                Ok(Expr::new(ExprKind::Lit(lit), span))
+                Ok(Expr::new(self.node(), ExprKind::Lit(lit), span))
             }
 
             _ => Err(Diag::err(
@@ -101,8 +106,12 @@ impl Parser {
             ));
         };
 
+        let callee_span = self.token.span;
+
         self.bump();
         self.expect(TokenKind::OpenParen)?;
+
+        let callee = Expr::new(self.node(), ExprKind::Ident(ident), callee_span);
 
         let mut args: Vec<Expr> = Vec::new();
 
@@ -115,6 +124,6 @@ impl Parser {
 
         self.expect(TokenKind::CloseParen)?;
 
-        Ok(ExprKind::Call(ident, args))
+        Ok(ExprKind::Call(Box::new(callee), args))
     }
 }

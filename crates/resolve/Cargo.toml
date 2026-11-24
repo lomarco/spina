@@ -1,0 +1,14 @@
+[package]
+name = "resolve"
+edition.workspace = true
+version.workspace = true
+
+[dependencies]
+ast.workspace = true
+err.workspace = true
+parser.workspace = true
+span.workspace = true
+symbol.workspace = true
+
+[dev-dependencies]
+lex.workspace = true

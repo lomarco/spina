@@ -4,6 +4,7 @@ use std::path::PathBuf;
 pub enum Stage {
     Tok,
     Ast,
+    Rast,
 }
 
 pub struct Options {
