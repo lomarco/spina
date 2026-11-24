@@ -35,8 +35,8 @@ pub enum Resolution {
 pub struct Resolutions(Vec<Resolution>);
 
 pub(crate) struct Resolved {
-    resolutions: Vec<Resolution>,
-    defs: Vec<Def>,
+    resolutions: Resolutions,
+    defs: Defs,
 }
 
 impl Resolved {
