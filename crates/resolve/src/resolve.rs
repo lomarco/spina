@@ -26,6 +26,19 @@ struct Def {
 #[derive(Debug, Default)]
 pub struct Defs(Vec<Def>);
 
+impl Defs {
+    fn alloc(&mut self, kind: DefKind, name: Symbol, node: NodeId, span: Span) -> DefId {
+        let id = DefId(self.0.len() as u32);
+        self.0.push(Def {
+            kind,
+            name,
+            node,
+            span,
+        });
+        id
+    }
+}
+
 #[derive(Debug)]
 pub enum Resolution {
     Local(DefId),
@@ -35,8 +48,8 @@ pub enum Resolution {
 pub struct Resolutions(Vec<Resolution>);
 
 pub(crate) struct Resolved {
-    resolutions: Resolutions,
-    defs: Defs,
+    pub resolutions: Resolutions,
+    pub defs: Defs,
 }
 
 impl Resolved {
@@ -55,11 +68,15 @@ impl ScopeStack {
             scopes: vec![HashMap::new()],
         }
     }
+
+    fn insert(&mut self, name: Symbol, def: DefId) -> Option<DefId> {
+        self.scopes.last_mut().expect("The module scope is never popped").insert(name, def)
+    }
 }
 
 pub(crate) struct Resolver {
-    defs: Defs,
-    resolutions: Resolutions,
+    pub defs: Defs,
+    pub resolutions: Resolutions,
     scopes: ScopeStack,
     diags: Vec<Diag>,
 }
@@ -80,5 +97,11 @@ impl Resolver {
         }
     }
 
-    fn declare_item() -> PResult<()> {}
+    fn declare(&mut self, name: Symbol, kind: DefKind, node: NodeId, span: Span) {
+        let def = self.defs.alloc(kind, name, node, span);
+
+        if self.scopes.insert(name, def).is_some() {
+            self.diags.push(Diag::err(format!("Duplicate definition of {:#?}", name.as_str()), span))
+        }
+    }
 }
