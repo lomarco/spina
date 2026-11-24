@@ -28,5 +28,6 @@ pub(crate) enum Stage {
     #[value(alias = "tokens")]
     Tok,
     Ast,
+    Rast,
     // TODO: Add the rest stages.
 }

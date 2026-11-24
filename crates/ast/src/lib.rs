@@ -1,11 +1,41 @@
 use span::Span;
 use symbol::{Symbol, ty};
 
+#[derive(Debug, Clone, Copy)]
+pub struct NodeId(u32);
+
+impl NodeId {
+    pub fn index(&self) -> usize {
+        self.0 as usize
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct NodeIdGen {
+    next: u32,
+}
+
+impl NodeIdGen {
+    pub fn alloc(&mut self) -> NodeId {
+        let id = NodeId(self.next);
+        self.next += 1;
+        id
+    }
+
+    pub fn count(&self) -> u32 {
+        self.next
+    }
+}
+
 #[derive(Debug)]
-pub struct Unit(pub Vec<Item>);
+pub struct Unit {
+    pub items: Vec<Item>,
+    pub node_count: u32,
+}
 
 #[derive(Debug)]
 pub struct Param {
+    pub id: NodeId,
     pub ty: Ty,
     pub ident: Ident,
 }
@@ -76,13 +106,14 @@ impl BinOp {
 
 #[derive(Debug)]
 pub struct Expr {
+    pub id: NodeId,
     pub kind: ExprKind,
     pub span: Span,
 }
 
 impl Expr {
-    pub fn new(kind: ExprKind, span: Span) -> Self {
-        Self { kind, span }
+    pub fn new(id: NodeId, kind: ExprKind, span: Span) -> Self {
+        Self { id, kind, span }
     }
 }
 
@@ -96,6 +127,7 @@ pub enum StmtKind {
 
 #[derive(Debug)]
 pub struct Stmt {
+    pub id: NodeId,
     pub kind: StmtKind,
     pub span: Span,
 }
@@ -103,7 +135,7 @@ pub struct Stmt {
 #[derive(Debug)]
 pub enum ExprKind {
     Array(Vec<Expr>),
-    Call(Ident, Vec<Expr>),
+    Call(Box<Expr>, Vec<Expr>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
@@ -132,6 +164,7 @@ pub enum ItemKind {
 
 #[derive(Debug)]
 pub struct Item {
+    pub id: NodeId,
     pub kind: ItemKind,
     pub span: Span,
 }

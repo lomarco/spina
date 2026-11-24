@@ -8,6 +8,7 @@ impl From<cli::Stage> for Stage {
         match a {
             cli::Stage::Tok => Stage::Tok,
             cli::Stage::Ast => Stage::Ast,
+            cli::Stage::Rast => Stage::Rast,
         }
     }
 }

@@ -6,6 +6,7 @@ use cli::Cli;
 use err::{Diag, catch_fatal_error_marker, raise};
 use lex::{TokenStream, flex};
 use parser::{Unit, parse};
+use resolve::{Resolved, resolve};
 use sess::{Options, Session, Source, Stage};
 use std::process::ExitCode;
 
@@ -13,6 +14,7 @@ use std::process::ExitCode;
 pub enum CompileOutput {
     Tokens(TokenStream),
     Ast(Unit),
+    Rast(Resolved),
 }
 
 pub fn compile(sess: &Session) -> Result<CompileOutput, Vec<Diag>> {
@@ -22,10 +24,16 @@ pub fn compile(sess: &Session) -> Result<CompileOutput, Vec<Diag>> {
         return Ok(CompileOutput::Tokens(stream));
     }
 
-    let unit = parse(stream).map_err(|diag| vec![diag])?;
+    let unit = parse(stream).map_err(|diag| vec![diag])?; // TOOD: Add vec of errors!
 
     if let Some(Stage::Ast) = sess.opts.emit {
         return Ok(CompileOutput::Ast(unit));
+    }
+
+    let resolved = resolve(&unit)?;
+
+    if let Some(Stage::Rast) = sess.opts.emit {
+        return Ok(CompileOutput::Rast(resolved));
     }
 
     // TODO: Add the rests
@@ -61,6 +69,7 @@ fn run() {
     match (sess.opts.emit, artifact) {
         (Some(Stage::Tok), CompileOutput::Tokens(stream)) => println!("{stream:?}"),
         (Some(Stage::Ast), CompileOutput::Ast(unit)) => println!("{unit:?}"),
+        (Some(Stage::Rast), CompileOutput::Rast(resolved)) => println!("{resolved:?}"),
         _ => {} // TODO: Add -o key
     }
 }

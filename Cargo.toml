@@ -4,6 +4,7 @@ members = ["crates/*"]
 
 [workspace.package]
 version = "0.0.0-test"
+edition = "2024"
 
 [workspace.dependencies]
 spinac.path = "crates/spinac"
@@ -15,6 +16,7 @@ sess.path = "crates/sess"
 span.path = "crates/span"
 symbol.path = "crates/symbol"
 ast.path = "crates/ast"
+resolve.path = "crates/resolve"
 logos = "^0.16"
 clap = { version = "^4", features = ["derive"] }
 

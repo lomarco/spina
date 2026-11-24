@@ -1,7 +1,7 @@
 [package]
 name = "driver"
 version.workspace = true
-edition = "2024"
+edition.workspace = true
 
 [dependencies]
 sess.workspace = true
@@ -9,3 +9,4 @@ err.workspace = true
 parser.workspace = true
 lex.workspace = true
 clap.workspace = true
+resolve.workspace = true

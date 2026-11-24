@@ -12,7 +12,7 @@ fn emits_ast_for_valid_source() {
         .expect("failed to spawn spinac");
 
     assert!(output.status.success());
-    assert!(String::from_utf8_lossy(&output.stdout).contains("Unit("));
+    assert!(String::from_utf8_lossy(&output.stdout).contains("Unit {"));
 }
 
 #[test]
