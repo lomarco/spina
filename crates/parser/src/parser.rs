@@ -1,4 +1,4 @@
-use ast::Ident;
+use ast::{Ident, NodeId, NodeIdGen};
 use err::{Diag, PResult};
 use lex::{Token, TokenCursor, TokenKind, TokenStream};
 use std::mem::replace;
@@ -7,6 +7,7 @@ pub(crate) struct Parser {
     pub(crate) token: Token,
     prev_token: Token,
     token_cursor: TokenCursor,
+    ids: NodeIdGen,
 }
 
 impl Parser {
@@ -15,11 +16,16 @@ impl Parser {
             token: Token::dummy(),
             prev_token: Token::dummy(),
             token_cursor: TokenCursor::new(stream),
+            ids: NodeIdGen::default(),
         };
 
         parser.bump();
 
         parser
+    }
+
+    pub(crate) fn node(&mut self) -> NodeId {
+        self.ids.alloc()
     }
 
     pub(crate) fn expect(&mut self, kind: TokenKind) -> PResult<()> {
