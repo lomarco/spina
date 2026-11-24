@@ -1,7 +1,7 @@
 use span::Span;
 use symbol::{Symbol, ty};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct NodeId(u32);
 
 #[derive(Debug, Default)]

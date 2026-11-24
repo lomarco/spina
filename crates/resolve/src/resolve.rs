@@ -94,6 +94,10 @@ impl Resolver {
     pub(crate) fn resolve_unit(&self, unit: &Unit) {
         for item in &unit.0 {
             self.declare_item(item)?;
+    fn declare_item(&mut self, item: &Item) {
+        match &item.kind {
+            ItemKind::Fn(f) => self.declare(f.ident.get_symbol(), DefKind::Fn, item.id, f.ident.get_span()),
+            ItemKind::Const(ident, ..) => self.declare(ident.get_symbol(), DefKind::Const, item.id, ident.get_span()),
         }
     }
 
