@@ -21,10 +21,17 @@ impl NodeIdGen {
         self.next += 1;
         id
     }
+
+    pub fn count(&self) -> u32 {
+        self.next
+    }
 }
 
 #[derive(Debug)]
-pub struct Unit(pub Vec<Item>);
+pub struct Unit {
+    pub items: Vec<Item>,
+    pub node_count: u32,
+}
 
 #[derive(Debug)]
 pub struct Param {

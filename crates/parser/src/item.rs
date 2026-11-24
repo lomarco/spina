@@ -7,7 +7,10 @@ use lex::TokenKind;
 
 impl Parser {
     pub(crate) fn parse_unit(&mut self) -> PResult<Unit> {
-        Ok(Unit(self.parse_items()?))
+        Ok(Unit {
+            items: self.parse_items()?,
+            node_count: self.node_count(),
+        })
     }
 
     fn parse_items(&mut self) -> PResult<Vec<Item>> {

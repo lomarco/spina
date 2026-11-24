@@ -47,12 +47,17 @@ impl Defs {
 pub enum Resolution {
     Local(DefId),
     Item(DefId),
+    Unresolved,
     Error,
 }
 #[derive(Debug, Default)]
 pub struct Resolutions(Vec<Resolution>);
 
 impl Resolutions {
+    pub(crate) fn new(node_count: u32) -> Self {
+        Self(vec![Resolution::Unresolved; node_count as usize])
+    }
+
     pub(crate) fn get(&self, node: NodeId) -> Resolution {
         self.0
             .get(node.index())
@@ -123,21 +128,21 @@ pub(crate) struct Resolver {
 }
 
 impl Resolver {
-    pub(crate) fn new() -> Self {
+    pub(crate) fn new(node_count: u32) -> Self {
         Self {
             defs: Defs::default(),
-            resolutions: Resolutions::default(),
+            resolutions: Resolutions::new(node_count),
             scopes: ScopeStack::new(),
             diags: Vec::new(),
         }
     }
 
     pub(crate) fn resolve_unit(&mut self, unit: &Unit) {
-        for item in &unit.0 {
+        for item in &unit.items {
             self.declare_item(item);
         }
 
-        for item in &unit.0 {
+        for item in &unit.items {
             self.resolve_item(item);
         }
     }

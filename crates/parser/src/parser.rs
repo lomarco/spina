@@ -28,6 +28,10 @@ impl Parser {
         self.ids.alloc()
     }
 
+    pub(crate) fn node_count(&self) -> u32 {
+        self.ids.count()
+    }
+
     pub(crate) fn expect(&mut self, kind: TokenKind) -> PResult<()> {
         if self.eat(kind) {
             Ok(())
