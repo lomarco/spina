@@ -1,0 +1,64 @@
+use ast::{NodeId, Unit};
+use err::Diag;
+use span::Span;
+use std::collections::HashMap;
+use symbol::Symbol;
+
+pub struct DefId(u32);
+
+enum DefKind {
+    Fn,
+    Const,
+    Local,
+    Param,
+}
+
+struct Def {
+    kind: DefKind,
+    name: Symbol,
+    node: NodeId,
+    span: Span,
+}
+
+pub enum Resolution {
+    Local(DefId),
+    Item(DefId),
+}
+
+pub(crate) struct Resolved {
+    resolutions: Vec<Resolution>,
+    defs: Vec<Def>,
+}
+
+impl Resolved {
+    pub fn resolution(&self, node: NodeId) -> Resolution {
+        self.resolutions.get(node)
+    }
+}
+
+struct ScopeStack {
+    scopes: Vec<HashMap<Symbol, DefId>>,
+}
+
+pub(crate) struct Resolver {
+    defs: Vec<Def>,
+    resolutions: Vec<Resolution>,
+    scopes: ScopeStack,
+}
+
+impl Resolver {
+    pub(crate) fn new() -> Self {
+        Self {
+            scopes: vec![HashMap::new()],
+            bindings: Vec::new(),
+        }
+    }
+
+    pub(crate) fn resolve_unit(&self, unit: &Unit) -> Result<(), Vec<Diag>> {
+        for item in &unit.0 {
+            self.declare_item(item)?;
+        }
+    }
+
+    fn declare_item() -> PResult<()> {}
+}
