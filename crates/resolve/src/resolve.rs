@@ -114,6 +114,10 @@ impl Resolver {
         for item in &unit.0 {
             self.declare_item(item);
         }
+
+        for item in &unit.0 {
+            self.resolve_item(item);
+        }
     }
 
     fn declare_item(&mut self, item: &Item) {
@@ -141,6 +145,13 @@ impl Resolver {
                 format!("Duplicate definition of {:#?}", name.as_str()),
                 span,
             ))
+        }
+    }
+
+    fn resolve_item(&mut self, item: &Item) {
+        match &item.kind {
+            ItemKind::Fn(f) => self.resolve_fn(f),
+            ItemKind::Const(_, _, init, _) => self.resolve_expr(init),
         }
     }
 }
