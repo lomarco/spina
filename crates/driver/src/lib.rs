@@ -29,7 +29,7 @@ pub fn compile(sess: &Session) -> Result<CompileOutput, Vec<Diag>> {
         return Ok(CompileOutput::Ast(unit));
     }
 
-    resolve(&unit)?;
+    let resolved = resolve(&unit)?;
 
     // TODO: Add the rests
     Ok(CompileOutput::Ast(unit))
