@@ -91,6 +91,13 @@ impl ScopeStack {
             .expect("The module scope is never popped")
             .insert(name, def)
     }
+
+    fn lookup(&self, name: Symbol) -> Option<DefId> {
+        self.scopes
+            .iter()
+            .rev()
+            .find_map(|scope| scope.get(&name).copied())
+    }
 }
 
 pub(crate) struct Resolver {
