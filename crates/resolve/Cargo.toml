@@ -9,3 +9,6 @@ err.workspace = true
 parser.workspace = true
 span.workspace = true
 symbol.workspace = true
+
+[dev-dependencies]
+lex.workspace = true

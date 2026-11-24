@@ -1,5 +1,8 @@
 mod resolve;
 
+#[cfg(test)]
+mod tests;
+
 use ast::Unit;
 use err::Diag;
 pub use resolve::Resolved;

@@ -19,7 +19,7 @@ enum DefKind {
 pub struct Def {
     kind: DefKind,
     name: Symbol,
-    node: NodeId,
+    pub node: NodeId,
     span: Span,
 }
 

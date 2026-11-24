@@ -259,6 +259,7 @@ version = "0.0.0-test"
 dependencies = [
  "ast",
  "err",
+ "lex",
  "parser",
  "span",
  "symbol",
