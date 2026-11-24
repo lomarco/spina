@@ -4,7 +4,7 @@ use span::Span;
 use std::collections::HashMap;
 use symbol::Symbol;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct DefId(u32);
 
 #[derive(Debug)]
@@ -39,14 +39,22 @@ impl Defs {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Resolution {
     Local(DefId),
     Item(DefId),
+    Error,
 }
 #[derive(Debug, Default)]
 pub struct Resolutions(Vec<Resolution>);
 
+impl Resolutions {
+    pub(crate) fn get(&self, node: NodeId) -> Resolution {
+        self.0.get(node.index() as usize).copied().unwrap_or(Resolution::Error)
+    }
+}
+
+#[derive(Debug)]
 pub struct Resolved {
     pub resolutions: Resolutions,
     pub defs: Defs,
