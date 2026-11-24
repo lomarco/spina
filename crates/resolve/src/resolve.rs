@@ -20,10 +20,13 @@ struct Def {
     span: Span,
 }
 
+pub struct Defs(Vec<Def>);
+
 pub enum Resolution {
     Local(DefId),
     Item(DefId),
 }
+pub struct Resolutions(Vec<Resolution>);
 
 pub(crate) struct Resolved {
     resolutions: Vec<Resolution>,
@@ -41,8 +44,8 @@ struct ScopeStack {
 }
 
 pub(crate) struct Resolver {
-    defs: Vec<Def>,
-    resolutions: Vec<Resolution>,
+    defs: Defs,
+    resolutions: Resolutions,
     scopes: ScopeStack,
 }
 
