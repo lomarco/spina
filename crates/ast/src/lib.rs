@@ -4,6 +4,12 @@ use symbol::{Symbol, ty};
 #[derive(Debug, Clone, Copy)]
 pub struct NodeId(u32);
 
+impl NodeId {
+    pub fn index(&self) -> u32 {
+        self.0
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct NodeIdGen {
     next: u32,
