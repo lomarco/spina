@@ -6,7 +6,7 @@ use cli::Cli;
 use err::{Diag, catch_fatal_error_marker, raise};
 use lex::{TokenStream, flex};
 use parser::{Unit, parse};
-use resolve::resolve;
+use resolve::{resolve, Resolved};
 use sess::{Options, Session, Source, Stage};
 use std::process::ExitCode;
 
@@ -14,6 +14,7 @@ use std::process::ExitCode;
 pub enum CompileOutput {
     Tokens(TokenStream),
     Ast(Unit),
+    Rast(Resolved),
 }
 
 pub fn compile(sess: &Session) -> Result<CompileOutput, Vec<Diag>> {
@@ -30,6 +31,10 @@ pub fn compile(sess: &Session) -> Result<CompileOutput, Vec<Diag>> {
     }
 
     let resolved = resolve(&unit)?;
+
+    if let Some(Stage::Rast) = sess.opts.emit {
+        return Ok(CompileOutput::Rast(resolved));
+    }
 
     // TODO: Add the rests
     Ok(CompileOutput::Ast(unit))
@@ -64,6 +69,7 @@ fn run() {
     match (sess.opts.emit, artifact) {
         (Some(Stage::Tok), CompileOutput::Tokens(stream)) => println!("{stream:?}"),
         (Some(Stage::Ast), CompileOutput::Ast(unit)) => println!("{unit:?}"),
+        (Some(Stage::Rast), CompileOutput::Rast(resolved)) => println!("{resolved:?}"),
         _ => {} // TODO: Add -o key
     }
 }

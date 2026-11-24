@@ -2,7 +2,8 @@ mod resolve;
 
 use ast::Unit;
 use err::Diag;
-use resolve::{Resolved, Resolver};
+use resolve::Resolver;
+pub use resolve::Resolved;
 
 pub fn resolve(unit: &Unit) -> Result<Resolved, Vec<Diag>> {
     let mut resolve = Resolver::new();
