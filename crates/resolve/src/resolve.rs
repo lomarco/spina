@@ -53,6 +53,7 @@ pub(crate) struct Resolver {
     defs: Defs,
     resolutions: Resolutions,
     scopes: ScopeStack,
+    diags: Vec<Diag>,
 }
 
 impl Resolver {
@@ -65,7 +66,7 @@ impl Resolver {
         }
     }
 
-    pub(crate) fn resolve_unit(&self, unit: &Unit) -> Result<(), Vec<Diag>> {
+    pub(crate) fn resolve_unit(&self, unit: &Unit) {
         for item in &unit.0 {
             self.declare_item(item)?;
         }
