@@ -105,6 +105,14 @@ impl ScopeStack {
             .rev()
             .find_map(|scope| scope.get(&name).copied())
     }
+
+    fn push(&mut self) {
+        self.scopes.push(HashMap::new());
+    }
+
+    fn pop(&mut self) {
+        self.scopes.pop();
+    }
 }
 
 pub(crate) struct Resolver {
