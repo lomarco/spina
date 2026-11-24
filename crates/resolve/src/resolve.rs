@@ -16,7 +16,7 @@ enum DefKind {
 }
 
 #[derive(Debug)]
-struct Def {
+pub struct Def {
     kind: DefKind,
     name: Symbol,
     node: NodeId,
@@ -36,6 +36,10 @@ impl Defs {
             span,
         });
         id
+    }
+
+    pub fn get(&self, id: DefId) -> &Def {
+        &self.0[id.0 as usize]
     }
 }
 
@@ -63,6 +67,10 @@ pub struct Resolved {
 impl Resolved {
     pub fn resolution(&self, node: NodeId) -> Resolution {
         self.resolutions.get(node)
+    }
+
+    pub fn def(&self, id: DefId) -> &Def {
+        self.defs.get(id)
     }
 }
 
