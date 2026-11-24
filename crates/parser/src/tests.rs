@@ -22,14 +22,14 @@ fn expr(s: &str) -> Expr {
 
 #[test]
 fn empty_unit() {
-    assert_eq!(unit("").0.len(), 0)
+    assert_eq!(unit("").items.len(), 0)
 }
 
 #[test]
 fn fn_item() {
     let unit = unit("fn foo(): i8 {}");
 
-    let ItemKind::Fn(fn_item) = &unit.0[0].kind else {
+    let ItemKind::Fn(fn_item) = &unit.items[0].kind else {
         panic!();
     };
 
@@ -226,7 +226,7 @@ fn const_item_has_const_keyword_span() {
 
     let unit = unit(src);
 
-    assert_eq!(unit.0[0].span, spans[0]);
+    assert_eq!(unit.items[0].span, spans[0]);
 }
 
 #[test]

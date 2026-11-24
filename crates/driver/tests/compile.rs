@@ -35,7 +35,7 @@ fn emits_ast_for_ast_stage() {
         panic!("expected an ast artifact");
     };
 
-    assert_eq!(unit.0.len(), 1);
+    assert_eq!(unit.items.len(), 1);
 }
 
 #[test]
