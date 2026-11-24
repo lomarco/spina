@@ -1,4 +1,4 @@
-use ast::{NodeId, Unit, Item, ItemKind};
+use ast::{Item, ItemKind, NodeId, Unit};
 use err::Diag;
 use span::Span;
 use std::collections::HashMap;
@@ -70,7 +70,10 @@ impl ScopeStack {
     }
 
     fn insert(&mut self, name: Symbol, def: DefId) -> Option<DefId> {
-        self.scopes.last_mut().expect("The module scope is never popped").insert(name, def)
+        self.scopes
+            .last_mut()
+            .expect("The module scope is never popped")
+            .insert(name, def)
     }
 }
 
@@ -91,13 +94,26 @@ impl Resolver {
         }
     }
 
-    pub(crate) fn resolve_unit(&self, unit: &Unit) {
+    pub(crate) fn resolve_unit(&mut self, unit: &Unit) {
         for item in &unit.0 {
-            self.declare_item(item)?;
+            self.declare_item(item);
+        }
+    }
+
     fn declare_item(&mut self, item: &Item) {
         match &item.kind {
-            ItemKind::Fn(f) => self.declare(f.ident.get_symbol(), DefKind::Fn, item.id, f.ident.get_span()),
-            ItemKind::Const(ident, ..) => self.declare(ident.get_symbol(), DefKind::Const, item.id, ident.get_span()),
+            ItemKind::Fn(f) => self.declare(
+                f.ident.get_symbol(),
+                DefKind::Fn,
+                item.id,
+                f.ident.get_span(),
+            ),
+            ItemKind::Const(ident, ..) => self.declare(
+                ident.get_symbol(),
+                DefKind::Const,
+                item.id,
+                ident.get_span(),
+            ),
         }
     }
 
@@ -105,7 +121,10 @@ impl Resolver {
         let def = self.defs.alloc(kind, name, node, span);
 
         if self.scopes.insert(name, def).is_some() {
-            self.diags.push(Diag::err(format!("Duplicate definition of {:#?}", name.as_str()), span))
+            self.diags.push(Diag::err(
+                format!("Duplicate definition of {:#?}", name.as_str()),
+                span,
+            ))
         }
     }
 }

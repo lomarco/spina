@@ -6,7 +6,7 @@ use cli::Cli;
 use err::{Diag, catch_fatal_error_marker, raise};
 use lex::{TokenStream, flex};
 use parser::{Unit, parse};
-use resolve::{resolve, Resolved};
+use resolve::{Resolved, resolve};
 use sess::{Options, Session, Source, Stage};
 use std::process::ExitCode;
 
@@ -24,7 +24,7 @@ pub fn compile(sess: &Session) -> Result<CompileOutput, Vec<Diag>> {
         return Ok(CompileOutput::Tokens(stream));
     }
 
-    let unit = parse(stream).map_err(|diag| vec!(diag))?; // TOOD: Add vec of errors!
+    let unit = parse(stream).map_err(|diag| vec![diag])?; // TOOD: Add vec of errors!
 
     if let Some(Stage::Ast) = sess.opts.emit {
         return Ok(CompileOutput::Ast(unit));
