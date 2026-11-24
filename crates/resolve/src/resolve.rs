@@ -55,13 +55,13 @@ pub struct Resolutions(Vec<Resolution>);
 impl Resolutions {
     pub(crate) fn get(&self, node: NodeId) -> Resolution {
         self.0
-            .get(node.index() as usize)
+            .get(node.index())
             .copied()
             .unwrap_or(Resolution::Error)
     }
 
     pub(crate) fn set(&mut self, node: NodeId, resolution: Resolution) {
-        self.0[node.index() as usize] = resolution;
+        self.0[node.index()] = resolution;
     }
 }
 

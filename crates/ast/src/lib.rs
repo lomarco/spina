@@ -5,8 +5,8 @@ use symbol::{Symbol, ty};
 pub struct NodeId(u32);
 
 impl NodeId {
-    pub fn index(&self) -> u32 {
-        self.0
+    pub fn index(&self) -> usize {
+        self.0 as usize
     }
 }
 
