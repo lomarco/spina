@@ -1,4 +1,4 @@
-use ast::{Item, ItemKind, NodeId, Unit};
+use ast::{Block, Expr, ExprKind, Item, ItemKind, NodeId, Unit};
 use err::Diag;
 use span::Span;
 use std::collections::HashMap;
@@ -54,7 +54,14 @@ pub struct Resolutions(Vec<Resolution>);
 
 impl Resolutions {
     pub(crate) fn get(&self, node: NodeId) -> Resolution {
-        self.0.get(node.index() as usize).copied().unwrap_or(Resolution::Error)
+        self.0
+            .get(node.index() as usize)
+            .copied()
+            .unwrap_or(Resolution::Error)
+    }
+
+    pub(crate) fn set(&mut self, node: NodeId, resolution: Resolution) {
+        self.0[node.index() as usize] = resolution;
     }
 }
 
