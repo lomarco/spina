@@ -23,7 +23,7 @@ pub fn compile(sess: &Session) -> Result<CompileOutput, Vec<Diag>> {
         return Ok(CompileOutput::Tokens(stream));
     }
 
-    let unit = parse(stream)?; // TOOD: Add vec of errors!
+    let unit = parse(stream).map_err(|diag| vec!(diag))?; // TOOD: Add vec of errors!
 
     if let Some(Stage::Ast) = sess.opts.emit {
         return Ok(CompileOutput::Ast(unit));
