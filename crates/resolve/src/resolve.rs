@@ -1,4 +1,4 @@
-use ast::{Block, Expr, ExprKind, Item, ItemKind, NodeId, Unit};
+use ast::{Block, Expr, ExprKind, Item, ItemKind, NodeId, Stmt, StmtKind, Unit};
 use err::Diag;
 use span::Span;
 use std::collections::HashMap;
@@ -174,6 +174,90 @@ impl Resolver {
         match &item.kind {
             ItemKind::Fn(f) => self.resolve_fn(f),
             ItemKind::Const(_, _, init, _) => self.resolve_expr(init),
+        }
+    }
+
+    fn resolve_stmt(&mut self, stmt: &Stmt) {
+        match &stmt.kind {
+            StmtKind::Let(ident, _, init, _) => {
+                self.resolve_expr(init);
+
+                let name = ident.get_symbol();
+                let def = self
+                    .defs
+                    .alloc(DefKind::Local, name, stmt.id, ident.get_span());
+
+                self.scopes.insert(name, def);
+            }
+            StmtKind::Semi(expr) | StmtKind::Expr(expr) => self.resolve_expr(expr),
+            StmtKind::Empty => {}
+        }
+    }
+
+    fn resolve_block(&mut self, block: &Block) {
+        self.scopes.push();
+
+        for stmt in &block.stmts {
+            self.resolve_stmt(stmt);
+        }
+
+        self.scopes.pop();
+    }
+
+    fn resolve_expr(&mut self, expr: &Expr) {
+        match &expr.kind {
+            ExprKind::Ident(ident) => {
+                let name = ident.get_symbol();
+
+                match self.scopes.lookup(name) {
+                    Some(def) => self.resolutions.set(expr.id, Resolution::Item(def)), // TODO: Maybe replace it to Def
+                    None => {
+                        self.diags.push(Diag::err(
+                            format!("cannot find `{}` in this scope", name.as_str()),
+                            ident.get_span(),
+                        ));
+                        self.resolutions.set(expr.id, Resolution::Error);
+                    }
+                }
+            }
+            ExprKind::Array(elems) => {
+                for elem in elems {
+                    self.resolve_expr(elem);
+                }
+            }
+            ExprKind::Call(callee, args) => {
+                self.resolve_expr(callee);
+                for arg in args {
+                    self.resolve_expr(arg);
+                }
+            }
+            ExprKind::Binary(_, lhs, rhs) => {
+                self.resolve_expr(lhs);
+                self.resolve_expr(rhs);
+            }
+            ExprKind::If(cond, then, else_) => {
+                self.resolve_expr(cond);
+                self.resolve_block(then);
+                if let Some(else_) = else_ {
+                    self.resolve_expr(else_);
+                }
+            }
+            ExprKind::While(cond, body) => {
+                self.resolve_expr(cond);
+                self.resolve_block(body);
+            }
+            ExprKind::Index(base, index, _) => {
+                self.resolve_expr(base);
+                self.resolve_expr(index);
+            }
+            ExprKind::Break(expr) | ExprKind::Ret(expr) => {
+                if let Some(expr) = expr {
+                    self.resolve_expr(expr);
+                }
+            }
+            ExprKind::Loop(body, _) => self.resolve_block(body),
+
+            ExprKind::Continue() | ExprKind::Lit(_) => {}
         }
     }
 }
