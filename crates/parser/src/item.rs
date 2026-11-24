@@ -24,7 +24,11 @@ impl Parser {
     fn parse_item(&mut self) -> PResult<Option<Item>> {
         let span = self.token.span;
         let kind = self.parse_item_kind()?;
-        Ok(kind.map(|kind| Item { kind, span }))
+        Ok(kind.map(|kind| Item {
+            id: self.node(),
+            kind,
+            span,
+        }))
     }
 
     fn parse_item_kind(&mut self) -> PResult<Option<ItemKind>> {
@@ -100,7 +104,11 @@ impl Parser {
         let ident = self.parse_ident()?;
         let ty = self.parse_ty_annot()?;
 
-        Ok(Param { ty, ident })
+        Ok(Param {
+            id: self.node(),
+            ty,
+            ident,
+        })
     }
 
     fn parse_fn_decl(&mut self) -> PResult<FnDecl> {
