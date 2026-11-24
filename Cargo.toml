@@ -4,6 +4,7 @@ members = ["crates/*"]
 
 [workspace.package]
 version = "0.0.0-test"
+edition = "2024"
 
 [workspace.dependencies]
 spinac.path = "crates/spinac"
