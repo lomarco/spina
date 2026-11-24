@@ -16,6 +16,10 @@ enum DefKind {
 }
 
 #[derive(Debug)]
+#[expect( // TODO: Remove this `expect`
+    dead_code,
+    reason = "`kind`, `name` and `span` are populated but not read yet"
+)]
 pub struct Def {
     kind: DefKind,
     name: Symbol,
