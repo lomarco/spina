@@ -9,7 +9,11 @@ impl Parser {
     pub(crate) fn parse_stmt(&mut self) -> PResult<Stmt> {
         let span = self.token.span;
         let kind = self.parse_stmt_kind()?;
-        Ok(Stmt { kind, span })
+        Ok(Stmt {
+            id: self.node(),
+            kind,
+            span,
+        })
     }
 
     fn parse_stmt_kind(&mut self) -> PResult<StmtKind> {
@@ -59,7 +63,7 @@ impl Parser {
     }
 
     fn parse_call_stmt(&mut self) -> PResult<StmtKind> {
-        let expr = Expr::new(self.parse_call()?, self.token.span);
+        let expr = Expr::new(self.node(), self.parse_call()?, self.token.span);
 
         Ok(if self.check(TokenKind::Semi) {
             self.bump();
