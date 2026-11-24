@@ -58,8 +58,10 @@ pub(crate) struct Resolver {
 impl Resolver {
     pub(crate) fn new() -> Self {
         Self {
-            scopes: vec![HashMap::new()],
-            bindings: Vec::new(),
+            defs: Defs::default(),
+            resolutions: Resolutions::default(),
+            scopes: ScopeStack::new(),
+            diags: Vec::new(),
         }
     }
 
