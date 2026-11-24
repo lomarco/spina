@@ -4,8 +4,10 @@ use span::Span;
 use std::collections::HashMap;
 use symbol::Symbol;
 
+#[derive(Debug)]
 pub struct DefId(u32);
 
+#[derive(Debug)]
 enum DefKind {
     Fn,
     Const,
@@ -13,6 +15,7 @@ enum DefKind {
     Param,
 }
 
+#[derive(Debug)]
 struct Def {
     kind: DefKind,
     name: Symbol,
@@ -20,12 +23,15 @@ struct Def {
     span: Span,
 }
 
+#[derive(Debug, Default)]
 pub struct Defs(Vec<Def>);
 
+#[derive(Debug)]
 pub enum Resolution {
     Local(DefId),
     Item(DefId),
 }
+#[derive(Debug, Default)]
 pub struct Resolutions(Vec<Resolution>);
 
 pub(crate) struct Resolved {
