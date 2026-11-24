@@ -5,7 +5,7 @@ use err::Diag;
 use resolve::{Resolved, Resolver};
 
 pub fn resolve(unit: &Unit) -> Result<Resolved, Vec<Diag>> {
-    let resolve = Resolver::new();
+    let mut resolve = Resolver::new();
     resolve.resolve_unit(unit);
 
     Ok(Resolved {
