@@ -1,4 +1,4 @@
-use ast::{Block, Expr, ExprKind, Item, ItemKind, NodeId, Stmt, StmtKind, Unit};
+use ast::{Block, Expr, ExprKind, Fn, Item, ItemKind, NodeId, Stmt, StmtKind, Unit};
 use err::Diag;
 use span::Span;
 use std::collections::HashMap;
@@ -175,6 +175,23 @@ impl Resolver {
             ItemKind::Fn(f) => self.resolve_fn(f),
             ItemKind::Const(_, _, init, _) => self.resolve_expr(init),
         }
+    }
+
+    fn resolve_fn(&mut self, f: &Fn) {
+        self.scopes.push();
+
+        for param in &f.decl.params {
+            self.declare(
+                param.ident.get_symbol(),
+                DefKind::Param,
+                param.id,
+                param.ident.get_span(),
+            );
+        }
+
+        self.resolve_block(&f.body);
+
+        self.scopes.pop();
     }
 
     fn resolve_stmt(&mut self, stmt: &Stmt) {
