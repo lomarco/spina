@@ -122,7 +122,7 @@ pub struct Stmt {
 #[derive(Debug)]
 pub enum ExprKind {
     Array(Vec<Expr>),
-    Call(Ident, Vec<Expr>),
+    Call(Box<Expr>, Vec<Expr>),
     Binary(BinOp, Box<Expr>, Box<Expr>),
     If(Box<Expr>, Box<Block>, Option<Box<Expr>>),
     While(Box<Expr>, Box<Block>),
