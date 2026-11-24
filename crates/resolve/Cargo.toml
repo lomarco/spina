@@ -4,6 +4,7 @@ edition = "2024"
 version.workspace = true
 
 [dependencies]
+ast.workspace = true
 err.workspace = true
 parser.workspace = true
 span.workspace = true
