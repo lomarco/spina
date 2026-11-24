@@ -49,6 +49,14 @@ struct ScopeStack {
     scopes: Vec<HashMap<Symbol, DefId>>,
 }
 
+impl ScopeStack {
+    fn new() -> Self {
+        Self {
+            scopes: vec![HashMap::new()],
+        }
+    }
+}
+
 pub(crate) struct Resolver {
     defs: Defs,
     resolutions: Resolutions,
