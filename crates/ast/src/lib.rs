@@ -4,6 +4,19 @@ use symbol::{Symbol, ty};
 #[derive(Debug)]
 pub struct NodeId(u32);
 
+#[derive(Debug, Default)]
+pub struct NodeIdGen {
+    next: u32,
+}
+
+impl NodeIdGen {
+    pub fn alloc(&mut self) -> NodeId {
+        let id = NodeId(self.next);
+        self.next += 1;
+        id
+    }
+}
+
 #[derive(Debug)]
 pub struct Unit(pub Vec<Item>);
 
