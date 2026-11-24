@@ -1,4 +1,4 @@
-use ast::{NodeId, Unit};
+use ast::{NodeId, Unit, Item, ItemKind};
 use err::Diag;
 use span::Span;
 use std::collections::HashMap;
@@ -47,7 +47,7 @@ pub enum Resolution {
 #[derive(Debug, Default)]
 pub struct Resolutions(Vec<Resolution>);
 
-pub(crate) struct Resolved {
+pub struct Resolved {
     pub resolutions: Resolutions,
     pub defs: Defs,
 }
